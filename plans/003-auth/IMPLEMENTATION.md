@@ -19,13 +19,13 @@ auth on every request except a fixed allowlist.
 - **Cookie**: name `wallrus_session`, `HttpOnly`, `SameSite=Lax`,
   `Secure` when `event.url.protocol === "https:"`, `Path=/`,
   `Max-Age=2592000`.
-- **JWT claims**: `{ sub: env.WALLRUS_AUTH_USERNAME, iat, exp,
+- **JWT claims**: `{ sub: env.WALLRUS_USERNAME, iat, exp,
 iss: "wallrus", aud: "wallrus" }`. Algorithm: HS256. Secret:
   `env.WALLRUS_AUTH_SECRET` (already enforced ≥32 bytes by Zod in 001).
 - **Password storage**: env-only. Compare via `Bun.password.verify` with
   `argon2id` hashing. The plaintext env value is hashed in-memory at boot
   and discarded; the hash is held by the lazy env singleton. Add
-  `WALLRUS_AUTH_PASSWORD` (plaintext) and `WALLRUS_AUTH_PASSWORD_HASH`
+  `WALLRUS_PASSWORD` (plaintext) and `WALLRUS_PASSWORD_HASH`
   (optional pre-hashed override). Boot prefers the hash if present.
 - **Allowlist** (paths that bypass auth even when enabled):
   `/healthz`, `/api/v1/otel/discover`, `/otlp/*`, `/login`,
@@ -41,7 +41,7 @@ message: "…" } }` matching the `AppError` shape from telemetry-js.
   hooks; success short-circuits the cookie check and does **not** set a
   cookie (stateless for API clients).
 - **`AUTH_ENABLE=false`**: hooks.server.ts sets `locals.user = { name:
-env.WALLRUS_AUTH_USERNAME ?? "anonymous", auth_mode: "disabled" }` and
+env.WALLRUS_USERNAME ?? "anonymous", auth_mode: "disabled" }` and
   lets everything through. Login/logout routes still exist but return 204
   no-op when auth is disabled.
 - **OTLP proxy auth coupling**: `WALLRUS_OTEL_FRONTEND=enable` already
@@ -58,8 +58,8 @@ env.WALLRUS_AUTH_USERNAME ?? "anonymous", auth_mode: "disabled" }` and
 - `src/routes/api/v1/auth/login/+server.ts` + `.../logout/+server.ts`.
 - `src/routes/login/+page.svelte` (minimal form using superforms +
   shadcn-svelte Input/Button).
-- `src/lib/server/env.ts` adds `WALLRUS_AUTH_PASSWORD` (optional plaintext)
-  and `WALLRUS_AUTH_PASSWORD_HASH` (optional pre-hashed).
+- `src/lib/server/env.ts` adds `WALLRUS_PASSWORD` (optional plaintext)
+  and `WALLRUS_PASSWORD_HASH` (optional pre-hashed).
 - `src/lib/schemas/auth/Login.ts` Zod schema (request + response).
 - `app.d.ts` `Locals.user` typed `{ name: string; auth_mode: "jwt"
 | "basic" | "disabled" }` (no more `null`).
@@ -68,8 +68,8 @@ env.WALLRUS_AUTH_USERNAME ?? "anonymous", auth_mode: "disabled" }` and
 
 ## Resume here
 
-1. **Env**: extend `src/lib/server/env.ts` with `WALLRUS_AUTH_PASSWORD`
-   (string optional) and `WALLRUS_AUTH_PASSWORD_HASH` (string optional).
+1. **Env**: extend `src/lib/server/env.ts` with `WALLRUS_PASSWORD`
+   (string optional) and `WALLRUS_PASSWORD_HASH` (string optional).
    Add a derived `password_hash` field on the parsed env object,
    computed once at parse time (`await Bun.password.hash(plaintext,
 { algorithm: "argon2id" })` if hash absent). Discard the plaintext
@@ -131,8 +131,8 @@ Promise<Locals["user"] | null>` that:
 - [ ] `bun test` green — new tests for jwt/cookie/basic/password/rate-limit/hooks
 - [ ] `bunx eslint .` zero errors
 - [ ] `bunx prettier --check .` clean
-- [ ] Smoke: `WALLRUS_AUTH_ENABLE=true WALLRUS_AUTH_USERNAME=x
-    WALLRUS_AUTH_PASSWORD=y WALLRUS_AUTH_SECRET=$(openssl rand -hex 32)
+- [ ] Smoke: `WALLRUS_AUTH_ENABLE=true WALLRUS_USERNAME=x
+    WALLRUS_PASSWORD=y WALLRUS_AUTH_SECRET=$(openssl rand -hex 32)
     WALLRUS_MODE=prod bun run src/cli.ts serve` then:
   - `curl -i http://127.0.0.1:5173/api/v1/devices` → 401 JSON
   - `curl -i -u x:y http://127.0.0.1:5173/api/v1/devices` → 200/empty list

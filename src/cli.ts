@@ -18,7 +18,7 @@ program
 	.command("serve")
 	.description("Start the long-running daemon (HTTP + scheduler)")
 	.action(async () => {
-		const runtime = boot()
+		const runtime = await boot()
 
 		// Wire the runtime singleton so hooks.server.ts and other modules can
 		// reach it via runtime_ref(). Must happen before Bun.serve() starts

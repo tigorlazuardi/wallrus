@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm"
 import { create_db, type DbClient } from "./db/client"
 import { run_migrations } from "./db/migrate"
 import { run_history } from "./db/schema"
-import { env as env_singleton, parse_env, type Env } from "./env"
+import { env as env_singleton, init_password_hash, parse_env, type Env } from "./env"
 import { db_file_path, ensure_data_dir, ensure_db_perms } from "./fs/perms"
 import { getLogger, initSDK, setDefaultLogger, type SDKResult } from "./telemetry"
 
@@ -23,7 +23,7 @@ export type Runtime = {
 //   6. tighten DB file perms (chmod 0600)
 //   7. crash recovery: status='running' -> 'failed' / stop_reason='daemon_crash'
 //   8. return Runtime for caller (HTTP server, scheduler) to use.
-export function boot(): Runtime {
+export async function boot(): Promise<Runtime> {
 	// Warm the env singleton so subsequent imports (route handlers, services)
 	// share the same parsed instance. parse_env is still used here so the
 	// fail-fast path runs synchronously before anything else opens a DB or
@@ -32,6 +32,10 @@ export function boot(): Runtime {
 	// Trigger the lazy cache in env.ts with the same source so route handlers
 	// reading `env()` get the identical object.
 	env_singleton()
+	// Hash the plaintext password once at boot (CPU-bound; done here so no
+	// request handler ever touches the plaintext). No-op if password_hash is
+	// already populated (WALLRUS_PASSWORD_HASH was set directly).
+	await init_password_hash()
 
 	// Init OTel SDK first so every subsequent log line, span, and metric
 	// flows through the configured exporters. Endpoint is optional — when

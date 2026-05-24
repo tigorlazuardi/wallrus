@@ -17,16 +17,51 @@ export WALLRUS_PASSWORD='ganti-segera-ya'
 export WALLRUS_AUTH_SECRET="$(openssl rand -hex 32)"
 ```
 
-Tiga kredensial diterima di API:
+Atau, kalau kamu sudah punya hash Argon2id dari password-mu, lewati
+`WALLRUS_PASSWORD` dan berikan hash-nya langsung:
+
+```sh
+export WALLRUS_PASSWORD_HASH='$argon2id$v=19$m=65536,...'
+```
+
+Cukup salah satu dari `WALLRUS_PASSWORD` / `WALLRUS_PASSWORD_HASH`; kalau
+kamu memasukkan plaintext, daemon akan meng-hash-nya saat boot lalu membuang
+plaintext dari memori.
+
+| Variabel                | Wajib saat auth aktif | Default | Keterangan                                                       |
+| ----------------------- | :-------------------: | ------- | ---------------------------------------------------------------- |
+| `WALLRUS_USERNAME`      | Ya                    | —       | Username login tunggal.                                          |
+| `WALLRUS_PASSWORD`      | Salah satu dari dua   | —       | Password plaintext; di-hash saat boot, lalu dibuang.             |
+| `WALLRUS_PASSWORD_HASH` | Salah satu dari dua   | —       | Hash Argon2id yang sudah dihitung (ganti plaintext jika ada).    |
+| `WALLRUS_AUTH_SECRET`   | Ya                    | —       | Minimal 32 byte entropi. Generate: `openssl rand -hex 32`.       |
+| `WALLRUS_JWT_TTL_DAYS`  | Tidak                 | `30`    | Masa berlaku JWT / session-cookie dalam hari.                    |
+
+Tiga jenis kredensial yang diterima API:
 
 - `Authorization: Bearer <jwt>` — utama untuk mobile / script. JWT didapat
   via `POST /api/v1/auth/login` dengan `{ "username", "password" }`.
 - `Authorization: Basic base64(user:pass)` — praktis untuk curl / tes.
-- Cookie `auth_session` — di-set oleh form login WebUI. httpOnly,
+- Cookie `wallrus_session` — di-set oleh form login WebUI. HttpOnly,
   SameSite=Lax, langsung invalid saat `WALLRUS_AUTH_SECRET` di-rotate.
 
-WebUI menyajikan halaman login HTML sederhana. TTL JWT default 30 hari.
-Tidak ada refresh token — login ulang saat habis.
+### Endpoint login
+
+```
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "ganti-segera-ya" }
+```
+
+Berhasil: `204 No Content` + `Set-Cookie: wallrus_session=<jwt>; ...`
+
+### Detail sesi
+
+- Nama cookie: `wallrus_session`
+- Masa sesi: **30 hari** (bisa diatur via `WALLRUS_JWT_TTL_DAYS`)
+- Proteksi brute-force: **5 percobaan gagal** dalam **15 menit** memicu
+  lockout `429 Too Many Requests` untuk IP tersebut. Reset otomatis setelah
+  window berlalu atau saat login berhasil.
 
 ### Rotasi
 
@@ -45,8 +80,8 @@ export WALLRUS_TRUST_PROXY=true  # bila di belakang https
 Saat auth dimatikan:
 
 - Setiap route publik dari sudut pandang wallrus.
-- `GET /auth/login` mengembalikan `404`.
-- `POST /api/v1/auth/login` mengembalikan `410 Gone`, body `{ "error": "auth_disabled" }`.
+- `POST /api/v1/auth/login` mengembalikan `204 No Content` (no-op; aman
+  dipanggil, tidak ada cookie yang di-set).
 - Satu peringatan startup dicatat agar pilihan ini terlihat.
 
 Reverse proxy yang sepenuhnya bertanggung jawab menahan traffic tidak

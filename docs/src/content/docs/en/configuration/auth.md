@@ -17,16 +17,51 @@ export WALLRUS_PASSWORD='change-me-please'
 export WALLRUS_AUTH_SECRET="$(openssl rand -hex 32)"
 ```
 
+Alternatively, if you already have an Argon2id hash of your password, skip
+`WALLRUS_PASSWORD` and pass the hash directly:
+
+```sh
+export WALLRUS_PASSWORD_HASH='$argon2id$v=19$m=65536,...'
+```
+
+At most one of `WALLRUS_PASSWORD` / `WALLRUS_PASSWORD_HASH` is needed; if you
+supply the plaintext the daemon hashes it at boot and discards the plaintext
+from memory.
+
+| Variable                | Required when auth enabled | Default | Notes                                                     |
+| ----------------------- | :------------------------: | ------- | --------------------------------------------------------- |
+| `WALLRUS_USERNAME`      | Yes                        | —       | The single login username.                                |
+| `WALLRUS_PASSWORD`      | One of these two           | —       | Plaintext password; hashed at boot, then discarded.       |
+| `WALLRUS_PASSWORD_HASH` | One of these two           | —       | Pre-computed Argon2id hash (use instead of the plaintext).|
+| `WALLRUS_AUTH_SECRET`   | Yes                        | —       | ≥ 32 bytes of entropy. Generate: `openssl rand -hex 32`.  |
+| `WALLRUS_JWT_TTL_DAYS`  | No                         | `30`    | JWT / session-cookie lifetime in days.                    |
+
 Three credentials accepted at the API:
 
-- `Authorization: Bearer <jwt>` — primary for mobile / scripts. Get a JWT via
-  `POST /api/v1/auth/login` with `{ "username", "password" }`.
+- `Authorization: Bearer <jwt>` — primary for mobile / scripts. Obtain a JWT
+  via `POST /api/v1/auth/login` with `{ "username", "password" }`.
 - `Authorization: Basic base64(user:pass)` — convenience for curl / tests.
-- `auth_session` cookie — set by the WebUI login form. httpOnly, SameSite=Lax,
-  rotates when `WALLRUS_AUTH_SECRET` rotates.
+- `wallrus_session` cookie — set by the WebUI login form. HttpOnly,
+  SameSite=Lax, rotates when `WALLRUS_AUTH_SECRET` rotates.
 
-The WebUI ships a simple HTML login page. The JWT TTL defaults to 30 days.
-No refresh tokens — re-login on expiry.
+### Login endpoint
+
+```
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "change-me-please" }
+```
+
+Success: `204 No Content` + `Set-Cookie: wallrus_session=<jwt>; ...`
+
+### Session details
+
+- Cookie name: `wallrus_session`
+- Session length: **30 days** (configurable via `WALLRUS_JWT_TTL_DAYS`)
+- Brute-force protection: **5 failed attempts** within **15 minutes** triggers
+  a `429 Too Many Requests` lockout on that IP. Resets automatically after the
+  window passes or on a successful login.
 
 ### Rotation
 
@@ -45,8 +80,8 @@ export WALLRUS_TRUST_PROXY=true  # if behind https
 When auth is disabled:
 
 - Every route is public from wallrus's perspective.
-- `GET /auth/login` returns `404`.
-- `POST /api/v1/auth/login` returns `410 Gone`, body `{ "error": "auth_disabled" }`.
+- `POST /api/v1/auth/login` returns `204 No Content` (no-op; safe to call but
+  does not set a cookie).
 - A single startup warning is logged so the choice is visible.
 
 Your reverse proxy is now solely responsible for keeping unauthenticated

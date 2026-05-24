@@ -16,6 +16,7 @@ const RawEnv = z
 			.transform((v) => v === "true"),
 		WALLRUS_USERNAME: z.string().optional(),
 		WALLRUS_PASSWORD: z.string().optional(),
+		WALLRUS_PASSWORD_HASH: z.string().optional(),
 		WALLRUS_AUTH_SECRET: z.string().optional(),
 		WALLRUS_JWT_TTL_DAYS: z.coerce.number().int().positive().default(30),
 		WALLRUS_TRUST_PROXY: z
@@ -44,7 +45,8 @@ const RawEnv = z
 		if (!v.WALLRUS_AUTH_ENABLE) return
 		const missing: string[] = []
 		if (!v.WALLRUS_USERNAME) missing.push("WALLRUS_USERNAME")
-		if (!v.WALLRUS_PASSWORD) missing.push("WALLRUS_PASSWORD")
+		if (!v.WALLRUS_PASSWORD && !v.WALLRUS_PASSWORD_HASH)
+			missing.push("WALLRUS_PASSWORD or WALLRUS_PASSWORD_HASH")
 		if (!v.WALLRUS_AUTH_SECRET) missing.push("WALLRUS_AUTH_SECRET")
 		if (missing.length > 0) {
 			ctx.addIssue({
@@ -64,7 +66,15 @@ const RawEnv = z
 		}
 	})
 
-export type Env = z.infer<typeof RawEnv>
+// The raw Zod-inferred shape, before we strip WALLRUS_PASSWORD.
+type RawEnvData = z.infer<typeof RawEnv>
+
+// Env is the public shape: WALLRUS_PASSWORD is omitted (stripped at parse time
+// so it cannot leak via inspect / serialisation). password_hash is the derived
+// field populated async by `init_password_hash()` after boot.
+export type Env = Omit<RawEnvData, "WALLRUS_PASSWORD"> & {
+	password_hash?: string
+}
 
 export function parse_env(source: Record<string, string | undefined> = Bun.env): Env {
 	const result = RawEnv.safeParse(source)
@@ -74,16 +84,53 @@ export function parse_env(source: Record<string, string | undefined> = Bun.env):
 		)
 		throw new Error(`invalid env:\n${lines.join("\n")}`)
 	}
-	return result.data
+	// Strip the plaintext password so it can't leak via console.log / serialise.
+	// If WALLRUS_PASSWORD_HASH is already set, populate password_hash immediately
+	// (synchronous path — no hashing needed).
+	const { WALLRUS_PASSWORD: _discarded, ...safe } = result.data
+	const out: Env = safe
+	if (safe.WALLRUS_PASSWORD_HASH) {
+		out.password_hash = safe.WALLRUS_PASSWORD_HASH
+	}
+	return out
 }
 
-// Lazy-cached env singleton. Bootstrap warms it first; route handlers call
-// `env()` to read the same parsed config without re-running Zod each request.
-let _env: Env | null = null
+// Lazy-cached env singleton stored on globalThis so it is shared between
+// cli.ts (loaded from source) and the SvelteKit build output (which has its
+// own compiled copy of this module). Without globalThis, `init_password_hash()`
+// in cli.ts would mutate the source-module copy while the built
+// hooks.server.ts would consult a different compiled-module copy and see
+// `password_hash: undefined`. Pattern mirrors runtime.ts §globals.
+declare global {
+	var __wallrus_env__: Env | null
+}
+
+if (!("__wallrus_env__" in globalThis)) {
+	globalThis.__wallrus_env__ = null
+}
 
 export function env(): Env {
-	if (!_env) _env = parse_env()
-	return _env
+	if (!globalThis.__wallrus_env__) globalThis.__wallrus_env__ = parse_env()
+	return globalThis.__wallrus_env__
+}
+
+// Async init called once at boot (after parse_env) to compute and cache the
+// argon2id hash. If WALLRUS_PASSWORD_HASH is already set we use it directly.
+// If only WALLRUS_PASSWORD was set (stripped from Env), we accept the plaintext
+// from the raw source so we can hash it once and never hold it again.
+// After this call, `env().password_hash` is populated and all auth modules use
+// that — no route handler ever touches a plaintext password.
+export async function init_password_hash(
+	source: Record<string, string | undefined> = Bun.env,
+): Promise<void> {
+	const e = env()
+	if (e.password_hash) return // already set (WALLRUS_PASSWORD_HASH was provided)
+	// Hash the plaintext (still in the raw source; already stripped from Env).
+	const plaintext = source["WALLRUS_PASSWORD"]
+	if (plaintext) {
+		e.password_hash = await Bun.password.hash(plaintext, { algorithm: "argon2id" })
+	}
+	// If neither is set (AUTH_ENABLE=false case), password_hash stays undefined.
 }
 
 // Parses the OpenTelemetry-standard `OTEL_EXPORTER_OTLP_HEADERS` format
