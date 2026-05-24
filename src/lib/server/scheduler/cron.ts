@@ -10,6 +10,7 @@ import type { Runtime } from "../bootstrap"
 import { getLogger } from "../telemetry"
 import { subscriptions } from "../db/schema"
 import { enqueue, wait_idle } from "./queue"
+import * as pipeline from "../ingest/pipeline"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -23,6 +24,7 @@ export type CronEntry = { cron: Cron; source_slug: string }
 
 let _interval: ReturnType<typeof setInterval> | null = null
 let _registry: Map<string, CronEntry> = new Map()
+let _runtime: Runtime | null = null
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -80,7 +82,24 @@ export function _tick_with_clock(reg: Map<string, CronEntry>, now: number): void
 		const next_ms = next.getTime()
 		if (next_ms >= now && next_ms < window_end) {
 			enqueue(source_slug, async () => {
-				log.info("would run", { module: "scheduler", subscription_id, source_slug })
+				if (_runtime === null) {
+					log.warn("scheduler fired before runtime initialised", {
+						module: "scheduler",
+						subscription_id,
+						source_slug,
+					})
+					return
+				}
+				try {
+					await pipeline.run_subscription(_runtime, subscription_id)
+				} catch (err) {
+					log.error("ingest run failed", {
+						module: "scheduler",
+						subscription_id,
+						source_slug,
+						error: err instanceof Error ? err.message : String(err),
+					})
+				}
 			})
 		}
 	}
@@ -96,6 +115,7 @@ export function _tick_with_clock(reg: Map<string, CronEntry>, now: number): void
  */
 export function start(runtime: Runtime): void {
 	const log = getLogger()
+	_runtime = runtime
 	_registry = load_registry(runtime)
 	log.info("scheduler started", { module: "scheduler", subscriptions: _registry.size })
 
@@ -114,6 +134,7 @@ export async function stop(): Promise<void> {
 		clearInterval(_interval)
 		_interval = null
 	}
+	_runtime = null
 	log.info("scheduler stopping — draining queue", { module: "lifecycle" })
 	await Promise.race([wait_idle(), new Promise<void>((resolve) => setTimeout(resolve, 5_000))])
 	log.info("scheduler stopped", { module: "lifecycle" })

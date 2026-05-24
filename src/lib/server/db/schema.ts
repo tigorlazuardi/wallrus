@@ -253,6 +253,7 @@ export const run_history = sqliteTable(
 		items_seen: integer("items_seen").notNull().default(0),
 		items_new: integer("items_new").notNull().default(0),
 		items_failed_download: integer("items_failed_download").notNull().default(0),
+		items_skipped_no_device: integer("items_skipped_no_device").notNull().default(0),
 		device_adds: jsonCol<DeviceAdds>("device_adds").notNull().default({}),
 	},
 	(t) => [

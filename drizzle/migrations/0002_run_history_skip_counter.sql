@@ -1,0 +1,1 @@
+ALTER TABLE `run_history` ADD `items_skipped_no_device` integer DEFAULT 0 NOT NULL;

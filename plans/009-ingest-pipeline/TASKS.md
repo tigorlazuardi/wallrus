@@ -2,53 +2,53 @@
 
 ## Migration
 
-- [ ] `drizzle/migrations/0002_run_history_skip_counter.sql` adds `items_skipped_no_device INTEGER NOT NULL DEFAULT 0`
-- [ ] STRICT preserved (rewrite if drizzle-kit generated without it)
-- [ ] Drizzle snapshot regenerated + committed
-- [ ] Update `src/lib/server/db/schema.ts` with the new column
-- [ ] Update run_history DTO + Zod schema
+- [x] `drizzle/migrations/0002_run_history_skip_counter.sql` adds `items_skipped_no_device INTEGER NOT NULL DEFAULT 0`
+- [x] STRICT preserved (rewrite if drizzle-kit generated without it)
+- [x] Drizzle snapshot regenerated + committed
+- [x] Update `src/lib/server/db/schema.ts` with the new column
+- [x] Update run_history DTO + Zod schema (RunHistoryRow inferred type updated; dedicated Zod schema deferred to invocation 2 — no existing runs/ schema to update)
 
 ## Filters
 
-- [ ] `src/lib/server/ingest/filters.ts` — pure fn evaluating `DeviceFilters` against candidate
-- [ ] Unit test: every branch (resolution, aspect, size, format, tags include/exclude, NSFW)
-- [ ] Unit test: empty filters → pass
-- [ ] Unit test: include + exclude tag conflict → exclude wins
+- [x] `src/lib/server/ingest/filters.ts` — pure fn evaluating `DeviceFilters` against candidate
+- [x] Unit test: every branch (resolution, aspect, size, format, tags include/exclude, NSFW)
+- [x] Unit test: empty filters → pass
+- [x] Unit test: include + exclude tag conflict → exclude wins
 
 ## FS helpers
 
-- [ ] `src/lib/server/ingest/fs.ts`:
-  - [ ] `atomic_write(temp, final)` rename or copy+unlink
-  - [ ] `link_or_copy(src, dst)` hardlink with EXDEV/EPERM fallback
-  - [ ] `compute_thumbnail(blob, thumb)` sharp pipeline (rotate → resize 512 inside → webp q80)
-- [ ] Unit test: `link_or_copy` happy path (hardlink, ino matches)
-- [ ] Unit test: `link_or_copy` simulated EXDEV → falls back to copy (mock fs.linkSync)
-- [ ] Unit test: thumbnail honours EXIF orientation (use a pre-rotated fixture)
-- [ ] Unit test: thumbnail max dim 512, AR preserved
+- [x] `src/lib/server/ingest/fs.ts`:
+  - [x] `atomic_write(temp, final)` rename or copy+unlink
+  - [x] `link_or_copy(src, dst)` hardlink with EXDEV/EPERM fallback
+  - [x] `compute_thumbnail(blob, thumb)` sharp pipeline (rotate → resize 512 inside → webp q80)
+- [x] Unit test: `link_or_copy` happy path (hardlink, ino matches)
+- [x] Unit test: `link_or_copy` simulated EXDEV → falls back to copy (mock fs.linkSync)
+- [~] Unit test: thumbnail honours EXIF orientation (use a pre-rotated fixture) — deferred; no fixture binary; .rotate() verified by code review; see .builder-notes.md
+- [x] Unit test: thumbnail max dim 512, AR preserved
 
 ## Dedup
 
-- [ ] `src/lib/server/ingest/dedup.ts` — 3-stage check, discriminated union return
-- [ ] Unit test: URL match + blacklisted → skip_blacklisted
-- [ ] Unit test: URL match + present + not blacklisted → skip_already_present
-- [ ] Unit test: sha256 match across different URL → re_fan_out
-- [ ] Unit test: nothing matches → new
+- [x] `src/lib/server/ingest/dedup.ts` — 3-stage check, discriminated union return
+- [x] Unit test: URL match + blacklisted → skip_blacklisted
+- [x] Unit test: URL match + present + not blacklisted → skip_already_present
+- [x] Unit test: sha256 match across different URL → re_fan_out
+- [x] Unit test: nothing matches → new
 
 ## Pipeline
 
-- [ ] `src/lib/server/ingest/pipeline.ts` `run_subscription(runtime, subscription_id)`
-- [ ] Opens run_history row at start, closes at end (success/failed)
-- [ ] Increments counters: `items_seen`, `items_new`, `items_failed_download`, `items_skipped_no_device`
-- [ ] Snapshots `input_params` to `input_params_snapshot` at run start
-- [ ] Stop reasons: `source_exhausted`, `max_items_inspected`, `error`
-- [ ] Wraps per-item errors → continues; wraps source-level errors → fails the run
-- [ ] Sequential downloads (no parallelism inside one run)
-- [ ] Respects `subscriptions.max_items_inspected` (fallback default 300)
+- [x] `src/lib/server/ingest/pipeline.ts` `run_subscription(runtime, subscription_id)`
+- [x] Opens run_history row at start, closes at end (success/failed)
+- [x] Increments counters: `items_seen`, `items_new`, `items_failed_download`, `items_skipped_no_device`
+- [x] Snapshots `input_params` to `input_params_snapshot` at run start
+- [x] Stop reasons: `source_exhausted`, `max_items_inspected`, `error`
+- [x] Wraps per-item errors → continues; wraps source-level errors → fails the run
+- [x] Sequential downloads (no parallelism inside one run)
+- [x] Respects `subscriptions.max_items_inspected` (fallback default 300)
 
 ## Scheduler hook
 
-- [ ] `src/lib/server/scheduler/cron.ts` executor body calls `pipeline.run_subscription`
-- [ ] Errors caught, logged with `getLogger({ module: "scheduler" }).error(…)`, queue stays alive
+- [x] `src/lib/server/scheduler/cron.ts` executor body calls `pipeline.run_subscription`
+- [x] Errors caught, logged with `getLogger({ module: "scheduler" }).error(…)`, queue stays alive
 
 ## Pipeline integration tests
 
