@@ -1,0 +1,95 @@
+/**
+ * Route tests for POST /api/v1/images/[id]/tags.
+ */
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
+import { create_test_db } from "$test/db"
+import { DeviceService } from "$lib/server/service/devices"
+import { SubscriptionService } from "$lib/server/service/subscriptions"
+import { ImageService } from "$lib/server/service/images"
+import { set_runtime, _reset_runtime_for_tests } from "$lib/server/runtime"
+import type { Runtime } from "$lib/server/bootstrap"
+import { seed_images, IMG } from "$test/fixtures/seed_images"
+import { POST } from "../../../../../../../routes/api/v1/images/[id]/tags/+server"
+
+function make_event(id: string, body?: unknown) {
+	const url = new URL(`http://localhost/api/v1/images/${id}/tags`)
+	const request = new Request(url.toString(), {
+		method: "POST",
+		body: body !== undefined ? JSON.stringify(body) : undefined,
+		headers: body !== undefined ? { "content-type": "application/json" } : {},
+	})
+	return {
+		url,
+		request,
+		params: { id },
+		locals: {},
+		cookies: {} as unknown,
+		fetch: globalThis.fetch,
+		getClientAddress: () => "127.0.0.1",
+		platform: undefined,
+		setHeaders: () => {},
+		isDataRequest: false,
+		isSubRequest: false,
+		route: { id: "/api/v1/images/[id]/tags" },
+	}
+}
+
+let db: ReturnType<typeof create_test_db>
+
+beforeEach(() => {
+	db = create_test_db()
+	const services = {
+		devices: new DeviceService({ db }),
+		subscriptions: new SubscriptionService({ db }),
+		images: new ImageService({ db }),
+	}
+	set_runtime({ db, services, env: {} as never, sdk: {} as never } as Runtime)
+	seed_images(db)
+})
+
+afterEach(() => {
+	_reset_runtime_for_tests()
+})
+
+describe("POST /api/v1/images/[id]/tags", () => {
+	test("adds a tag and returns 200 with the tag row", async () => {
+		const event = make_event(IMG.i04, { tag: "mountains" })
+		const res = await POST(event as never)
+		expect(res.status).toBe(200)
+		const body = await res.json()
+		expect(body.tag).toBe("mountains")
+		expect(body.image_id).toBe(IMG.i04)
+	})
+
+	test("tag is normalised to lowercase", async () => {
+		const event = make_event(IMG.i04, { tag: "UPPERCASE" })
+		const res = await POST(event as never)
+		expect(res.status).toBe(200)
+		const body = await res.json()
+		expect(body.tag).toBe("uppercase")
+	})
+
+	test("duplicate tag is idempotent — returns 200 not 409", async () => {
+		const event1 = make_event(IMG.i04, { tag: "dupe" })
+		const res1 = await POST(event1 as never)
+		expect(res1.status).toBe(200)
+
+		const event2 = make_event(IMG.i04, { tag: "dupe" })
+		const res2 = await POST(event2 as never)
+		expect(res2.status).toBe(200)
+		const body = await res2.json()
+		expect(body.tag).toBe("dupe")
+	})
+
+	test("missing tag field returns 400", async () => {
+		const event = make_event(IMG.i04, { other: "stuff" })
+		const res = await POST(event as never)
+		expect(res.status).toBe(400)
+	})
+
+	test("empty tag string returns 400", async () => {
+		const event = make_event(IMG.i04, { tag: "" })
+		const res = await POST(event as never)
+		expect(res.status).toBe(400)
+	})
+})

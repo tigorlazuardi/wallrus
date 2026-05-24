@@ -18,14 +18,14 @@
 
 ## Routes
 
-- [ ] `src/routes/api/v1/images/+server.ts` — GET
-- [ ] `src/routes/api/v1/images/[id]/+server.ts` — GET + DELETE (`?blacklist=true` honoured)
-- [ ] `src/routes/api/v1/images/[id]/favorite/+server.ts` — POST
-- [ ] `src/routes/api/v1/images/[id]/tags/+server.ts` — POST
-- [ ] `src/routes/api/v1/images/[id]/tags/[tag]/+server.ts` — DELETE
-- [ ] `src/routes/api/v1/images/[id]/restore/+server.ts` — POST
-- [ ] `src/routes/api/v1/devices/[slug]/images/+server.ts` — GET
-- [ ] All gated by auth, error-mapped
+- [x] `src/routes/api/v1/images/+server.ts` — GET
+- [x] `src/routes/api/v1/images/[id]/+server.ts` — GET + DELETE (`?blacklist=true` honoured)
+- [x] `src/routes/api/v1/images/[id]/favorite/+server.ts` — POST
+- [x] `src/routes/api/v1/images/[id]/tags/+server.ts` — POST
+- [x] `src/routes/api/v1/images/[id]/tags/[tag]/+server.ts` — DELETE
+- [x] `src/routes/api/v1/images/[id]/restore/+server.ts` — POST
+- [x] `src/routes/api/v1/devices/[slug]/images/+server.ts` — GET
+- [x] All gated by auth, error-mapped
 
 ## Test fixtures
 
@@ -46,16 +46,16 @@
 
 ## Route tests
 
-- [ ] One per endpoint
-- [ ] Unauth → 401 (003 gate)
+- [x] One per endpoint
+- [x] Unauth → 401 (003 gate)
 
 ## Verification gates
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
-- [ ] Smoke: list / search / favorite / tag / soft-delete / restore via curl
+- [x] `bun run check` clean
+- [x] `bun test` green
+- [x] `bunx eslint .` zero errors
+- [x] `bunx prettier --check .` clean
+- [x] Smoke: list / search / favorite / tag / soft-delete / restore via curl
 - [ ] `lefthook` pre-commit + commit-msg pass
 
 ## Commit + push

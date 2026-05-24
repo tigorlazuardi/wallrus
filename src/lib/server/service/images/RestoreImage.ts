@@ -26,7 +26,7 @@ export function RestoreImage<T extends Constructor>(Sup: T) {
 			// Refuse to restore a blacklisted image — that's a separate unblacklist flow (post-MVP)
 			if (row.blacklisted_at !== null) {
 				throw new AppError({
-					message: `cannot restore blacklisted image: ${req.id}`,
+					message: "validation.blacklisted",
 					publicMessage:
 						"This image has been blacklisted and cannot be restored. Contact an administrator to unblacklist it.",
 					status: 400,
