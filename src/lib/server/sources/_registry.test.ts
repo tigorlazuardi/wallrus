@@ -59,9 +59,10 @@ describe("sources registry", () => {
 
 	test("register_sources does not throw and registers built-in sources", () => {
 		expect(() => register_sources()).not.toThrow()
-		// register_sources now registers the reddit source (slice 007).
-		// After calling it, the registry should contain at least "reddit".
+		// register_sources now registers the reddit source (slice 007)
+		// and the booru source (slice 008).
 		const slugs = list_sources().map((s) => s.slug)
 		expect(slugs).toContain("reddit")
+		expect(slugs).toContain("booru")
 	})
 })

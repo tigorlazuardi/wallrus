@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1001,
+    "created_at": "2024-01-15T10:30:00.000Z",
+    "rating": "s",
+    "file_url": "https://cdn.danbooru.example.com/data/1234567890abcdef1234567890abcdef.jpg",
+    "file_size": 2048576,
+    "image_width": 3840,
+    "image_height": 2160,
+    "tag_string_general": "sky clouds mountain scenery",
+    "tag_string_character": "",
+    "tag_string_copyright": "",
+    "tag_string_artist": "artist1"
+  },
+  {
+    "id": 1002,
+    "created_at": "2024-01-16T12:00:00.000Z",
+    "rating": "q",
+    "file_url": "https://cdn.danbooru.example.com/data/abcdef1234567890abcdef1234567890.png",
+    "file_size": 1572864,
+    "image_width": 2560,
+    "image_height": 1440,
+    "tag_string_general": "forest trees water",
+    "tag_string_character": "character1",
+    "tag_string_copyright": "series1",
+    "tag_string_artist": "artist2"
+  },
+  {
+    "id": 1003,
+    "created_at": "2024-01-17T08:00:00.000Z",
+    "rating": "e",
+    "file_url": null,
+    "file_size": null,
+    "image_width": null,
+    "image_height": null,
+    "tag_string_general": "ocean sunset",
+    "tag_string_character": "",
+    "tag_string_copyright": "",
+    "tag_string_artist": "artist3"
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "@attributes": {
+    "limit": 3,
+    "offset": 0,
+    "count": 3
+  },
+  "post": [
+    {
+      "id": 2001,
+      "created_at": "Mon Jan 15 10:30:00 -0500 2024",
+      "rating": "s",
+      "file_url": "https://img.gelbooru.example.com/images/ab/cd/abcdef1234567890.jpg",
+      "width": 1920,
+      "height": 1080,
+      "image": "abcdef1234567890.jpg",
+      "tags": "sky clouds mountain scenery wallpaper"
+    },
+    {
+      "id": 2002,
+      "created_at": "Tue Jan 16 12:00:00 -0500 2024",
+      "rating": "q",
+      "file_url": "https://img.gelbooru.example.com/images/cd/ef/cdef12345678.png",
+      "width": 2560,
+      "height": 1440,
+      "image": "cdef12345678.png",
+      "tags": "forest trees water nature"
+    },
+    {
+      "id": 2003,
+      "created_at": "Wed Jan 17 08:00:00 -0500 2024",
+      "rating": "e",
+      "file_url": "https://img.gelbooru.example.com/images/ef/gh/efgh90123456.webp",
+      "width": 3840,
+      "height": 2160,
+      "image": "efgh90123456.webp",
+      "tags": "ocean sunset beach"
+    }
+  ]
+}

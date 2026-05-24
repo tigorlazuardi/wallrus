@@ -2,28 +2,28 @@
 
 ## Fixtures
 
-- [ ] `__fixtures__/booru/danbooru-posts.json` — 3 posts, mixed `rating`, one with `file_url: null`
-- [ ] `__fixtures__/booru/gelbooru-posts.json` — 3 posts, mixed rating, both `post` and `posts` wrapper variants in separate fixtures if needed
+- [x] `__fixtures__/booru/danbooru-posts.json` — 3 posts, mixed `rating`, one with `file_url: null`
+- [x] `__fixtures__/booru/gelbooru-posts.json` — 3 posts, mixed rating, both `post` and `posts` wrapper variants in separate fixtures if needed
 
 ## Module
 
-- [ ] `src/lib/server/sources/booru.ts` exports `slug`, `input_schema`, `crawl`, `register`
-- [ ] `BooruInputSchema` matches Decisions, `.strict()`
-- [ ] Variant-aware URL builder
-- [ ] Tag concatenation per variant
-- [ ] NSFW rating → wallrus nsfw mapping
-- [ ] Skip null `file_url`
-- [ ] Skip `.gif`
-- [ ] Pagination loop terminates on empty response
-- [ ] `rating: "any"` does not append `rating:` token
+- [x] `src/lib/server/sources/booru.ts` exports `slug`, `input_schema`, `crawl`, `register`
+- [x] `BooruInputSchema` matches Decisions, `.strict()`
+- [x] Variant-aware URL builder
+- [x] Tag concatenation per variant
+- [x] NSFW rating → wallrus nsfw mapping
+- [x] Skip null `file_url`
+- [x] Skip `.gif`
+- [x] Pagination loop terminates on empty response
+- [x] `rating: "any"` does not append `rating:` token
 
 ## Aggregator
 
-- [ ] `_aggregator.ts` imports + registers Booru
+- [x] `_aggregator.ts` imports + registers Booru
 
 ## Unit tests
 
-- [ ] `booru.test.ts` covers:
+- [x] `booru.test.ts` covers:
   - Danbooru happy path (3 posts → 2 SourceItems after skip)
   - Gelbooru happy path
   - `rating` filter applied
@@ -36,14 +36,14 @@
 
 ## Registry interaction
 
-- [ ] `_registry.lookup("booru")` returns the entry post-bootstrap
+- [x] `_registry.lookup("booru")` returns the entry post-bootstrap
 
 ## Verification gates
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
+- [x] `bun run check` clean
+- [x] `bun test` green
+- [x] `bunx eslint .` zero errors
+- [x] `bunx prettier --check .` clean
 - [ ] `lefthook` pre-commit + commit-msg pass
 
 ## Commit + push

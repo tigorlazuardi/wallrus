@@ -1,5 +1,6 @@
 import type { SourceModule } from "./_types"
 import { register_reddit } from "./reddit"
+import { register_booru } from "./booru"
 
 // First-party source registry. Each concrete source (`reddit.ts`,
 // `danbooru.ts`, etc.) imports here and gets registered by slug.
@@ -29,5 +30,5 @@ export function register(entry: SourceModule): void {
  */
 export function register_sources(): void {
 	register_reddit()
-	// 008 will add: register_danbooru(), register_gelbooru(), …
+	register_booru()
 }
