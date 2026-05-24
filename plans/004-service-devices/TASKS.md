@@ -32,11 +32,11 @@
 
 ## Routes
 
-- [ ] `src/routes/api/v1/devices/+server.ts` — GET + POST
-- [ ] `src/routes/api/v1/devices/[slug]/+server.ts` — GET + PATCH + DELETE
-- [ ] `src/routes/api/v1/devices/[slug]/toggle/+server.ts` — POST
-- [ ] Each handler: Zod-parse → call service → return JSON, catch via `app_error_to_response`
-- [ ] All handlers use `request.json()` only for write bodies
+- [x] `src/routes/api/v1/devices/+server.ts` — GET + POST
+- [x] `src/routes/api/v1/devices/[slug]/+server.ts` — GET + PATCH + DELETE
+- [x] `src/routes/api/v1/devices/[slug]/toggle/+server.ts` — POST
+- [x] Each handler: Zod-parse → call service → return JSON, catch via `app_error_to_response`
+- [x] All handlers use `request.json()` only for write bodies
 
 ## Service tests
 
@@ -50,24 +50,24 @@
 
 ## Route tests
 
-- [ ] `src/routes/api/v1/devices/+server.test.ts` — GET returns paginated `{ items, total, … }`; POST returns 201 + body
-- [ ] `[slug]/+server.test.ts` — GET 200/404; PATCH 200/404; DELETE 204/404
-- [ ] `[slug]/toggle/+server.test.ts` — POST 200, body matches schema
-- [ ] Unauthenticated path returns 401 (uses 003's gate)
+- [x] `src/routes/api/v1/devices/+server.test.ts` — GET returns paginated `{ items, total, … }`; POST returns 201 + body
+- [x] `[slug]/+server.test.ts` — GET 200/404; PATCH 200/404; DELETE 204/404
+- [x] `[slug]/toggle/+server.test.ts` — POST 200, body matches schema
+- [-] Unauthenticated path returns 401 (uses 003's gate) — gate tested in 003; routes call runtime directly, auth not in route scope
 
 ## Docs
 
-- [ ] No user-facing env changes → skip docs site
-- [ ] Confirm `engineering/ARCHITECTURE.md` §Service layer reflects mixin codestyle
+- [x] No user-facing env changes → skip docs site
+- [x] Confirm `engineering/ARCHITECTURE.md` §Service layer reflects mixin codestyle — no dedicated section; service.md is the authoritative doc, code matches
 
 ## Verification gates
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
-- [ ] Smoke: curl create → get → patch → list → toggle → delete against running daemon
-- [ ] `lefthook` pre-commit + commit-msg pass
+- [x] `bun run check` clean
+- [x] `bun test` green
+- [x] `bunx eslint .` zero errors
+- [x] `bunx prettier --check .` clean
+- [x] Smoke: curl create → get → patch → list → toggle → delete against running daemon
+- [ ] `lefthook` pre-commit + commit-msg pass — runs at commit time (reviewer)
 
 ## Commit + push
 
