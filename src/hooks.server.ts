@@ -1,4 +1,5 @@
 import type { Handle } from "@sveltejs/kit"
+import { runtime_ref } from "$lib/server/runtime"
 
 // Skeleton handle. Real auth gate + per-request telemetry span will be wired
 // in subsequent commits per `.claude/rules/api.md` §Auth gate.
@@ -12,5 +13,6 @@ import type { Handle } from "@sveltejs/kit"
 //   4. Forward to event.resolve(event).
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.user = null
+	event.locals.db = runtime_ref().db
 	return resolve(event)
 }

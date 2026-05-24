@@ -26,6 +26,7 @@ If `WALLRUS_AUTH_ENABLE=false`, all three are ignored.
 | `WALLRUS_AUTH_ENABLE`   | `true`                 | `"true"` or `"false"`. When `false`, every route is public and the login endpoints return `404` / `410`. Intended for reverse-proxy deployments. |
 | `WALLRUS_DATA_DIR`      | `./data` (bare-metal) `\| /data/wallrus` (Docker image) | Directory holding the SQLite DB, thumbnails, staging files, and per-device subdirs. Daemon enforces `chmod 0700` on this dir. |
 | `WALLRUS_LISTEN_ADDR`   | `0.0.0.0:5173`         | Host + port the HTTP server binds to.                                                                                                |
+| `WALLRUS_MODE`          | `prod`                 | `"prod"` or `"dev"`. When `dev`, `wallrus serve` skips `Bun.serve` and exits after boot. Use `bun run dev` for local development (Vite-managed). The Docker image always runs in `prod` mode. |
 | `WALLRUS_JWT_TTL_DAYS`  | `30`                   | Lifetime of issued JWTs (positive integer). No refresh tokens; re-login when expired.                                                |
 | `WALLRUS_TRUST_PROXY`   | `false`                | `"true"` or `"false"`. When on, wallrus trusts `X-Forwarded-Proto` + `X-Forwarded-For` from the first hop only.                       |
 

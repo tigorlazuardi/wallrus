@@ -26,6 +26,7 @@ Bila `WALLRUS_AUTH_ENABLE=false`, ketiganya diabaikan.
 | `WALLRUS_AUTH_ENABLE`   | `true`                                             | `"true"` atau `"false"`. Bila `false`, semua route publik dan endpoint login mengembalikan `404` / `410`. Cocok untuk deployment di belakang reverse proxy. |
 | `WALLRUS_DATA_DIR`      | `./data` (bare-metal) \| `/data/wallrus` (Docker)  | Direktori penyimpanan database SQLite, thumbnail, file staging, dan subdir per perangkat. Daemon menerapkan `chmod 0700` di dir ini.                       |
 | `WALLRUS_LISTEN_ADDR`   | `0.0.0.0:5173`                                     | Host + port yang dipakai server HTTP.                                                                                                                    |
+| `WALLRUS_MODE`          | `prod`                                             | `"prod"` atau `"dev"`. Bila `dev`, `wallrus serve` melewati `Bun.serve` dan keluar setelah boot. Gunakan `bun run dev` untuk pengembangan lokal (dikelola Vite). Docker image selalu berjalan dalam mode `prod`. |
 | `WALLRUS_JWT_TTL_DAYS`  | `30`                                               | Umur JWT (integer positif). Tidak ada refresh token; login ulang saat habis.                                                                             |
 | `WALLRUS_TRUST_PROXY`   | `false`                                            | `"true"` atau `"false"`. Bila aktif, wallrus mempercayai `X-Forwarded-Proto` + `X-Forwarded-For` dari first hop saja.                                     |
 

@@ -9,6 +9,10 @@ declare global {
 			// Populated by hooks.server.ts after the auth gate succeeds.
 			// `null` when auth is disabled (WALLRUS_AUTH_ENABLE=false).
 			user: { username: string } | null
+			// Set by hooks.server.ts before every request. Comes from the
+			// Runtime singleton established by cli.ts serve after boot().
+			// Type is the Drizzle BunSQLite client (has `.run()` for plain SQL).
+			db: import("./lib/server/db/client").DbClient
 		}
 		// interface PageData {}
 		// interface PageState {}

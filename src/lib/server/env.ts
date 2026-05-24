@@ -1,3 +1,4 @@
+import { AppError } from "@tigorhutasuhut/telemetry-js/error"
 import { z } from "zod"
 
 // Parsed once at boot. All other modules import `env` from here, never read
@@ -8,6 +9,7 @@ const RawEnv = z
 	.object({
 		WALLRUS_DATA_DIR: z.string().default("./data"),
 		WALLRUS_LISTEN_ADDR: z.string().default("0.0.0.0:5173"),
+		WALLRUS_MODE: z.enum(["prod", "dev"]).default("prod"),
 		WALLRUS_AUTH_ENABLE: z
 			.union([z.literal("true"), z.literal("false")])
 			.default("true")
@@ -99,6 +101,40 @@ export function parse_otlp_headers(raw: string | undefined): Record<string, stri
 		if (k && v) out[k] = v
 	}
 	return out
+}
+
+// Parses `WALLRUS_LISTEN_ADDR` (format: `host:port` or `:port`) into the
+// `{ hostname, port }` shape `Bun.serve` expects. Throws `AppError` on
+// invalid input so boot fails fast rather than binding to a wrong address.
+//
+// Examples:
+//   "0.0.0.0:5173" → { hostname: "0.0.0.0", port: 5173 }
+//   ":5173"        → { hostname: "0.0.0.0", port: 5173 }  (empty host → 0.0.0.0)
+//   "5173"         → throws (no colon → ambiguous)
+//   "foo:bar"      → throws (NaN port)
+export function parse_listen_addr(raw: string): { hostname: string; port: number } {
+	const last_colon = raw.lastIndexOf(":")
+	if (last_colon === -1) {
+		throw new AppError({
+			message: `WALLRUS_LISTEN_ADDR must be host:port, got: ${raw}`,
+			publicMessage: "WALLRUS_LISTEN_ADDR must be host:port",
+			status: 500,
+			fields: { raw },
+		})
+	}
+	const host_part = raw.slice(0, last_colon)
+	const port_part = raw.slice(last_colon + 1)
+	const port = Number(port_part)
+	if (!Number.isInteger(port) || port < 1 || port > 65535) {
+		throw new AppError({
+			message: `WALLRUS_LISTEN_ADDR port must be 1-65535, got: ${port_part}`,
+			publicMessage: "WALLRUS_LISTEN_ADDR must be host:port",
+			status: 500,
+			fields: { raw, port_part },
+		})
+	}
+	const hostname = host_part === "" ? "0.0.0.0" : host_part
+	return { hostname, port }
 }
 
 // Browser telemetry posture derived from WALLRUS_OTEL_FRONTEND + the rest of
