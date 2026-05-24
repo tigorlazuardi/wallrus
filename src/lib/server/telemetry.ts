@@ -1,9 +1,11 @@
-// Telemetry wiring. Wraps `@tigorhutasuhut/telemetry-js` so the rest of the
-// codebase imports a single `telemetry` namespace. Pretty stdout on TTY,
-// JSON otherwise; OTEL emission enabled when WALLRUS_OTEL_ENDPOINT is set.
+// Telemetry surface for the rest of the codebase. Importers ALWAYS go through
+// `$lib/server/telemetry` so the bindings can be swapped in tests and so a
+// single module owns the contract documented in `.claude/rules/telemetry.md`.
 //
-// This is intentionally a thin re-export for now. Detailed wiring (spans,
-// metric counters, log redaction of Authorization / Cookie / auth-route POST
-// bodies) lands when the surfaces that need them ship.
+// Detailed SDK init (initSDK) is wired from `bootstrap.ts` to keep this module
+// import-time-pure (no side effects on import — important for unit tests).
 
-export * as telemetry from "@tigorhutasuhut/telemetry-js/bun"
+export { getLogger, traced, withTrace, initSDK } from "@tigorhutasuhut/telemetry-js/bun"
+export type { Logger } from "@tigorhutasuhut/telemetry-js/bun"
+export { withQueryName } from "@tigorhutasuhut/telemetry-js/db"
+export { AppError } from "@tigorhutasuhut/telemetry-js/error"

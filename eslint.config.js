@@ -48,4 +48,13 @@ export default tseslint.config(
 			},
 		},
 	},
+	// `console.*` is banned under `src/` — use `getLogger()` from
+	// `$lib/server/telemetry` instead. See `.claude/rules/telemetry.md`.
+	{
+		files: ["src/**/*.{ts,tsx,js,jsx,svelte}"],
+		ignores: ["src/**/*.test.ts"],
+		rules: {
+			"no-console": "error",
+		},
+	},
 )

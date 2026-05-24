@@ -19,7 +19,7 @@ paths:
 4. **No `JSON.parse` / `JSON.stringify` for DB-bound JSON columns.** Use the Drizzle `customType<T>()` declared in `db/schema.ts`. See [`database.md`](./database.md) §SQLite conventions #4.
 5. **Multi-write operations wrap in a transaction.** `db.transaction(tx => { … })` — see [`database.md`](./database.md) §Transactions.
 6. **Time discipline.** Services use `Date.now()` to populate `*_at` columns; never `new Date().toISOString()` for storage. ISO conversion happens at the API boundary (route layer), not here.
-7. **Throw typed errors.** Define an `AppError` union (e.g. `NotFoundError`, `ConflictError`, `ValidationError`). Route handlers map these to HTTP status codes in one place. No `throw new Error("string")` in services.
+7. **Throw `AppError`** from `@tigorhutasuhut/telemetry-js/error` (re-exported via `$lib/server/telemetry`). Pass `{ message, publicMessage, status, fields, cause }`. Route handlers map `status` to HTTP and `publicMessage` to the response body. No `throw new Error("string")` in services. Full surface in [`telemetry.md`](./telemetry.md).
 
 ## Code style — mixin composition
 
@@ -174,14 +174,16 @@ Bootstrap instantiates one `Service` and passes it to callers (routes get it via
 
 ### Telemetry
 
-- Every public service method carries `@traced()` from `@tigorhutasuhut/telemetry-js/bun`. The decorator creates a span named after the method.
-- Inside methods, use the logger from `Dependencies` (or the telemetry singleton). Never `console.log`.
-- Log levels: `debug` for hot-path detail, `info` for state transitions, `warn` for recoverable anomalies, `error` for failures. Never log credentials, full request bodies, or response payloads.
+See [`telemetry.md`](./telemetry.md) for the full surface. Service-specific summary:
+
+- Every public service method carries `@traced()`. Span auto-named `Class.method`.
+- Use `getLogger()` for logs, `AppError` for thrown errors, `withQueryName` for non-trivial DB calls. **Never `console.log`**.
+- Import the surface via `$lib/server/telemetry` (project's thin re-export), not directly from `@tigorhutasuhut/telemetry-js/*`.
 
 ## Special files
 
 - `_pagination.ts` — typed `paginate<T>(…)` helper used by every list operation. Returns `{ items, total, next_cursor?, prev_cursor? }` per the pagination contract in [`api.md`](./api.md).
-- `_errors.ts` — `AppError` union: `NotFoundError`, `ConflictError`, `ValidationError`, `ForbiddenError` (reserved post-MVP). Underscore prefix = internal helper, not a domain service.
+- Error type: **use `AppError` from `@tigorhutasuhut/telemetry-js/error`** (re-exported via `$lib/server/telemetry`). Don't roll a custom error class hierarchy. Pass `{ message, publicMessage, status, fields }` to the constructor; routes map `status` to HTTP and `publicMessage` to the response body. See [`telemetry.md`](./telemetry.md) §Errors.
 
 ## Patterns
 
@@ -204,10 +206,19 @@ async listDevices(req: ListDevicesRequest): Promise<ListDevicesResponse> {
 ### Single-item fetch
 
 ```ts
+import { AppError } from "$lib/server/telemetry"
+
 @traced()
 async getDevice(req: GetDeviceRequest): Promise<GetDeviceResponse> {
   const row = await this.deps.db.query.devices.findFirst({ where: eq(devices.id, req.id) })
-  if (!row) throw new NotFoundError(`device:${req.id}`)
+  if (!row) {
+    throw new AppError({
+      message: `device not found: ${req.id}`,
+      publicMessage: "Device not found.",
+      status: 404,
+      fields: { device_id: req.id },
+    })
+  }
   return to_dto(row)
 }
 ```
