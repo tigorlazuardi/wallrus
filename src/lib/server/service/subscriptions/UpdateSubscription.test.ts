@@ -5,13 +5,18 @@ import { create_test_db } from "$test/db"
 import { set_runtime, _reset_runtime_for_tests } from "$lib/server/runtime"
 import { sources } from "$lib/server/sources/_registry"
 import { SubscriptionService } from "./index"
+import { ImageService } from "$lib/server/service/images"
 import type { Runtime } from "$lib/server/bootstrap"
 import type { SourceModule } from "$lib/server/sources/_types"
 
 function make_runtime(db: ReturnType<typeof create_test_db>): Runtime {
 	return {
 		db,
-		services: { devices: {} as never, subscriptions: new SubscriptionService({ db }) },
+		services: {
+			devices: {} as never,
+			subscriptions: new SubscriptionService({ db }),
+			images: new ImageService({ db }),
+		},
 		env: {} as never,
 		sdk: {} as never,
 	}

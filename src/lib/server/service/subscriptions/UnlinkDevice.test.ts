@@ -6,6 +6,7 @@ import { set_runtime, _reset_runtime_for_tests } from "$lib/server/runtime"
 import { sources } from "$lib/server/sources/_registry"
 import { SubscriptionService } from "./index"
 import { DeviceService } from "$lib/server/service/devices"
+import { ImageService } from "$lib/server/service/images"
 import type { Runtime } from "$lib/server/bootstrap"
 import type { SourceModule } from "$lib/server/sources/_types"
 
@@ -15,7 +16,7 @@ function make_runtime(
 ): Runtime {
 	return {
 		db,
-		services: { devices: {} as never, subscriptions },
+		services: { devices: {} as never, subscriptions, images: new ImageService({ db }) },
 		env: {} as never,
 		sdk: {} as never,
 	}

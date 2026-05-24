@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { create_test_db } from "$test/db"
 import { SubscriptionService } from "$lib/server/service/subscriptions"
+import { ImageService } from "$lib/server/service/images"
 import { set_runtime, _reset_runtime_for_tests } from "$lib/server/runtime"
 import { sources } from "$lib/server/sources/_registry"
 import { reload } from "./cron"
@@ -17,6 +18,7 @@ function make_runtime(): Runtime {
 		services: {
 			devices: {} as never,
 			subscriptions,
+			images: new ImageService({ db }),
 		},
 		env: {} as never,
 		sdk: {} as never,

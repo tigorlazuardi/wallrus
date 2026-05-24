@@ -2,19 +2,19 @@
 
 ## Schemas
 
-- [ ] `src/lib/schemas/images/Image.ts` DTO
-- [ ] `src/lib/schemas/images/{ListImages,GetImage,ListDeviceImages,ToggleFavorite,AddTag,RemoveTag,SoftDeleteImage,BlacklistImage,RestoreImage}.ts`
-- [ ] `index.ts` barrel
-- [ ] Unit test: `ListImagesRequest` accepts every filter; rejects unknown keys
+- [x] `src/lib/schemas/images/Image.ts` DTO
+- [x] `src/lib/schemas/images/{ListImages,GetImage,ListDeviceImages,ToggleFavorite,AddTag,RemoveTag,SoftDeleteImage,BlacklistImage,RestoreImage}.ts`
+- [x] `index.ts` barrel
+- [x] Unit test: `ListImagesRequest` accepts every filter; rejects unknown keys
 
 ## Services
 
-- [ ] `service/images/base.ts`
-- [ ] 9 operation mixins per Decisions
-- [ ] `ListImages` builds query via Drizzle + raw FTS5 IN-subquery when `search` set
-- [ ] `BlacklistImage` clears `favorited` and `user_tags` join rows
-- [ ] `RestoreImage` refuses on blacklisted with `AppError("validation.blacklisted", …)`
-- [ ] `service/images/index.ts` barrel + `runtime.services.images`
+- [x] `service/images/base.ts` — verified
+- [x] 9 operation mixins per Decisions — verified (ListImages.ts bugs fixed: images.rowid qualified, \_list_images_page1 inlined, ListDeviceImages extends Sup not ListImages(Sup))
+- [x] `ListImages` builds query via Drizzle + raw FTS5 IN-subquery when `search` set — verified
+- [x] `BlacklistImage` clears `favorited` and `user_tags` join rows — verified
+- [x] `RestoreImage` refuses on blacklisted with `AppError("validation.blacklisted", …)` — verified
+- [x] `service/images/index.ts` barrel + `runtime.services.images` — verified (18 test files updated with images mock)
 
 ## Routes
 
@@ -29,20 +29,20 @@
 
 ## Test fixtures
 
-- [ ] `src/test/fixtures/seed_images.ts` seeds 20 rows across 2 devices, 2 sources, mixed nsfw
+- [x] `src/test/fixtures/seed_images.ts` seeds 20 rows across 2 devices, 2 sources, mixed nsfw — verified
 
 ## Service tests
 
-- [ ] `ListImages.test.ts` — empty / populated / filter device / filter source / favorited / nsfw matrix / include_deleted / include_blacklisted / search
-- [ ] FTS5 test: two rows, distinct `search_text`; query for one term returns one row in expected order
-- [ ] `GetImage.test.ts` — happy / soft-deleted hidden by default / `include_deleted=true` returns it
-- [ ] `ListDeviceImages.test.ts`
-- [ ] `ToggleFavorite.test.ts`
-- [ ] `AddTag.test.ts` — happy, idempotent on duplicate, normalised lower-case
-- [ ] `RemoveTag.test.ts`
-- [ ] `SoftDeleteImage.test.ts`
-- [ ] `BlacklistImage.test.ts`
-- [ ] `RestoreImage.test.ts` — happy + refuses on blacklisted
+- [x] `ListImages.test.ts` — empty / populated / filter device / filter source / favorited / nsfw matrix / include_deleted / include_blacklisted / search
+- [x] FTS5 test: two rows, distinct `search_text`; query for one term returns one row in expected order
+- [x] `GetImage.test.ts` — happy / soft-deleted hidden by default / `include_deleted=true` returns it
+- [x] `ListDeviceImages.test.ts`
+- [x] `ToggleFavorite.test.ts`
+- [x] `AddTag.test.ts` — happy, idempotent on duplicate, normalised lower-case
+- [x] `RemoveTag.test.ts`
+- [x] `SoftDeleteImage.test.ts`
+- [x] `BlacklistImage.test.ts`
+- [x] `RestoreImage.test.ts` — happy + refuses on blacklisted
 
 ## Route tests
 

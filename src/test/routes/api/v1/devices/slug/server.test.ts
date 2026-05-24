@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { create_test_db } from "$test/db"
 import { DeviceService } from "$lib/server/service/devices"
 import { SubscriptionService } from "$lib/server/service/subscriptions"
+import { ImageService } from "$lib/server/service/images"
 import { set_runtime, _reset_runtime_for_tests } from "$lib/server/runtime"
 import type { Runtime } from "$lib/server/bootstrap"
 import { GET, PATCH, DELETE } from "../../../../../../routes/api/v1/devices/[slug]/+server"
@@ -40,7 +41,11 @@ let svc: DeviceService
 beforeEach(() => {
 	db = create_test_db()
 	svc = new DeviceService({ db })
-	const services = { devices: svc, subscriptions: new SubscriptionService({ db }) }
+	const services = {
+		devices: svc,
+		subscriptions: new SubscriptionService({ db }),
+		images: new ImageService({ db }),
+	}
 	set_runtime({ db, services, env: {} as never, sdk: {} as never } as Runtime)
 })
 

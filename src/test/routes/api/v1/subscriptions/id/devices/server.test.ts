@@ -6,6 +6,7 @@ import { z } from "zod"
 import { create_test_db } from "$test/db"
 import { DeviceService } from "$lib/server/service/devices"
 import { SubscriptionService } from "$lib/server/service/subscriptions"
+import { ImageService } from "$lib/server/service/images"
 import { set_runtime, _reset_runtime_for_tests } from "$lib/server/runtime"
 import { sources } from "$lib/server/sources/_registry"
 import type { Runtime } from "$lib/server/bootstrap"
@@ -51,7 +52,7 @@ beforeEach(() => {
 	db = create_test_db()
 	sub_svc = new SubscriptionService({ db })
 	dev_svc = new DeviceService({ db })
-	const services = { devices: dev_svc, subscriptions: sub_svc }
+	const services = { devices: dev_svc, subscriptions: sub_svc, images: new ImageService({ db }) }
 	set_runtime({ db, services, env: {} as never, sdk: {} as never } as Runtime)
 
 	sources[MOCK_SOURCE_SLUG] = {
