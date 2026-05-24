@@ -76,7 +76,7 @@ authoritative checklist for the slice.
 | `002-http-integration`      | done        | Bun.serve hosting SvelteKit + scheduler tick + `/healthz`                         |
 | `003-auth`                  | done        | JWT cookie + Basic auth gate, login routes, rate-limited brute-force lockout      |
 | `004-service-devices`       | done        | Devices CRUD + toggle service, API routes, paginated list                         |
-| `005-service-subscriptions` | not-started | Subscriptions CRUD + soft-delete + device link, cron validation, scheduler reload |
+| `005-service-subscriptions` | done        | Subscriptions CRUD + soft-delete + device link, cron validation, scheduler reload |
 | `006-service-images`        | not-started | Images list/search/get/favorite/tag/delete/blacklist/restore + per-device images  |
 | `007-source-reddit`         | not-started | Async-generator Reddit crawler with OAuth + gallery expansion                     |
 | `008-source-booru`          | not-started | Danbooru + Gelbooru crawler with tag/rating filters                               |
