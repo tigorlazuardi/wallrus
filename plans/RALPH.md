@@ -112,13 +112,15 @@ unless tagged `[builder]`.)
      the missing change.
    - Spot-check the most-touched files via Read. Confirm the actual code
      matches what was promised (right symbols, right imports, no
-     placeholder TODOs).
+     placeholder TODOs). **Read-only** — never `Edit`/`Write` source.
    - Re-run the slice's "Verification gates" yourself
      (`bun run check`, `bun test`, `bunx eslint .`, `bunx prettier --check .`,
-     slice-specific smoke). Do not trust the builder's claim alone.
-   - If gates fail: either fix trivially (a typo, a missing format pass)
-     and re-run, or spawn the builder again with a tight follow-up prompt
-     citing the exact failure.
+     slice-specific smoke). All read-only commands. Do not trust the
+     builder's claim alone.
+   - If gates fail: **always** spawn a fresh `wallrus-builder` in
+     FIX-MODE with the exact gate output pasted in the prompt. The
+     reviewer NEVER edits source — not even typos, not even a single
+     `bunx prettier --write` pass. See §Fix-mode invocation below.
    - If multiple invocations are needed (per the split table), repeat
      step 4 with a new prompt: "steps 1-3 done per TASKS.md; do steps
      4-6 now." The builder reads TASKS.md state + .builder-notes.md and
@@ -138,6 +140,25 @@ unless tagged `[builder]`.)
 
 ## Hard rules (reviewer)
 
+- **Reviewer NEVER touches code.** No `Edit` or `Write` on anything
+  under `src/`, `drizzle/`, `engineering/`, `docs/`, `tests/`,
+  `lefthook.yml`, `package.json`, `bun.lock`, `tsconfig*.json`,
+  `eslint.config.*`, `.prettierrc*`, `svelte.config.js`,
+  `vite.config.*`, `tailwind.config.*`, `commitlint.config.*`, or
+  any first-party source file. Allowed reviewer writes are limited to:
+  - `plans/<NNN>-*/IMPLEMENTATION.md` `Status:` field (one-line edit).
+  - `plans/README.md` index status column (one-line edit).
+  - Git commit messages (via `git commit -m`).
+    Everything else — typos, format passes, lint fixes, broken tests,
+    one-character regressions, a missing semicolon — is delegated to a
+    fresh `wallrus-builder` invocation. **Reason**: Opus implementer
+    time burns the user's quota; Sonnet builder cost is ~5× cheaper
+    per token and the user has explicitly forbidden Opus implementations.
+- **Fix-mode is also delegated.** If verification gates fail, do NOT
+  fix locally. Spawn another `wallrus-builder` with a FIX-MODE prompt
+  (see §Fix-mode invocation). The reviewer's only responsibility on
+  failure is to read the failure output, choose the right prompt,
+  re-spawn, and re-verify when the builder reports back.
 - **Never edit a slice already marked `done`.** Done = historical record.
   New work = new slice (`NNN+1`).
 - **One slice per iteration ceiling.** If the builder can't finish a
@@ -167,6 +188,45 @@ unless tagged `[builder]`.)
 - No new slices, no `plans/` restructure.
 - No marking a TASKS line `[x]` unless the verification it implies passes.
 - No silent design overrides — if Decisions conflict, STOP and report.
+
+## Fix-mode invocation (when a verification gate fails)
+
+Reviewer never fixes code. Every fix is a fresh `wallrus-builder`
+invocation. Use this template:
+
+```
+You are resuming slice <NNN>-<slug> in FIX-MODE. The previous
+invocation landed file changes but a verification gate failed.
+
+GATE: <bun run check | bun test | bunx eslint . | bunx prettier --check . | <smoke command>>
+EXACT OUTPUT:
+<paste 10-40 relevant lines verbatim — TypeScript errors with
+file:line, failing test name + assertion message, eslint rule +
+file:line, prettier diff, smoke command stderr — whichever applies>
+
+What to do:
+1. Read TASKS.md and .builder-notes.md to ground-truth current state.
+2. Run `git status` and `git diff --stat HEAD` so you see what the
+   previous invocation actually wrote.
+3. Diagnose the failure from the pasted output. Do NOT redo prior
+   work — just fix the regression named by the gate.
+4. Apply the smallest fix that makes the gate green.
+5. Re-run the failing gate locally until it passes.
+6. Re-run ALL gates (check, test, eslint, prettier, slice smoke) to
+   confirm no new regression was introduced.
+7. Report back with the standard report format from
+   .claude/agents/wallrus-builder.md.
+
+Hard rules unchanged: do NOT `git commit`. Do NOT `git push`. Do NOT
+`--no-verify`. Do NOT edit IMPLEMENTATION.md Status or
+plans/README.md.
+```
+
+**Fix-mode quota guard**: if the same gate fails 3 FIX-MODE
+invocations in a row on the same slice, set the slice `Status: blocked`
+with reason "fix-mode budget exceeded — likely a Decision conflict or
+underspecified gate", push the bookkeeping, exit **without** the
+completion promise. (Same exit semantics as the main blocked path.)
 
 ## Compaction defense — proactive HANDOFF protocol
 

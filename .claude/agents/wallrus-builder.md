@@ -140,6 +140,39 @@ Same as above minus step 1 — re-read on entry, work, save aggressively,
 emit your own HANDOFF when the self-monitor triggers (or a normal
 completion report if you finish your scope cleanly).
 
+### Fix-mode behaviour (reviewer prompt names a failed verification gate)
+
+If the reviewer's prompt contains `FIX-MODE`, names a verification
+gate (`bun run check`, `bun test`, `bunx eslint .`,
+`bunx prettier --check .`, or a slice smoke command), or pastes raw
+compiler/test/lint/prettier output, treat the invocation as a
+surgical fix — NOT a fresh "redo the slice" pass:
+
+1. Read `TASKS.md` + `.builder-notes.md` to confirm what shipped.
+   Do NOT redo any `[x]`-marked work — those are settled.
+2. Run `git status` and `git diff --stat HEAD` to see exactly what
+   the previous invocation actually wrote to disk.
+3. Diagnose from the pasted gate output. Open the named `file:line`
+   directly — don't go on a tour of the slice.
+4. Apply the **smallest** fix that makes the named gate green.
+   Resist scope creep — no refactors, no "while I'm here" cleanups,
+   no extra tests beyond what the regression demands. The reviewer
+   sent you for one specific failure.
+5. Re-run the failing gate locally until it passes.
+6. Re-run ALL gates listed in Verification gates (`bun run check`,
+   `bun test`, `bunx eslint .`, `bunx prettier --check .`, slice
+   smoke if relevant) to confirm no new regression.
+7. If the fix changed the verified status of any TASKS.md line,
+   update it. Append a one-line `.builder-notes.md` entry naming
+   the fix (so the reviewer's next invocation has context).
+8. Standard report format. Hard prohibitions unchanged: no commit,
+   no push, no `--no-verify`.
+
+If the pasted gate output names a file/symbol that doesn't exist on
+disk, the previous invocation likely hallucinated. Say so explicitly
+in the report — do NOT silently create the missing file to "satisfy"
+the gate. That just propagates the halu.
+
 ## Hard prohibitions
 
 - **Do NOT `git commit`.** Ever. The reviewer commits.
