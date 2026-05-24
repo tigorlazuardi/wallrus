@@ -958,7 +958,7 @@ async function link_or_copy(src: string, dst: string) {
     WALLRUS_USERNAME, WALLRUS_PASSWORD, WALLRUS_AUTH_SECRET,    # required when WALLRUS_AUTH_ENABLE=true
     WALLRUS_JWT_TTL_DAYS?, WALLRUS_TRUST_PROXY?,
     WALLRUS_LISTEN_ADDR,
-    WALLRUS_OTEL_ENDPOINT?)
+    OTEL_EXPORTER_OTLP_ENDPOINT?)
    # Zod schema enforces:
    #   - if WALLRUS_AUTH_ENABLE=true (default), require USERNAME + PASSWORD + AUTH_SECRET
    #     (and AUTH_SECRET >= 32 bytes of entropy). Reject otherwise.

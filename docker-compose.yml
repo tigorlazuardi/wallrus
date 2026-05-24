@@ -23,7 +23,7 @@ services:
       # WALLRUS_PASSWORD: "change-me"
       # WALLRUS_AUTH_SECRET: "<openssl rand -hex 32>"
       # WALLRUS_TRUST_PROXY: "true"
-      # WALLRUS_OTEL_ENDPOINT: "http://otel-collector:4318"
+      # OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
     volumes:
       - wallrus-data:/data/wallrus
 

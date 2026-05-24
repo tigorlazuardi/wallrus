@@ -28,7 +28,16 @@ If `WALLRUS_AUTH_ENABLE=false`, all three are ignored.
 | `WALLRUS_LISTEN_ADDR`   | `0.0.0.0:5173`         | Host + port the HTTP server binds to.                                                                                                |
 | `WALLRUS_JWT_TTL_DAYS`  | `30`                   | Lifetime of issued JWTs (positive integer). No refresh tokens; re-login when expired.                                                |
 | `WALLRUS_TRUST_PROXY`   | `false`                | `"true"` or `"false"`. When on, wallrus trusts `X-Forwarded-Proto` + `X-Forwarded-For` from the first hop only.                       |
-| `WALLRUS_OTEL_ENDPOINT` | unset                  | URL of an OpenTelemetry collector. Enables OTEL log/trace/metric export when set.                                                    |
+
+## OpenTelemetry (standard OTel envs)
+
+wallrus reads the **standard** OpenTelemetry env names. Set the same variables you'd use with any OTel-compliant SDK or collector.
+
+| Variable                       | Default    | Description                                                                                                                                                |
+| ------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`  | unset      | Base URL of an OpenTelemetry collector (e.g. `http://otel-collector:4318`). When unset, OTLP export is disabled and logs go to stderr only.                |
+| `OTEL_SERVICE_NAME`            | `wallrus`  | Service name reported in every span / log / metric. Override if you run multiple wallrus instances behind one collector.                                   |
+| `OTEL_RESOURCE_ATTRIBUTES`     | unset      | Comma-separated `key=value` pairs merged into the OpenTelemetry Resource (e.g. `deployment.environment=prod,service.instance.id=tv-rack`). Defaults include `service.namespace=homelab`. |
 
 ## Fail-fast behavior
 

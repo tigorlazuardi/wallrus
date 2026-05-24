@@ -28,7 +28,16 @@ Bila `WALLRUS_AUTH_ENABLE=false`, ketiganya diabaikan.
 | `WALLRUS_LISTEN_ADDR`   | `0.0.0.0:5173`                                     | Host + port yang dipakai server HTTP.                                                                                                                    |
 | `WALLRUS_JWT_TTL_DAYS`  | `30`                                               | Umur JWT (integer positif). Tidak ada refresh token; login ulang saat habis.                                                                             |
 | `WALLRUS_TRUST_PROXY`   | `false`                                            | `"true"` atau `"false"`. Bila aktif, wallrus mempercayai `X-Forwarded-Proto` + `X-Forwarded-For` dari first hop saja.                                     |
-| `WALLRUS_OTEL_ENDPOINT` | tidak diset                                        | URL OpenTelemetry collector. Mengaktifkan ekspor OTEL log/trace/metric saat di-set.                                                                      |
+
+## OpenTelemetry (env standar OTel)
+
+wallrus membaca nama env **standar** OpenTelemetry. Gunakan variabel yang sama yang biasa kamu pakai untuk SDK / collector OTel mana pun.
+
+| Variabel                      | Default     | Deskripsi                                                                                                                                                                                       |
+| ----------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | tidak diset | URL dasar OpenTelemetry collector (mis. `http://otel-collector:4318`). Bila tidak di-set, ekspor OTLP dimatikan dan log hanya ke stderr.                                                        |
+| `OTEL_SERVICE_NAME`           | `wallrus`   | Nama service yang dilaporkan di setiap span / log / metric. Override bila kamu menjalankan beberapa instance wallrus di belakang satu collector.                                                |
+| `OTEL_RESOURCE_ATTRIBUTES`    | tidak diset | Pasangan `key=value` yang dipisah koma, digabung ke OpenTelemetry Resource (mis. `deployment.environment=prod,service.instance.id=tv-rack`). Default sudah berisi `service.namespace=homelab`. |
 
 ## Perilaku fail-fast
 

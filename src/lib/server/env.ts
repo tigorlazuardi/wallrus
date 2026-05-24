@@ -20,7 +20,11 @@ const RawEnv = z
 			.union([z.literal("true"), z.literal("false")])
 			.default("false")
 			.transform((v) => v === "true"),
-		WALLRUS_OTEL_ENDPOINT: z.string().url().optional(),
+		// Standard OpenTelemetry env names — same vars an OTel SDK already picks
+		// up automatically. wallrus reads them through Zod so they're typed.
+		OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+		OTEL_SERVICE_NAME: z.string().default("wallrus"),
+		OTEL_RESOURCE_ATTRIBUTES: z.string().optional(),
 	})
 	.superRefine((v, ctx) => {
 		// Bootstrap fail-fast: when auth is enabled, all three credential env
