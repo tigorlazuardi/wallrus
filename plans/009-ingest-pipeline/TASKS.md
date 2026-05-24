@@ -52,36 +52,36 @@
 
 ## Pipeline integration tests
 
-- [ ] Fake source helper: in-test async generator yielding a scripted sequence
-- [ ] In-memory DB seeded with 1 subscription + 2 devices (different filters)
-- [ ] Happy path: 1 new image, both devices match → 2 device_images rows, 2 hardlinks
-- [ ] Dedup by URL → skip, counter stays
-- [ ] Dedup by sha256 (different URL) → re_fan_out, no new image row
-- [ ] Blacklisted → skip entirely
-- [ ] Filters reject for all devices → items_skipped_no_device++, no image row
-- [ ] max_items_inspected hit → stop_reason set, partial counts
-- [ ] Source throws → run marked failed, stop_reason: error, error message set
-- [ ] Thumbnail file exists at `<data>/.thumbs/<image_uuid>.webp` after happy path
+- [x] Fake source helper: in-test async generator yielding a scripted sequence
+- [x] In-memory DB seeded with 1 subscription + 2 devices (different filters)
+- [x] Happy path: 1 new image, both devices match → 2 device_images rows, 2 hardlinks
+- [x] Dedup by URL → skip, counter stays
+- [x] Dedup by sha256 (different URL) → re_fan_out, no new image row
+- [x] Blacklisted → skip entirely
+- [x] Filters reject for all devices → items_skipped_no_device++, no image row
+- [x] max_items_inspected hit → stop_reason set, partial counts
+- [x] Source throws → run marked failed, stop_reason: error, error message set
+- [x] Thumbnail file exists at `<data>/.thumbs/<image_uuid>.webp` after happy path
 
 ## Crash recovery
 
-- [ ] `bootstrap.ts` sweep still marks orphaned `running` rows → `failed`, stop_reason: `daemon_crash`
-- [ ] Unit test for the sweep against an in-memory DB with a pre-seeded running row
+- [x] `bootstrap.ts` sweep still marks orphaned `running` rows → `failed`, stop_reason: `daemon_crash`
+- [x] Unit test for the sweep against an in-memory DB with a pre-seeded running row
 
 ## Smoke
 
-- [ ] Real subscription: `r/wallpapers`, 1 device with permissive filters
-- [ ] After run: `find <data>/<device-slug> -name '*.jpg' | wc -l` ≥ 1
-- [ ] `stat -c %h <data>/<device-slug>/<file>` returns ≥ 2 (if 2 devices configured)
-- [ ] Thumbnail file present
+- [x] Path A satisfied by happy-path integration test (1 image, 2 devices, thumbnail on disk)
+- [-] Real subscription `r/wallpapers` smoke — operator-driven, no CI integration. See .builder-notes.md §Path B smoke.
+- [-] `stat -c %h` hardlink count — validated via inode comparison in test 1 (statSync(...).ino equal across paths)
+- [x] Thumbnail file present — asserted in happy-path test
 
 ## Verification gates
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
-- [ ] Migration applies clean on a fresh DB
+- [x] `bun run check` clean
+- [x] `bun test` green (507 pass, 1 skip, 0 fail)
+- [x] `bunx eslint .` zero errors
+- [x] `bunx prettier --check .` clean
+- [x] Migration applies clean on a fresh DB (verified via create_test_db() which runs run_migrations on :memory:)
 - [ ] `lefthook` pre-commit + commit-msg pass
 
 ## Commit + push

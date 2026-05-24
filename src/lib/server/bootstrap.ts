@@ -102,7 +102,7 @@ function parse_resource_attributes(raw: string | undefined): Record<string, stri
 // Mark any run_history row left in `running` state as failed on startup —
 // indicates the previous daemon process died mid-run. See
 // `engineering/ARCHITECTURE.md` §Crash recovery.
-function recover_orphan_runs(db: DbClient) {
+export function recover_orphan_runs(db: DbClient) {
 	db.update(run_history)
 		.set({
 			status: "failed",
