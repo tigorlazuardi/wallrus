@@ -70,20 +70,20 @@ authoritative checklist for the slice.
 
 ## Index
 
-| Slice                       | Status      | Goal                                                                              |
-| --------------------------- | ----------- | --------------------------------------------------------------------------------- |
-| `001-foundation`            | done        | Scope locked, scaffold + schema + Docker + docs                                   |
-| `002-http-integration`      | done        | Bun.serve hosting SvelteKit + scheduler tick + `/healthz`                         |
-| `003-auth`                  | done        | JWT cookie + Basic auth gate, login routes, rate-limited brute-force lockout      |
-| `004-service-devices`       | done        | Devices CRUD + toggle service, API routes, paginated list                         |
-| `005-service-subscriptions` | done        | Subscriptions CRUD + soft-delete + device link, cron validation, scheduler reload |
-| `006-service-images`        | done        | Images list/search/get/favorite/tag/delete/blacklist/restore + per-device images  |
-| `007-source-reddit`         | done        | Async-generator Reddit crawler with OAuth + gallery expansion                     |
-| `008-source-booru`          | done        | Danbooru + Gelbooru crawler with tag/rating filters                               |
-| `009-ingest-pipeline`       | done        | Scheduler executor: download, dedup, thumbnail, fan-out to devices                |
-| `010-run-history`           | done        | Run history list/get/active/SSE-stream API, prune-to-100 trigger                  |
-| `011-webui-gallery`         | done        | Masonry gallery, filter chips, infinite scroll, image modal, NSFW gate            |
-| `012-webui-device`          | done        | Device + subscription editor pages with superforms-driven flows                   |
-| `013-webui-runs`            | not-started | Run dashboard with SSE live updates and per-subscription history                  |
+| Slice                       | Status | Goal                                                                              |
+| --------------------------- | ------ | --------------------------------------------------------------------------------- |
+| `001-foundation`            | done   | Scope locked, scaffold + schema + Docker + docs                                   |
+| `002-http-integration`      | done   | Bun.serve hosting SvelteKit + scheduler tick + `/healthz`                         |
+| `003-auth`                  | done   | JWT cookie + Basic auth gate, login routes, rate-limited brute-force lockout      |
+| `004-service-devices`       | done   | Devices CRUD + toggle service, API routes, paginated list                         |
+| `005-service-subscriptions` | done   | Subscriptions CRUD + soft-delete + device link, cron validation, scheduler reload |
+| `006-service-images`        | done   | Images list/search/get/favorite/tag/delete/blacklist/restore + per-device images  |
+| `007-source-reddit`         | done   | Async-generator Reddit crawler with OAuth + gallery expansion                     |
+| `008-source-booru`          | done   | Danbooru + Gelbooru crawler with tag/rating filters                               |
+| `009-ingest-pipeline`       | done   | Scheduler executor: download, dedup, thumbnail, fan-out to devices                |
+| `010-run-history`           | done   | Run history list/get/active/SSE-stream API, prune-to-100 trigger                  |
+| `011-webui-gallery`         | done   | Masonry gallery, filter chips, infinite scroll, image modal, NSFW gate            |
+| `012-webui-device`          | done   | Device + subscription editor pages with superforms-driven flows                   |
+| `013-webui-runs`            | done   | Run dashboard with SSE live updates and per-subscription history                  |
 
 Completion promise (last slice emits): `<promise>WALLRUS-MVP-COMPLETE</promise>`.
