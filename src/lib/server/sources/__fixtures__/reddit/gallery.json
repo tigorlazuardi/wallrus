@@ -1,0 +1,59 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": null,
+    "dist": 1,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "gal001",
+          "name": "t3_gal001",
+          "title": "Space photography collection [gallery]",
+          "subreddit": "wallpapers",
+          "permalink": "/r/wallpapers/comments/gal001/space_photography_collection_gallery/",
+          "url": "https://www.reddit.com/gallery/gal001",
+          "is_gallery": true,
+          "over_18": false,
+          "created_utc": 1716850000,
+          "media_metadata": {
+            "imgabc": {
+              "status": "valid",
+              "e": "Image",
+              "m": "image/jpeg",
+              "s": {
+                "u": "https://preview.example.com/imgabc.jpg?width=3840&amp;height=2160",
+                "x": 3840,
+                "y": 2160
+              },
+              "id": "imgabc"
+            },
+            "imgdef": {
+              "status": "valid",
+              "e": "Image",
+              "m": "image/png",
+              "s": {
+                "u": "https://preview.example.com/imgdef.png?width=2560&amp;height=1440",
+                "x": 2560,
+                "y": 1440
+              },
+              "id": "imgdef"
+            }
+          },
+          "gallery_data": {
+            "items": [
+              {
+                "media_id": "imgabc",
+                "id": 10001
+              },
+              {
+                "media_id": "imgdef",
+                "id": 10002
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

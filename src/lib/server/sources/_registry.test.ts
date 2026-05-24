@@ -57,8 +57,11 @@ describe("sources registry", () => {
 		expect(get_source("dupe")?.display_name).toBe("Updated")
 	})
 
-	test("register_sources is a no-op stub (does not throw)", () => {
+	test("register_sources does not throw and registers built-in sources", () => {
 		expect(() => register_sources()).not.toThrow()
-		expect(list_sources()).toEqual([])
+		// register_sources now registers the reddit source (slice 007).
+		// After calling it, the registry should contain at least "reddit".
+		const slugs = list_sources().map((s) => s.slug)
+		expect(slugs).toContain("reddit")
 	})
 })

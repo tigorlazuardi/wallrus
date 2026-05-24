@@ -31,6 +31,18 @@ export type SourceContext = {
 	) => void
 	http_get_json: (url: string, init?: RequestInit) => Promise<unknown>
 	http_get_bytes: (url: string, init?: RequestInit) => Promise<Uint8Array>
+	/**
+	 * POST a form-encoded body and return the parsed JSON response.
+	 * Added in slice 007 to support Reddit OAuth client_credentials token
+	 * endpoint (POST https://www.reddit.com/api/v1/access_token).
+	 * The runtime wires this to globalThis.fetch with Content-Type:
+	 * application/x-www-form-urlencoded.
+	 */
+	http_post_form: (
+		url: string,
+		body: Record<string, string>,
+		init?: RequestInit,
+	) => Promise<unknown>
 	abort: AbortSignal
 }
 

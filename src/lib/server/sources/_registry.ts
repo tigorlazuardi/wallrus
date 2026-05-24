@@ -1,4 +1,5 @@
 import type { SourceModule } from "./_types"
+import { register_reddit } from "./reddit"
 
 // First-party source registry. Each concrete source (`reddit.ts`,
 // `danbooru.ts`, etc.) imports here and gets registered by slug.
@@ -23,10 +24,10 @@ export function register(entry: SourceModule): void {
 }
 
 /**
- * Aggregator stub — called by bootstrap once at startup to register all
- * first-party sources. Today it is a no-op; slices 007 and 008 will fill it
- * in with concrete `import` + `register(...)` calls.
+ * Aggregator — called by bootstrap once at startup to register all
+ * first-party sources. Slice 007 added Reddit; 008 will add Booru sources.
  */
 export function register_sources(): void {
-	// 007/008 will add: register(reddit_source), register(danbooru_source), …
+	register_reddit()
+	// 008 will add: register_danbooru(), register_gelbooru(), …
 }

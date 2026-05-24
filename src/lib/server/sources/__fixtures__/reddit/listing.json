@@ -1,0 +1,78 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": null,
+    "dist": 3,
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "id": "abc111",
+          "name": "t3_abc111",
+          "title": "Beautiful mountain at sunset",
+          "subreddit": "wallpapers",
+          "permalink": "/r/wallpapers/comments/abc111/beautiful_mountain_at_sunset/",
+          "url": "https://i.example.com/wallpapers/mountain_sunset.jpg",
+          "post_hint": "image",
+          "is_gallery": false,
+          "over_18": false,
+          "created_utc": 1716840000,
+          "preview": {
+            "images": [
+              {
+                "source": {
+                  "url": "https://i.example.com/wallpapers/mountain_sunset.jpg",
+                  "width": 3840,
+                  "height": 2160
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "abc222",
+          "name": "t3_abc222",
+          "title": "Discussion: best wallpaper apps?",
+          "subreddit": "wallpapers",
+          "permalink": "/r/wallpapers/comments/abc222/discussion_best_wallpaper_apps/",
+          "url": "https://www.reddit.com/r/wallpapers/comments/abc222/discussion_best_wallpaper_apps/",
+          "post_hint": "self",
+          "is_gallery": false,
+          "over_18": false,
+          "created_utc": 1716843600,
+          "is_self": true,
+          "selftext": "What apps do you use to manage wallpapers?"
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "id": "abc333",
+          "name": "t3_abc333",
+          "title": "NSFW artistic nude photography wallpaper",
+          "subreddit": "wallpapers",
+          "permalink": "/r/wallpapers/comments/abc333/nsfw_artistic_nude_photography_wallpaper/",
+          "url": "https://i.example.com/wallpapers/nsfw_art.png",
+          "post_hint": "image",
+          "is_gallery": false,
+          "over_18": true,
+          "created_utc": 1716847200,
+          "preview": {
+            "images": [
+              {
+                "source": {
+                  "url": "https://i.example.com/wallpapers/nsfw_art.png",
+                  "width": 1920,
+                  "height": 1080
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
