@@ -2,6 +2,7 @@
 paths:
   - "src/**/*"
   - "engineering/**/*.md"
+  - "plans/**/*.md"
   - "scripts/**/*"
   - "package.json"
 ---
@@ -108,3 +109,12 @@ Favorites, user tags, blacklist: **global per image**, not per device. Mobile/na
 ## Before adding scope
 
 If a request looks like new scope (new source kind beyond MVP set, new processing step, auto-retention, multi-user, plugin/extensibility, etc.), call it out and confirm against `engineering/SCOPE.md` before implementing.
+
+## Where to resume work
+
+Implementation progress lives under `plans/<NNN>-<slug>/`:
+
+- `plans/README.md` — convention (folder layout, status legend, ordering).
+- Each slice folder has `IMPLEMENTATION.md` (narrative, design decisions, **"Resume here" section** — read this first) and `TASKS.md` (checklist with `- [ ]` / `- [x]` / `- [~]` / `- [-]` markers).
+- A fresh session **must** read `plans/README.md`'s index table and then open the highest-numbered in-progress slice. Continue from its "Resume here" line — don't re-read every commit.
+- Done slices are historical record — never edit retroactively. New work = new slice folder, incremented `NNN`.

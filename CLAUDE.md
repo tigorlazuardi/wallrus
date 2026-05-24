@@ -19,6 +19,7 @@ This file is intentionally a **light index**. Detailed guidance lives in path-sc
 | `docs/**`, `src/lib/server/env.ts`, `Dockerfile`, `docker-compose.yml`, deploy workflow                                          | `.claude/rules/user-docs.md` — Astro Starlight user guide; keep env / Docker / deploy in sync, both `en` + `id` locales                                             |
 | Anything that looks like new scope (new source kind, plugin/extensibility, new processing step, auth model, retention policy, …) | `engineering/SCOPE.md` — confirm before implementing                                                                                                                |
 | Implementation / refactor — directory layout, schema, pipeline, scheduler, HTTP routing, FS layout, bootstrap, source contract   | `engineering/ARCHITECTURE.md` — the technical design                                                                                                                |
+| Resuming work / picking the next slice                                                                                           | `plans/README.md` → highest-numbered in-progress slice's `IMPLEMENTATION.md` "Resume here" section, then its `TASKS.md`                                             |
 
 ## Project layout (high level)
 
@@ -31,6 +32,7 @@ This file is intentionally a **light index**. Detailed guidance lives in path-sc
 - `engineering/SCOPE.md` — single source of truth for scope (what + why).
 - `engineering/ARCHITECTURE.md` — technical design (how).
 - `docs/` — **user-facing** Astro Starlight site (setup, env, Docker guides), deployed to GitHub Pages. Keep in sync when user-visible config changes — see `.claude/rules/user-docs.md`.
+- `plans/<NNN>-<slug>/` — implementation slices, each with `IMPLEMENTATION.md` (narrative + resume pointer) and `TASKS.md` (checklist). New session = read `plans/README.md` then the current slice's `IMPLEMENTATION.md`.
 - `.claude/rules/` — path-scoped rules loaded on demand.
 
 ## House rules
