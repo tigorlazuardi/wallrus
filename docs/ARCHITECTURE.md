@@ -1,6 +1,6 @@
 # wallrus — Architecture
 
-Companion to [`SCOPE.md`](./SCOPE.md). Scope says *what* and *why*; this doc says *how*. Update when the technical design changes, not on every implementation tweak.
+Companion to [`SCOPE.md`](./SCOPE.md). Scope says _what_ and _why_; this doc says _how_. Update when the technical design changes, not on every implementation tweak.
 
 > **Audience**: humans + AI agents. Read alongside `SCOPE.md` before implementing or refactoring.
 
@@ -13,21 +13,21 @@ Companion to [`SCOPE.md`](./SCOPE.md). Scope says *what* and *why*; this doc say
 
 ## Stack picks
 
-| Concern | Pick | Rationale |
-|---------|------|-----------|
-| Runtime | Bun | per scope |
-| HTTP / SSR | SvelteKit + `svelte-adapter-bun` | Bun.serve native handler; falls back to `adapter-node` if a regression bites |
-| CLI parser | `commander` | per scope |
-| ORM | `drizzle-orm` + `drizzle-kit` | typed schema, lightweight, first-class `bun:sqlite` driver, supports hand-written migration SQL |
-| SQLite driver | `bun:sqlite` | Bun built-in |
-| Cron | `croner` | active, supports `nextRun()` computation, light |
-| Validation | `zod` | de-facto, integrates with `zod-to-json-schema` for source param schemas |
-| JSON Schema export (optional) | Zod v4 built-in `z.toJSONSchema()` (beta) | Only for external client introspection (e.g. mobile fetching source `params_schema` as JSON Schema). WebUI consumes Zod directly via Superforms — no JSON Schema in the form path. Fallback to `zod-to-json-schema` package if Zod's built-in regresses. |
-| Forms | `sveltekit-superforms` + `zod` adapter | WebUI form actions; `dataType: 'json'` mode for nested data; same Zod schema as the service contract |
-| Image probe + thumbnail | `sharp` | dimensions, webp encode, format detect; native libvips |
-| UUID | `uuidv7` (tiny pkg) | per scope |
-| Telemetry | `@tigorhutasuhut/telemetry-js` (`/bun` export) | per scope |
-| Form generation (WebUI) | Hand-rolled minimal Svelte component | MVP sources need ~5 input kinds (string, number, enum, bool, array-of-strings); full json-schema-form lib is overkill |
+| Concern                       | Pick                                           | Rationale                                                                                                                                                                                                                                                |
+| ----------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime                       | Bun                                            | per scope                                                                                                                                                                                                                                                |
+| HTTP / SSR                    | SvelteKit + `svelte-adapter-bun`               | Bun.serve native handler; falls back to `adapter-node` if a regression bites                                                                                                                                                                             |
+| CLI parser                    | `commander`                                    | per scope                                                                                                                                                                                                                                                |
+| ORM                           | `drizzle-orm` + `drizzle-kit`                  | typed schema, lightweight, first-class `bun:sqlite` driver, supports hand-written migration SQL                                                                                                                                                          |
+| SQLite driver                 | `bun:sqlite`                                   | Bun built-in                                                                                                                                                                                                                                             |
+| Cron                          | `croner`                                       | active, supports `nextRun()` computation, light                                                                                                                                                                                                          |
+| Validation                    | `zod`                                          | de-facto, integrates with `zod-to-json-schema` for source param schemas                                                                                                                                                                                  |
+| JSON Schema export (optional) | Zod v4 built-in `z.toJSONSchema()` (beta)      | Only for external client introspection (e.g. mobile fetching source `params_schema` as JSON Schema). WebUI consumes Zod directly via Superforms — no JSON Schema in the form path. Fallback to `zod-to-json-schema` package if Zod's built-in regresses. |
+| Forms                         | `sveltekit-superforms` + `zod` adapter         | WebUI form actions; `dataType: 'json'` mode for nested data; same Zod schema as the service contract                                                                                                                                                     |
+| Image probe + thumbnail       | `sharp`                                        | dimensions, webp encode, format detect; native libvips                                                                                                                                                                                                   |
+| UUID                          | `uuidv7` (tiny pkg)                            | per scope                                                                                                                                                                                                                                                |
+| Telemetry                     | `@tigorhutasuhut/telemetry-js` (`/bun` export) | per scope                                                                                                                                                                                                                                                |
+| Form generation (WebUI)       | Hand-rolled minimal Svelte component           | MVP sources need ~5 input kinds (string, number, enum, bool, array-of-strings); full json-schema-form lib is overkill                                                                                                                                    |
 
 ## Directory layout
 
@@ -310,13 +310,14 @@ Refuses malformed JSON at write time so reads are always safe to `json_extract`.
 One helper, defined once in `db/schema.ts`:
 
 ```ts
-import { customType } from 'drizzle-orm/sqlite-core'
+import { customType } from "drizzle-orm/sqlite-core"
 
-export const jsonCol = <T>() => customType<{ data: T; driverData: string }>({
-  dataType: () => 'text',
-  toDriver: (v) => JSON.stringify(v),
-  fromDriver: (v) => JSON.parse(v) as T,
-})
+export const jsonCol = <T>() =>
+  customType<{ data: T; driverData: string }>({
+    dataType: () => "text",
+    toDriver: (v) => JSON.stringify(v),
+    fromDriver: (v) => JSON.parse(v) as T,
+  })
 ```
 
 Services declare typed JSON columns once and read/write them as native objects — never call `JSON.parse` / `JSON.stringify` in service code.
@@ -327,15 +328,15 @@ Applied to `image_user_tags.tag`, `images.source_slug`, `subscriptions.source_sl
 
 ### 6. Explicit `ON DELETE` per foreign key
 
-| FK | Action | Why |
-|----|--------|-----|
-| `device_subscriptions.device_id → devices(id)` | `CASCADE` | device hard-delete drops its joins |
-| `device_subscriptions.subscription_id → subscriptions(id)` | `NO ACTION` | sub is soft-deleted, never hard |
-| `device_images.device_id → devices(id)` | `CASCADE` | same as above |
-| `device_images.image_id → images(id)` | `NO ACTION` | images soft-deleted |
-| `image_user_tags.image_id → images(id)` | `NO ACTION` | |
-| `favorites.image_id → images(id)` | `NO ACTION` | |
-| `run_history.subscription_id → subscriptions(id)` | `NO ACTION` | sub soft-deleted |
+| FK                                                         | Action      | Why                                |
+| ---------------------------------------------------------- | ----------- | ---------------------------------- |
+| `device_subscriptions.device_id → devices(id)`             | `CASCADE`   | device hard-delete drops its joins |
+| `device_subscriptions.subscription_id → subscriptions(id)` | `NO ACTION` | sub is soft-deleted, never hard    |
+| `device_images.device_id → devices(id)`                    | `CASCADE`   | same as above                      |
+| `device_images.image_id → images(id)`                      | `NO ACTION` | images soft-deleted                |
+| `image_user_tags.image_id → images(id)`                    | `NO ACTION` |                                    |
+| `favorites.image_id → images(id)`                          | `NO ACTION` |                                    |
+| `run_history.subscription_id → subscriptions(id)`          | `NO ACTION` | sub soft-deleted                   |
 
 ### 7. `GENERATED VIRTUAL` columns for derived values
 
@@ -400,41 +401,45 @@ Most PRAGMAs are session-level; `client.ts` re-applies them on every connection 
 
 ```ts
 // src/lib/server/sources/_types.ts
-import type { z } from 'zod'
+import type { z } from "zod"
 
-export type Nsfw = 'sfw' | 'nsfw' | 'unknown'
-export type Format = 'jpg' | 'png' | 'webp' | 'avif'
+export type Nsfw = "sfw" | "nsfw" | "unknown"
+export type Format = "jpg" | "png" | "webp" | "avif"
 
 export type SourceItem = {
   source_id: string
   title: string
   source_url: string
   image_url: string
-  filename: string                  // globally unique per source item
+  filename: string // globally unique per source item
   width?: number
   height?: number
   file_size?: number
   format?: Format
   tags: string[]
   nsfw: Nsfw
-  created_at_source?: string        // ISO 8601
+  created_at_source?: string // ISO 8601
   search_text?: string
 }
 
 export type SourceContext = {
-  log: (level: 'debug'|'info'|'warn'|'error', msg: string, kv?: Record<string, unknown>) => void
+  log: (
+    level: "debug" | "info" | "warn" | "error",
+    msg: string,
+    kv?: Record<string, unknown>,
+  ) => void
   http_get_json: (url: string, init?: RequestInit) => Promise<unknown>
   http_get_bytes: (url: string, init?: RequestInit) => Promise<Uint8Array>
-  abort: AbortSignal                // shutdown / cancel
+  abort: AbortSignal // shutdown / cancel
 }
 
 export type SourceModule<Params = unknown, Credential = unknown> = {
-  slug: string                                 // unique, kebab-case
+  slug: string // unique, kebab-case
   display_name: string
-  params_schema: z.ZodType<Params>             // single source-of-truth
+  params_schema: z.ZodType<Params> // single source-of-truth
   credential?: {
     schema: z.ZodType<Credential>
-    description: string                        // "Reddit OAuth client_id+secret", etc.
+    description: string // "Reddit OAuth client_id+secret", etc.
   }
   fetch: (
     ctx: SourceContext,
@@ -493,7 +498,7 @@ export function source_json_schema(slug: string): JSONSchema  // via z.toJSONSch
 
 ```ts
 // scheduler/cron.ts
-const registry = new Map<subscription_id, Cron>()  // croner instances, schedule-only
+const registry = new Map<subscription_id, Cron>() // croner instances, schedule-only
 
 // on bootstrap and on any subscription mutation:
 //   - clear/recreate Cron for each enabled, non-deleted subscription
@@ -583,6 +588,7 @@ A single `auth_secret` (from `WALLRUS_AUTH_SECRET`) is the root for both cookie 
 - Bootstrap validates length: minimum 32 bytes of entropy (64 hex chars / 44 base64 chars). Refuse shorter values.
 
 Domain separation:
+
 - Cookie HMAC: `HMAC-SHA256(auth_secret, "wallrus-cookie-v1:" + username + ":" + password)`.
 - JWT signing key: `auth_secret` directly (HS256 via `jose`). Payload: `{ sub: "wallrus", iat, exp }`. No claims beyond standard.
 
@@ -607,10 +613,10 @@ Rotating `WALLRUS_AUTH_SECRET` (or username / password) invalidates every cookie
 
 ```ts
 type ListQuery = {
-  next?:   string   // UUIDv7 — anchor: results AFTER this row
-  prev?:   string   // UUIDv7 — anchor: results BEFORE this row
-  offset?: number   // default 0; additional rows to skip past the anchor
-  limit?:  number   // default 60; capped at 200
+  next?: string // UUIDv7 — anchor: results AFTER this row
+  prev?: string // UUIDv7 — anchor: results BEFORE this row
+  offset?: number // default 0; additional rows to skip past the anchor
+  limit?: number // default 60; capped at 200
   // filter params per endpoint (source, device, tag, q, ...)
 }
 ```
@@ -624,10 +630,10 @@ type ListQuery = {
 
 ```ts
 type ListResponse<T> = {
-  items:        T[]                       // up to `limit` items, in sort order
-  total:        number                    // total row count under the current filter
-  next_cursor?: string                    // id of last item in `items`, for "→" link
-  prev_cursor?: string                    // id of first item in `items`, for "←" link
+  items: T[] // up to `limit` items, in sort order
+  total: number // total row count under the current filter
+  next_cursor?: string // id of last item in `items`, for "→" link
+  prev_cursor?: string // id of first item in `items`, for "←" link
 }
 ```
 
@@ -674,7 +680,7 @@ The UI tracks the current page number as a **transient query param** (`?page=4`)
 - Page 1: URL omits `next` / `prev` (and may omit `page` or set `page=1`).
 - Next click: pushes `?page={current+1}&next={items[last].id}`.
 - Prev click: pushes `?page={current-1}&prev={items[0].id}`. If landing back on page 1, drop the cursor.
-- Jump-to-page-N from a non-adjacent state: use pure `offset = (N-1) * limit` (no cursor). Honest stale-tolerant behavior — collection may have shifted, the user sees the current top-(N-1)*limit window.
+- Jump-to-page-N from a non-adjacent state: use pure `offset = (N-1) * limit` (no cursor). Honest stale-tolerant behavior — collection may have shifted, the user sees the current top-(N-1)\*limit window.
 - Stale `page` is acceptable: if the underlying collection grew, `?page=4&next=<old-id>` simply renders whatever follows that anchor — the page number label may be off by some rows but no error.
 
 #### Service helpers
@@ -695,15 +701,15 @@ The WebUI is a SvelteKit app served from the same Bun process as the API. Server
 
 ### Stack
 
-| Concern | Pick |
-|---------|------|
-| Framework | **Svelte 5** (runes: `$state`, `$derived`, `$effect`) + SvelteKit |
-| Styling | **Tailwind CSS v4** (CSS-first config, oxide engine) |
-| UI primitives | **shadcn-svelte** (Bits UI under the hood) — components live in `src/lib/components/ui/` as copy-paste source |
-| Icons | **lucide-svelte** |
-| Form validation | **Zod** (same schemas as the API) + form actions returning `fail()` with field-level errors |
-| Real-time | **Server-Sent Events** (`/api/v1/runs/stream`) for live run progress |
-| Data fetching | SvelteKit `load()` + `invalidate*()` (no tanstack-query) |
+| Concern         | Pick                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| Framework       | **Svelte 5** (runes: `$state`, `$derived`, `$effect`) + SvelteKit                                             |
+| Styling         | **Tailwind CSS v4** (CSS-first config, oxide engine)                                                          |
+| UI primitives   | **shadcn-svelte** (Bits UI under the hood) — components live in `src/lib/components/ui/` as copy-paste source |
+| Icons           | **lucide-svelte**                                                                                             |
+| Form validation | **Zod** (same schemas as the API) + form actions returning `fail()` with field-level errors                   |
+| Real-time       | **Server-Sent Events** (`/api/v1/runs/stream`) for live run progress                                          |
+| Data fetching   | SvelteKit `load()` + `invalidate*()` (no tanstack-query)                                                      |
 
 ### Component organization
 
@@ -752,11 +758,11 @@ src/lib/
 
 #### Breakpoint contract
 
-| Viewport | Columns | Landscape (`aspect_ratio > 1.2`) | Portrait / squareish |
-|----------|---------|----------------------------------|----------------------|
-| Mobile (`< 640px`) | 2 | span 2 (fills width) | span 1 |
-| Tablet (`640–1023px`) | 3 | span 2 | span 1 |
-| Desktop (`≥ 1024px`) | 4 | span 2 | span 1 |
+| Viewport              | Columns | Landscape (`aspect_ratio > 1.2`) | Portrait / squareish |
+| --------------------- | ------- | -------------------------------- | -------------------- |
+| Mobile (`< 640px`)    | 2       | span 2 (fills width)             | span 1               |
+| Tablet (`640–1023px`) | 3       | span 2                           | span 1               |
+| Desktop (`≥ 1024px`)  | 4       | span 2                           | span 1               |
 
 Inter-card gap is tight on mobile (e.g. 2 px) and grows slightly on larger viewports.
 
@@ -787,7 +793,7 @@ Inter-card gap is tight on mobile (e.g. 2 px) and grows slightly on larger viewp
 >
   <img
     src="/api/v1/images/{img.id}/thumbnail"
-    alt={img.title || 'untitled'}
+    alt={img.title || "untitled"}
     width={img.width}
     height={img.height}
     loading="lazy"
@@ -800,11 +806,12 @@ Inter-card gap is tight on mobile (e.g. 2 px) and grows slightly on larger viewp
 
 #### Pagination — no infinite scroll
 
-Page-based. The page-control UI lives at the bottom of the gallery (and optionally a sticky control on the top bar). See *Listing & pagination contract* below for the wire format.
+Page-based. The page-control UI lives at the bottom of the gallery (and optionally a sticky control on the top bar). See _Listing & pagination contract_ below for the wire format.
 
 #### Density toggle
 
 Top-bar control toggles **compact / comfortable / spacious**, which adjusts:
+
 - `--cols` increment for each breakpoint (e.g. desktop comfortable=4, compact=5, spacious=3).
 - Gap size.
 
@@ -848,7 +855,7 @@ If the `dense` reflow becomes visually unacceptable (large gaps, awkward reorder
 
 - Endpoint: `GET /api/v1/runs/stream` returns `text/event-stream`. Auth same as other API routes (Bearer / Basic / cookie).
 - Event types:
-  - `run.started`  `{ id, subscription_id, source_slug, started_at }`
+  - `run.started` `{ id, subscription_id, source_slug, started_at }`
   - `run.progress` `{ id, items_seen, items_new }` — throttled to ~1/sec per active run
   - `run.finished` `{ id, status, stop_reason, items_seen, items_new, items_failed_download, device_adds, duration_ms }`
 - Client: `EventSource` wrapper in `lib/client/sse.ts`, auto-reconnects on close. Dashboard subscribes once per session; appends/updates rows live.
@@ -866,20 +873,20 @@ If the `dense` reflow becomes visually unacceptable (large gaps, awkward reorder
 
 ```css
 :root[data-theme="dark"] {
-  --bg:           #0a0a0c;                      /* near-black, slight cool */
-  --bg-elev:      #131316;
-  --surface:      rgb(255 255 255 / 0.04);      /* card bg */
-  --surface-hi:   rgb(255 255 255 / 0.08);      /* hover */
-  --glass:        rgb(20 20 24 / 0.55);         /* nav, modals, popovers */
+  --bg: #0a0a0c; /* near-black, slight cool */
+  --bg-elev: #131316;
+  --surface: rgb(255 255 255 / 0.04); /* card bg */
+  --surface-hi: rgb(255 255 255 / 0.08); /* hover */
+  --glass: rgb(20 20 24 / 0.55); /* nav, modals, popovers */
   --glass-border: rgb(255 255 255 / 0.08);
-  --fg:           #e8e8ec;
-  --fg-muted:     #9a9aa3;
-  --accent:       #7c5cff;                       /* violet */
-  --accent-fg:    #f3f0ff;
-  --ring:         rgb(124 92 255 / 0.4);
-  --radius:       10px;
-  --radius-card:  12px;
-  --blur:         20px;
+  --fg: #e8e8ec;
+  --fg-muted: #9a9aa3;
+  --accent: #7c5cff; /* violet */
+  --accent-fg: #f3f0ff;
+  --ring: rgb(124 92 255 / 0.4);
+  --radius: 10px;
+  --radius-card: 12px;
+  --blur: 20px;
 }
 ```
 
@@ -933,7 +940,7 @@ async function link_or_copy(src: string, dst: string) {
   try {
     await fs.link(src, dst)
   } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === 'EXDEV') {
+    if ((e as NodeJS.ErrnoException).code === "EXDEV") {
       await fs.copyFile(src, dst)
       return
     }
@@ -982,39 +989,40 @@ Add a new source = a TypeScript file under `src/lib/server/sources/<slug>.ts` an
 
 ```ts
 // reddit.ts (sketch)
-import { z } from 'zod'
-import type { SourceModule, SourceItem } from './_types'
+import { z } from "zod"
+import type { SourceModule, SourceItem } from "./_types"
 
 const Params = z.object({
   subreddit: z.string().min(1),
-  sort: z.enum(['hot', 'new', 'top']).default('hot'),
-  time: z.enum(['hour', 'day', 'week', 'month', 'year', 'all']).default('all'),
+  sort: z.enum(["hot", "new", "top"]).default("hot"),
+  time: z.enum(["hour", "day", "week", "month", "year", "all"]).default("all"),
 })
 
 const reddit: SourceModule<z.infer<typeof Params>> = {
-  slug: 'reddit',
-  display_name: 'Reddit',
+  slug: "reddit",
+  display_name: "Reddit",
   params_schema: Params,
   async *fetch(ctx, params) {
     let after: string | undefined
     while (!ctx.abort.aborted) {
-      const url = `https://www.reddit.com/r/${params.subreddit}/${params.sort}.json` +
-                  `?limit=100${after ? `&after=${after}` : ''}` +
-                  `${params.sort === 'top' ? `&t=${params.time}` : ''}`
+      const url =
+        `https://www.reddit.com/r/${params.subreddit}/${params.sort}.json` +
+        `?limit=100${after ? `&after=${after}` : ""}` +
+        `${params.sort === "top" ? `&t=${params.time}` : ""}`
       const data: any = await ctx.http_get_json(url)
       if (!data?.data?.children?.length) return
       for (const { data: post } of data.data.children) {
         if (!post.url || !looks_like_image(post.url)) continue
         const item: SourceItem = {
           source_id: post.id,
-          title: post.title ?? '',
+          title: post.title ?? "",
           source_url: `https://reddit.com${post.permalink}`,
           image_url: post.url,
           filename: post.id,
           tags: [],
-          nsfw: post.over_18 ? 'nsfw' : 'sfw',
+          nsfw: post.over_18 ? "nsfw" : "sfw",
           created_at_source: new Date(post.created_utc * 1000).toISOString(),
-          search_text: [post.title, post.author, `r/${params.subreddit}`].filter(Boolean).join(' '),
+          search_text: [post.title, post.author, `r/${params.subreddit}`].filter(Boolean).join(" "),
         }
         yield item
       }

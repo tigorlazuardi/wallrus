@@ -1,0 +1,20 @@
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --redact --verbose --no-banner
+    format:
+      glob: "*.{ts,tsx,js,jsx,svelte,json,yml,yaml,md,css}"
+      run: bunx prettier --check {staged_files}
+    lint:
+      glob: "*.{ts,tsx,js,jsx,svelte}"
+      run: bunx eslint {staged_files}
+    typecheck:
+      run: bunx tsc --noEmit
+    test:
+      run: bun test
+
+commit-msg:
+  commands:
+    commitlint:
+      run: bunx commitlint --edit {1}

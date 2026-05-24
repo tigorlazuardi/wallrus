@@ -10,20 +10,22 @@ First-party source adapters live under `src/lib/server/sources/<slug>.ts`. One f
 ## Module shape
 
 ```ts
-import { z } from 'zod'
-import type { SourceModule, SourceItem } from './_types'
+import { z } from "zod"
+import type { SourceModule, SourceItem } from "./_types"
 
 const Params = z.object({
   // …
 })
 
 const my_source: SourceModule<z.infer<typeof Params>> = {
-  slug: 'my-source',                       // unique, kebab-case
-  display_name: 'My Source',
-  params_schema: Params,                    // Zod — the contract. Consumed directly by WebUI (Superforms) and services. JSON Schema is an optional export via z.toJSONSchema() only.
+  slug: "my-source", // unique, kebab-case
+  display_name: "My Source",
+  params_schema: Params, // Zod — the contract. Consumed directly by WebUI (Superforms) and services. JSON Schema is an optional export via z.toJSONSchema() only.
   credential: {
-    schema: z.object({ /* … */ }),          // OPTIONAL; only if source supports elevated mode
-    description: 'OAuth client id + secret',
+    schema: z.object({
+      /* … */
+    }), // OPTIONAL; only if source supports elevated mode
+    description: "OAuth client id + secret",
   },
   async *fetch(ctx, params, credential) {
     // paginate, yield SourceItem
@@ -36,8 +38,8 @@ export default my_source
 Register in `_registry.ts`:
 
 ```ts
-import my_source from './my-source'
-export const sources: Record<string, SourceModule> = { /* … */ 'my-source': my_source }
+import my_source from "./my-source"
+export const sources: Record<string, SourceModule> = { /* … */ "my-source": my_source }
 ```
 
 ## What a source MUST do
@@ -60,20 +62,20 @@ export const sources: Record<string, SourceModule> = { /* … */ 'my-source': my
 
 ## Source item field rules
 
-| Field | Rule |
-|-------|------|
-| `source_id` | Stable identifier from the source. Must be unique within this source for the lifetime of the item. |
-| `title` | Source-provided. Empty string if absent — NOT `null`. |
-| `source_url` | The permalink the user would visit. Part of dedup key. Stable across crawls. |
-| `image_url` | The URL the daemon downloads from. May differ from `source_url`. May change (CDN rotation OK; dedup uses `source_url` + SHA256). |
-| `filename` | On-disk filename without extension. **Globally unique per source item.** Typically `source_id` or a hash. The runtime appends extension from `format`. |
-| `width`, `height` | Optional. If omitted, the runtime probes the downloaded bytes with `sharp`. Provide if cheap to extract from the listing response. |
-| `file_size` | Optional. If omitted, the runtime measures the downloaded bytes. |
-| `format` | Optional. If omitted, the runtime infers from magic bytes via `sharp`. Provide as `'jpg' \| 'png' \| 'webp' \| 'avif'`. |
-| `tags` | Array of source-provided tags. Empty array if none. |
-| `nsfw` | **Must pick one of `'sfw'` / `'nsfw'` / `'unknown'`.** If the source has no signal, use `'unknown'`. |
-| `created_at_source` | Optional ISO string. Runtime converts to ms epoch on insert. |
-| `search_text` | Optional. Free-form prose indexed into FTS5. Plan it to be searchable text — concat of title, tags, author, etc. Empty / omitted = item not reachable via free-text search. |
+| Field               | Rule                                                                                                                                                                        |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source_id`         | Stable identifier from the source. Must be unique within this source for the lifetime of the item.                                                                          |
+| `title`             | Source-provided. Empty string if absent — NOT `null`.                                                                                                                       |
+| `source_url`        | The permalink the user would visit. Part of dedup key. Stable across crawls.                                                                                                |
+| `image_url`         | The URL the daemon downloads from. May differ from `source_url`. May change (CDN rotation OK; dedup uses `source_url` + SHA256).                                            |
+| `filename`          | On-disk filename without extension. **Globally unique per source item.** Typically `source_id` or a hash. The runtime appends extension from `format`.                      |
+| `width`, `height`   | Optional. If omitted, the runtime probes the downloaded bytes with `sharp`. Provide if cheap to extract from the listing response.                                          |
+| `file_size`         | Optional. If omitted, the runtime measures the downloaded bytes.                                                                                                            |
+| `format`            | Optional. If omitted, the runtime infers from magic bytes via `sharp`. Provide as `'jpg' \| 'png' \| 'webp' \| 'avif'`.                                                     |
+| `tags`              | Array of source-provided tags. Empty array if none.                                                                                                                         |
+| `nsfw`              | **Must pick one of `'sfw'` / `'nsfw'` / `'unknown'`.** If the source has no signal, use `'unknown'`.                                                                        |
+| `created_at_source` | Optional ISO string. Runtime converts to ms epoch on insert.                                                                                                                |
+| `search_text`       | Optional. Free-form prose indexed into FTS5. Plan it to be searchable text — concat of title, tags, author, etc. Empty / omitted = item not reachable via free-text search. |
 
 ## Credential handling
 

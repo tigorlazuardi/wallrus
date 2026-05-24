@@ -31,20 +31,20 @@ Each source module exports:
 
 For each source item encountered during pagination, the source yields a structured record:
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `source_id` | string | Stable per-source identifier (Reddit post id, Booru post id). Required. |
-| `title` | string | Source-provided title. Empty string if source has none. Required. |
-| `source_url` | string | Permalink to the source post/page. Required. Part of dedup key. |
-| `image_url` | string | URL the daemon downloads from. Required. |
-| `filename` | string | On-disk filename (without extension; extension comes from `format`). **Must be globally unique per source item within this source** — typically `<source_id>` or a hash of it. Required. Used to build the on-disk path. |
-| `width`, `height` | int | Pixel dimensions, if known up front. Optional — daemon recomputes after download. |
-| `file_size` | int | Bytes, if reported by source. Optional. |
-| `format` | enum (`jpg`/`png`/`webp`/`avif`) | If known up front; otherwise inferred post-download. |
-| `tags` | string[] | Source-provided tags. Empty array if none. |
-| `nsfw` | `sfw` \| `nsfw` \| `unknown` | Source-reported state. Source must pick one. |
-| `created_at_source` | timestamp | Source-side creation time, if available. Optional. |
-| `search_text` | string | **Optional.** Free-form text indexed into FTS5. Source decides content (description, tags joined, uploader). Empty = item not reachable by free-text search. |
+| Field               | Type                             | Notes                                                                                                                                                                                                                    |
+| ------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `source_id`         | string                           | Stable per-source identifier (Reddit post id, Booru post id). Required.                                                                                                                                                  |
+| `title`             | string                           | Source-provided title. Empty string if source has none. Required.                                                                                                                                                        |
+| `source_url`        | string                           | Permalink to the source post/page. Required. Part of dedup key.                                                                                                                                                          |
+| `image_url`         | string                           | URL the daemon downloads from. Required.                                                                                                                                                                                 |
+| `filename`          | string                           | On-disk filename (without extension; extension comes from `format`). **Must be globally unique per source item within this source** — typically `<source_id>` or a hash of it. Required. Used to build the on-disk path. |
+| `width`, `height`   | int                              | Pixel dimensions, if known up front. Optional — daemon recomputes after download.                                                                                                                                        |
+| `file_size`         | int                              | Bytes, if reported by source. Optional.                                                                                                                                                                                  |
+| `format`            | enum (`jpg`/`png`/`webp`/`avif`) | If known up front; otherwise inferred post-download.                                                                                                                                                                     |
+| `tags`              | string[]                         | Source-provided tags. Empty array if none.                                                                                                                                                                               |
+| `nsfw`              | `sfw` \| `nsfw` \| `unknown`     | Source-reported state. Source must pick one.                                                                                                                                                                             |
+| `created_at_source` | timestamp                        | Source-side creation time, if available. Optional.                                                                                                                                                                       |
+| `search_text`       | string                           | **Optional.** Free-form text indexed into FTS5. Source decides content (description, tags joined, uploader). Empty = item not reachable by free-text search.                                                             |
 
 ## Subscription
 
@@ -55,6 +55,7 @@ subscription = (source_slug, input_params, cron, enabled)
 ```
 
 Examples:
+
 - `reddit`, `{ subreddit: "wallpapers" }`, cron `0 9 * * *` (daily 09:00).
 - `reddit`, `{ subreddit: "animewallpapers" }`, cron `0 10 * * 3,6` (Wed + Sat 10:00).
 - `danbooru`, `{ tags: ["scenery", "rating:safe"] }`, cron `0 */6 * * *`.
@@ -111,10 +112,10 @@ Devices added later only receive images from runs executed **after** they were a
 
 Each image row carries two independent flags:
 
-- `deleted_at` (TIMESTAMP NULL) — **soft-delete**. File removed from disk (from every device dir). DB row stays for ref integrity. On next crawl run that re-encounters the same `source_url`: `deleted_at` cleared, file re-downloaded, fan-out re-evaluated. (Use case: *"I don't want this right now, but I'm fine seeing it again later"*.)
+- `deleted_at` (TIMESTAMP NULL) — **soft-delete**. File removed from disk (from every device dir). DB row stays for ref integrity. On next crawl run that re-encounters the same `source_url`: `deleted_at` cleared, file re-downloaded, fan-out re-evaluated. (Use case: _"I don't want this right now, but I'm fine seeing it again later"_.)
 - `blacklisted_at` (TIMESTAMP NULL) — **permanent skip**. Removes image from **all** devices (on-disk files), DB row stays. Future crawler runs that encounter the same `source_url` or SHA256 are **skipped at ingest** — never re-downloaded, never re-fanned-out.
 
-WebUI **Delete** action prompts: *"Also blacklist?"* If yes → set `blacklisted_at`. If no → set `deleted_at` only.
+WebUI **Delete** action prompts: _"Also blacklist?"_ If yes → set `blacklisted_at`. If no → set `deleted_at` only.
 
 ## Image processing
 
@@ -247,7 +248,7 @@ On daemon startup, sweep `run_history` rows with `status = running` → mark `st
 ## Subscription / device lifecycle
 
 - **Disable** (subscription or device): `enabled = false`. Subscription stops running / device stops being a fan-out target. Existing images and history rows untouched.
-- **Delete subscription**: **soft-delete via `subscriptions.deleted_at`**. The row stays so `run_history.subscription_id` FK remains valid. Active lists in WebUI hide soft-deleted subs; per-subscription history page still loads (shows name/source from the surviving row). No cascade to images. WebUI offers a separate explicit action *"also delete all images sourced via this subscription"* if the user wants cleanup.
+- **Delete subscription**: **soft-delete via `subscriptions.deleted_at`**. The row stays so `run_history.subscription_id` FK remains valid. Active lists in WebUI hide soft-deleted subs; per-subscription history page still loads (shows name/source from the surviving row). No cascade to images. WebUI offers a separate explicit action _"also delete all images sourced via this subscription"_ if the user wants cleanup.
 - **Edit subscription input_params**: in-place mutation. `run_history.input_params_snapshot` preserves what each past run used.
 - **Delete device**: removes device row + its on-disk dir. Image rows referenced by other devices keep those references intact.
 
@@ -256,7 +257,7 @@ On daemon startup, sweep `run_history` rows with `status = running` → mark `st
 - **Primary keys**: UUIDv7 on all tables (sortable, B-tree friendly, mobile-sync friendly).
 - **Secondary lookup fields** get their own indexes (`images.sha256` UNIQUE, `images.source_url` UNIQUE, partial indexes on `deleted_at` and `blacklisted_at` for images, partial index on `deleted_at` for subscriptions).
 - **Full-text search** uses an SQLite **FTS5** virtual table over `images.search_text` (source-supplied, optional). Standard pattern: external-content FTS5 mirror table, kept in sync via triggers.
-- **Soft-delete** flag (`deleted_at`) on images and subscriptions. **Blacklist** flag (`blacklisted_at`) on images. See *Image lifecycle flags* above.
+- **Soft-delete** flag (`deleted_at`) on images and subscriptions. **Blacklist** flag (`blacklisted_at`) on images. See _Image lifecycle flags_ above.
 - Hard prune is **not** an MVP feature.
 
 ## Post-MVP / planned

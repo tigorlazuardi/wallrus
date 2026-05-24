@@ -63,10 +63,10 @@ Telemetry must redact `Authorization`, `Cookie`, and POST bodies on `/auth/login
 
 ```ts
 type ListQuery = {
-  next?:   string   // UUIDv7 — anchor: results AFTER this row
-  prev?:   string   // UUIDv7 — anchor: results BEFORE this row
-  offset?: number   // default 0; additional rows to skip past the anchor (or from start if no cursor)
-  limit?:  number   // default 60; capped at 200
+  next?: string // UUIDv7 — anchor: results AFTER this row
+  prev?: string // UUIDv7 — anchor: results BEFORE this row
+  offset?: number // default 0; additional rows to skip past the anchor (or from start if no cursor)
+  limit?: number // default 60; capped at 200
   // plus per-endpoint filter params (source, device, tag, q, …)
 }
 ```
@@ -79,10 +79,10 @@ type ListQuery = {
 
 ```ts
 type ListResponse<T> = {
-  items:        T[]                       // up to `limit` items, in sort order
-  total:        number                    // total row count under current filter
-  next_cursor?: string                    // id of last item in `items` (for "→")
-  prev_cursor?: string                    // id of first item in `items` (for "←")
+  items: T[] // up to `limit` items, in sort order
+  total: number // total row count under current filter
+  next_cursor?: string // id of last item in `items` (for "→")
+  prev_cursor?: string // id of first item in `items` (for "←")
 }
 ```
 

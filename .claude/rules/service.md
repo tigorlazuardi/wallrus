@@ -79,10 +79,7 @@ export type Constructor<T extends Base = Base> = new (...args: any[]) => T
 // src/lib/server/service/devices/ListDevices.ts
 import { type Constructor } from "../base"
 import { traced } from "@tigorhutasuhut/telemetry-js/bun"
-import type {
-  ListDevicesRequest,
-  ListDevicesResponse,
-} from "$lib/schemas/devices/ListDevices"
+import type { ListDevicesRequest, ListDevicesResponse } from "$lib/schemas/devices/ListDevices"
 
 export function ListDevices<T extends Constructor>(Base: T) {
   return class ListDevices extends Base {
@@ -98,13 +95,13 @@ export function ListDevices<T extends Constructor>(Base: T) {
 
 ```ts
 // src/lib/schemas/devices/ListDevices.ts
-import { z } from 'zod'
+import { z } from "zod"
 
 export const ListDevicesRequestSchema = z.object({
-  next:   z.uuid().optional(),
-  prev:   z.uuid().optional(),
+  next: z.uuid().optional(),
+  prev: z.uuid().optional(),
   offset: z.int().min(0).default(0),
-  limit:  z.int().min(1).max(100).default(20),
+  limit: z.int().min(1).max(100).default(20),
 })
 export type ListDevicesRequest = z.infer<typeof ListDevicesRequestSchema>
 
@@ -129,7 +126,7 @@ import { CreateDevice } from "./CreateDevice"
 
 const Service = CreateDevice(GetDevice(ListDevices(Base)))
 
-export class DeviceService extends Service { }
+export class DeviceService extends Service {}
 ```
 
 Operation mixins compose left-to-right with `Base` at the innermost. Adding a new operation = one line in this `index.ts`.
@@ -145,14 +142,14 @@ import { ImageService } from "./images"
 // ...
 
 export class Service {
-  devices:       DeviceService
+  devices: DeviceService
   subscriptions: SubscriptionService
-  images:        ImageService
+  images: ImageService
   // ...
   constructor(deps: Dependencies) {
-    this.devices       = new DeviceService(deps)
+    this.devices = new DeviceService(deps)
     this.subscriptions = new SubscriptionService(deps)
-    this.images        = new ImageService(deps)
+    this.images = new ImageService(deps)
   }
 }
 ```
@@ -161,19 +158,19 @@ Bootstrap instantiates one `Service` and passes it to callers (routes get it via
 
 ### Conventions
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Operation file | `PascalCase.ts` under `$lib/server/service/<domain>/` | `ListDevices.ts` |
-| Schema file | `PascalCase.ts` under `$lib/schemas/<domain>/` | `ListDevices.ts` (same filename as the operation) |
-| Method name | `camelCase` matching the file | `listDevices()` |
-| Request schema | `<Op>RequestSchema` | `ListDevicesRequestSchema` |
-| Request type | `<Op>Request` | `ListDevicesRequest` |
-| Response schema | `<Op>ResponseSchema` | `ListDevicesResponseSchema` |
-| Response type | `<Op>Response` | `ListDevicesResponse` |
-| Decorator | `@traced()` on every public method | `@traced() async listDevices(...)` |
-| Method signature | `(req: <Op>Request): Promise<<Op>Response>` | one typed input, one typed output |
-| Domain folder | `lowercase plural noun` | `devices/`, `subscriptions/`, `images/` |
-| Domain class | `<Domain>Service` | `DeviceService` |
+| Element          | Convention                                            | Example                                           |
+| ---------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| Operation file   | `PascalCase.ts` under `$lib/server/service/<domain>/` | `ListDevices.ts`                                  |
+| Schema file      | `PascalCase.ts` under `$lib/schemas/<domain>/`        | `ListDevices.ts` (same filename as the operation) |
+| Method name      | `camelCase` matching the file                         | `listDevices()`                                   |
+| Request schema   | `<Op>RequestSchema`                                   | `ListDevicesRequestSchema`                        |
+| Request type     | `<Op>Request`                                         | `ListDevicesRequest`                              |
+| Response schema  | `<Op>ResponseSchema`                                  | `ListDevicesResponseSchema`                       |
+| Response type    | `<Op>Response`                                        | `ListDevicesResponse`                             |
+| Decorator        | `@traced()` on every public method                    | `@traced() async listDevices(...)`                |
+| Method signature | `(req: <Op>Request): Promise<<Op>Response>`           | one typed input, one typed output                 |
+| Domain folder    | `lowercase plural noun`                               | `devices/`, `subscriptions/`, `images/`           |
+| Domain class     | `<Domain>Service`                                     | `DeviceService`                                   |
 
 ### Telemetry
 
@@ -217,7 +214,7 @@ async getDevice(req: GetDeviceRequest): Promise<GetDeviceResponse> {
 
 ### Mutation
 
-Mutations return the final row (using upsert + RETURNING * where applicable). Routes / form actions are responsible for `invalidate*()` on the SvelteKit side.
+Mutations return the final row (using upsert + RETURNING _ where applicable). Routes / form actions are responsible for `invalidate_()` on the SvelteKit side.
 
 ### Ingest pipeline (images)
 

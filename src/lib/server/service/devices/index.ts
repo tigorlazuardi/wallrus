@@ -1,6 +1,6 @@
-import { ListDevices } from "./ListDevices";
-import { Base } from "../base";
+import { ListDevices } from "./ListDevices"
+import { Base } from "../base"
 
 const Service = ListDevices(Base)
 
-export class DeviceService extends Service { }
+export class DeviceService extends Service {}

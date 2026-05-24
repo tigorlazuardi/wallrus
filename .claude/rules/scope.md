@@ -12,14 +12,14 @@ Canonical scope: [`docs/SCOPE.md`](../../docs/SCOPE.md). Architecture: [`docs/AR
 
 This rule covers the **what** and **why** only. Implementation details live in topic-scoped rules:
 
-| Touching… | Auto-loads |
-|----------|-----------|
-| `src/lib/server/db/**`, `drizzle/**`, `migrations/**`, `**/schema.ts` | `database.md` |
+| Touching…                                                                                    | Auto-loads    |
+| -------------------------------------------------------------------------------------------- | ------------- |
+| `src/lib/server/db/**`, `drizzle/**`, `migrations/**`, `**/schema.ts`                        | `database.md` |
 | `src/routes/**`, `src/lib/components/**`, `**/*.svelte`, `src/app.html`, `tailwind.config.*` | `frontend.md` |
-| `src/routes/api/**`, `src/hooks.server.ts` | `api.md` |
-| `src/lib/server/service/**` | `service.md` |
-| `src/lib/server/sources/**` | `sources.md` |
-| TS/JS/HTML / `package.json` / `bun.lock` | `bun.md` |
+| `src/routes/api/**`, `src/hooks.server.ts`                                                   | `api.md`      |
+| `src/lib/server/service/**`                                                                  | `service.md`  |
+| `src/lib/server/sources/**`                                                                  | `sources.md`  |
+| TS/JS/HTML / `package.json` / `bun.lock`                                                     | `bun.md`      |
 
 ## What it is
 
@@ -54,7 +54,7 @@ Devices added later only receive images from runs executed **after** they were a
 - `deleted_at` — **soft-delete**. File removed from every device dir. On next crawl re-encounter of same `source_url`: cleared, file re-downloaded, fan-out re-evaluated.
 - `blacklisted_at` — **permanent skip.** File removed from all devices + disk. Future crawl runs that see the same `source_url` or SHA256 are skipped at ingest. Never re-fans out.
 
-WebUI delete action asks: *"Also blacklist?"* — sets `blacklisted_at` if yes, `deleted_at` only if no.
+WebUI delete action asks: _"Also blacklist?"_ — sets `blacklisted_at` if yes, `deleted_at` only if no.
 
 ## Device filter criteria (MVP, all optional per device)
 
@@ -80,7 +80,7 @@ Resolution min/max w/h, aspect ratio ± tolerance, file size min/max bytes, form
 ## Lifecycle rules
 
 - Disable subscription/device → no run / no fan-out. Existing images untouched.
-- Delete subscription → **soft-delete** via `subscriptions.deleted_at` so `run_history.subscription_id` FK stays valid. WebUI hides from active lists but per-subscription history page still loads. No cascade to images; explicit *"also delete all images sourced via this subscription"* action available.
+- Delete subscription → **soft-delete** via `subscriptions.deleted_at` so `run_history.subscription_id` FK stays valid. WebUI hides from active lists but per-subscription history page still loads. No cascade to images; explicit _"also delete all images sourced via this subscription"_ action available.
 - Edit `input_params` → **in-place mutation**. `run_history.input_params_snapshot` records exact params used per run so history stays meaningful.
 
 ## Reporting (`run_history` table)

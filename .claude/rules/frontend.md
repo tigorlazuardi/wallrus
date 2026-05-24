@@ -24,7 +24,7 @@ Full detail in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §Frontend. 
 - **Tailwind CSS v4** (CSS-first config, oxide engine, no `postcss.config`).
 - **shadcn-svelte** primitives — components live in `src/lib/components/ui/*` as copy-paste source. Backed by **Bits UI**.
 - Icons: **lucide-svelte** only.
-- Forms: **`sveltekit-superforms`** with the `zod` adapter. `dataType: 'json'` mode for nested data. See *Forms — Superforms* below.
+- Forms: **`sveltekit-superforms`** with the `zod` adapter. `dataType: 'json'` mode for nested data. See _Forms — Superforms_ below.
 
 ## Component organization
 
@@ -61,20 +61,20 @@ src/lib/client/
 
 ```css
 :root[data-theme="dark"] {
-  --bg:           #0a0a0c;
-  --bg-elev:      #131316;
-  --surface:      rgb(255 255 255 / 0.04);
-  --surface-hi:   rgb(255 255 255 / 0.08);
-  --glass:        rgb(20 20 24 / 0.55);
+  --bg: #0a0a0c;
+  --bg-elev: #131316;
+  --surface: rgb(255 255 255 / 0.04);
+  --surface-hi: rgb(255 255 255 / 0.08);
+  --glass: rgb(20 20 24 / 0.55);
   --glass-border: rgb(255 255 255 / 0.08);
-  --fg:           #e8e8ec;
-  --fg-muted:     #9a9aa3;
-  --accent:       #7c5cff;          /* violet — DO NOT introduce a second accent */
-  --accent-fg:    #f3f0ff;
-  --ring:         rgb(124 92 255 / 0.4);
-  --radius:       10px;
-  --radius-card:  12px;
-  --blur:         20px;
+  --fg: #e8e8ec;
+  --fg-muted: #9a9aa3;
+  --accent: #7c5cff; /* violet — DO NOT introduce a second accent */
+  --accent-fg: #f3f0ff;
+  --ring: rgb(124 92 255 / 0.4);
+  --radius: 10px;
+  --radius-card: 12px;
+  --blur: 20px;
 }
 ```
 
@@ -102,11 +102,11 @@ Light-mode tokens flip surfaces/glass to white-translucent equivalents. Accent s
 
 **Layout: aspect-aware CSS-Grid masonry with `grid-auto-flow: dense`.** Pinterest-style with landscape images spanning 2 columns.
 
-| Viewport | `--cols` | Landscape (`aspect_ratio > 1.2`) | Portrait |
-|----------|----------|----------------------------------|----------|
-| Mobile (`< 640px`) | 2 | `grid-column: span 2` (fills width) | `span 1` |
-| Tablet (`640–1023px`) | 3 | `span 2` | `span 1` |
-| Desktop (`≥ 1024px`) | 4 | `span 2` | `span 1` |
+| Viewport              | `--cols` | Landscape (`aspect_ratio > 1.2`)    | Portrait |
+| --------------------- | -------- | ----------------------------------- | -------- |
+| Mobile (`< 640px`)    | 2        | `grid-column: span 2` (fills width) | `span 1` |
+| Tablet (`640–1023px`) | 3        | `span 2`                            | `span 1` |
+| Desktop (`≥ 1024px`)  | 4        | `span 2`                            | `span 1` |
 
 - `grid-template-columns: repeat(var(--cols), 1fr)`, `grid-auto-rows: 8px` (or similar small base unit).
 - Per-card `grid-row: span N` calculated from rendered card height (`column_width × aspect_ratio / base-unit`).
@@ -143,6 +143,7 @@ Light-mode tokens flip surfaces/glass to white-translucent equivalents. Accent s
 ### Same Zod schema in three places
 
 A single Zod schema in `$lib/schemas/<domain>/<Op>.ts` serves:
+
 1. Server **form action** (via `superValidate(..., zod(Schema))`).
 2. Client **form component** (via `superForm({...}, { validators: zodClient(Schema) })`).
 3. JSON **API endpoint** (via plain `Schema.parse(body)` in `/api/v1/*`).
@@ -153,10 +154,10 @@ One schema. No drift between WebUI and API.
 
 ```ts
 // src/routes/devices/[id]/+page.server.ts
-import { fail } from '@sveltejs/kit'
-import { superValidate } from 'sveltekit-superforms/server'
-import { zod } from 'sveltekit-superforms/adapters'
-import { UpdateDeviceRequestSchema } from '$lib/schemas/devices/UpdateDevice'
+import { fail } from "@sveltejs/kit"
+import { superValidate } from "sveltekit-superforms/server"
+import { zod } from "sveltekit-superforms/adapters"
+import { UpdateDeviceRequestSchema } from "$lib/schemas/devices/UpdateDevice"
 
 export const load = async ({ params, locals }) => {
   const device = await locals.service.devices.getDevice({ id: params.id })
@@ -178,14 +179,14 @@ export const actions = {
 
 ```svelte
 <script lang="ts">
-  import { superForm } from 'sveltekit-superforms/client'
-  import { zodClient } from 'sveltekit-superforms/adapters'
-  import { UpdateDeviceRequestSchema } from '$lib/schemas/devices/UpdateDevice'
+  import { superForm } from "sveltekit-superforms/client"
+  import { zodClient } from "sveltekit-superforms/adapters"
+  import { UpdateDeviceRequestSchema } from "$lib/schemas/devices/UpdateDevice"
 
   let { data } = $props()
 
   const { form, errors, enhance, submitting } = superForm(data.form, {
-    dataType: 'json',                                    // POST nested JSON, not FormData
+    dataType: "json", // POST nested JSON, not FormData
     validators: zodClient(UpdateDeviceRequestSchema),
   })
 </script>
@@ -201,14 +202,14 @@ export const actions = {
 
 `ZodForm.svelte` is a thin component over `superForm()`. It walks the Zod schema and renders one `<Field>` per leaf using the adapter table below. Superforms owns state, validation, and submission lifecycle under the hood.
 
-| Zod type | Field |
-|----------|-------|
-| `z.string()` | `<Input type="text">` |
-| `z.number() / z.int()` | `<Input type="number">` |
-| `z.boolean()` | `<Switch>` |
-| `z.enum([...])` | `<Select>` |
-| `z.array(z.string())` | `<TagInput>` |
-| `z.object({...})` | nested `<Fieldset>` recursing into the same component |
+| Zod type               | Field                                                 |
+| ---------------------- | ----------------------------------------------------- |
+| `z.string()`           | `<Input type="text">`                                 |
+| `z.number() / z.int()` | `<Input type="number">`                               |
+| `z.boolean()`          | `<Switch>`                                            |
+| `z.enum([...])`        | `<Select>`                                            |
+| `z.array(z.string())`  | `<TagInput>`                                          |
+| `z.object({...})`      | nested `<Fieldset>` recursing into the same component |
 
 Subscription form delegates to `ZodForm` using the picked source's `params_schema` (already a Zod schema → works the same).
 

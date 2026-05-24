@@ -6,17 +6,17 @@ This file is intentionally a **light index**. Detailed guidance lives in path-sc
 
 ## Where to look
 
-| You're working on… | Rule auto-loads (path-scoped) |
-|--------------------|-------------------------------|
-| `src/**`, `docs/**`, `scripts/**`, `package.json` | `.claude/rules/scope.md` — scope, domain model, what-and-why |
-| TS / JS / HTML / `package.json` / `bun.lock` | `.claude/rules/bun.md` — Bun built-ins, no-Node rules |
-| `src/lib/server/db/**`, `drizzle/**`, `migrations/**`, `schema.ts` | `.claude/rules/database.md` — STRICT, CHECK, json_valid, UUIDv7, time/_ms, junction reverse indexes, upsert + RETURNING |
-| `src/routes/**`, `src/lib/components/**`, `**/*.svelte`, `tailwind.config.*` | `.claude/rules/frontend.md` — Svelte 5 runes, Tailwind v4, shadcn, theme tokens, glass chrome, masonry, NSFW, SSE client |
-| `src/routes/api/**`, `src/hooks.server.ts` | `.claude/rules/api.md` — pagination contract, auth gates, Zod boundary, error shape |
-| `src/lib/server/service/**` or `src/lib/schemas/**` | `.claude/rules/service.md` — mixin codestyle, schema split, all business logic, no auth/HTTP awareness |
-| `src/lib/server/sources/**` | `.claude/rules/sources.md` — SourceItem contract, async generator, SourceContext, no FS/DB/env access |
-| Anything that looks like new scope (new source kind, plugin/extensibility, new processing step, auth model, retention policy, …) | `docs/SCOPE.md` — confirm before implementing |
-| Implementation / refactor — directory layout, schema, pipeline, scheduler, HTTP routing, FS layout, bootstrap, source contract | `docs/ARCHITECTURE.md` — the technical design |
+| You're working on…                                                                                                               | Rule auto-loads (path-scoped)                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `src/**`, `docs/**`, `scripts/**`, `package.json`                                                                                | `.claude/rules/scope.md` — scope, domain model, what-and-why                                                             |
+| TS / JS / HTML / `package.json` / `bun.lock`                                                                                     | `.claude/rules/bun.md` — Bun built-ins, no-Node rules                                                                    |
+| `src/lib/server/db/**`, `drizzle/**`, `migrations/**`, `schema.ts`                                                               | `.claude/rules/database.md` — STRICT, CHECK, json_valid, UUIDv7, time/\_ms, junction reverse indexes, upsert + RETURNING |
+| `src/routes/**`, `src/lib/components/**`, `**/*.svelte`, `tailwind.config.*`                                                     | `.claude/rules/frontend.md` — Svelte 5 runes, Tailwind v4, shadcn, theme tokens, glass chrome, masonry, NSFW, SSE client |
+| `src/routes/api/**`, `src/hooks.server.ts`                                                                                       | `.claude/rules/api.md` — pagination contract, auth gates, Zod boundary, error shape                                      |
+| `src/lib/server/service/**` or `src/lib/schemas/**`                                                                              | `.claude/rules/service.md` — mixin codestyle, schema split, all business logic, no auth/HTTP awareness                   |
+| `src/lib/server/sources/**`                                                                                                      | `.claude/rules/sources.md` — SourceItem contract, async generator, SourceContext, no FS/DB/env access                    |
+| Anything that looks like new scope (new source kind, plugin/extensibility, new processing step, auth model, retention policy, …) | `docs/SCOPE.md` — confirm before implementing                                                                            |
+| Implementation / refactor — directory layout, schema, pipeline, scheduler, HTTP routing, FS layout, bootstrap, source contract   | `docs/ARCHITECTURE.md` — the technical design                                                                            |
 
 ## Project layout (high level)
 

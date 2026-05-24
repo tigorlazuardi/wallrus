@@ -1,9 +1,11 @@
 # dependencies (bun install)
 node_modules
 
-# output
+# output / build
 out
 dist
+build
+.svelte-kit
 *.tgz
 
 # code coverage
@@ -12,8 +14,8 @@ coverage
 
 # logs
 logs
-_.log
-report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # dotenv environment variable files
 .env
@@ -26,9 +28,28 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .eslintcache
 .cache
 *.tsbuildinfo
+.vite
 
-# IntelliJ based IDEs
+# Playwright
+test-results
+playwright-report
+playwright/.cache
+blob-report
+
+# Editor configs (personal)
 .idea
+.vscode/*.local.json
 
-# Finder (MacOS) folder config
+# OS junk
 .DS_Store
+
+# wallrus runtime artifacts (data dir, sockets, DB, thumbs)
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sock
+.thumbs/
+.staging/
+.auth_secret
+.cookie_secret

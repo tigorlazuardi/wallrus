@@ -3,12 +3,37 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:e2e": "bunx playwright test",
+    "lint": "bunx eslint .",
+    "lint:fix": "bunx eslint . --fix",
+    "format": "bunx prettier --write .",
+    "format:check": "bunx prettier --check .",
+    "check": "bunx tsc --noEmit",
+    "check:watch": "bunx tsc --noEmit --watch",
+    "prepare": "lefthook install"
+  },
   "dependencies": {
     "@tigorhutasuhut/telemetry-js": "^1.10.0",
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@commitlint/cli": "21.0.1",
+    "@commitlint/config-conventional": "21.0.1",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.60.0",
+    "@types/bun": "latest",
+    "eslint": "10.4.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-svelte": "3.17.1",
+    "globals": "17.6.0",
+    "lefthook": "2.1.8",
+    "prettier": "3.8.3",
+    "prettier-plugin-svelte": "4.0.1",
+    "prettier-plugin-tailwindcss": "0.8.0",
+    "typescript-eslint": "8.59.4"
   },
   "peerDependencies": {
     "typescript": "^5"

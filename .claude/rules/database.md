@@ -42,12 +42,13 @@ Full schema sketch in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §DB 
 3. **`CHECK (json_valid(col))`** on every JSON text column. Examples: `images.tags_source`, `subscriptions.input_params`, `source_credentials.payload`, `devices.filter_criteria`, `device_adds`, `input_params_snapshot`.
 4. **Drizzle `customType` for typed JSON.** Define once in `db/schema.ts`:
    ```ts
-   import { customType } from 'drizzle-orm/sqlite-core'
-   export const jsonCol = <T>() => customType<{ data: T; driverData: string }>({
-     dataType: () => 'text',
-     toDriver: (v) => JSON.stringify(v),
-     fromDriver: (v) => JSON.parse(v) as T,
-   })
+   import { customType } from "drizzle-orm/sqlite-core"
+   export const jsonCol = <T>() =>
+     customType<{ data: T; driverData: string }>({
+       dataType: () => "text",
+       toDriver: (v) => JSON.stringify(v),
+       fromDriver: (v) => JSON.parse(v) as T,
+     })
    ```
    **Services and routes must NEVER call `JSON.parse` / `JSON.stringify` on DB-bound JSON columns.** Always go through the typed column.
 5. **`COLLATE NOCASE` on tag- and slug-shaped text** columns: `image_user_tags.tag`, `images.source_slug`, `subscriptions.source_slug`, `source_credentials.source_slug`, `devices.slug`. Indexes honor the collation; case-insensitive equality + ordering for free.
@@ -64,7 +65,7 @@ Full schema sketch in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §DB 
 7. **`GENERATED ... VIRTUAL`** for derived columns. Current:
    - `images.aspect_ratio REAL GENERATED ALWAYS AS (CAST(width AS REAL) / height) VIRTUAL`.
    - `run_history.duration_ms INTEGER GENERATED ALWAYS AS (ended_at - started_at) VIRTUAL` — NULL while running.
-   Use `STORED` only when the column must be both computed AND indexed-on-disk.
+     Use `STORED` only when the column must be both computed AND indexed-on-disk.
 8. **Upsert + `RETURNING *` as standard write pattern.** Drizzle exposes `.onConflictDoUpdate({...})` + `.returning()`. Use for `source_credentials` save, image ingest (resurrect from soft-delete), etc. Use `INSERT OR IGNORE` for write-once junction rows like `device_images` where the existing row should not be touched.
 9. **UNIQUE + NULL gotcha**: SQLite treats `NULL` as distinct in UNIQUE indexes. If a UNIQUE column ever goes nullable, add `CREATE UNIQUE INDEX … WHERE col IS NOT NULL` instead.
 
