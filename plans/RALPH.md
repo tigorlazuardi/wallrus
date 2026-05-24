@@ -162,20 +162,40 @@ unless tagged `[builder]`.)
 
 ## Hard rules (reviewer)
 
-- **Reviewer NEVER touches code.** No `Edit` or `Write` on anything
-  under `src/`, `drizzle/`, `engineering/`, `docs/`, `tests/`,
-  `lefthook.yml`, `package.json`, `bun.lock`, `tsconfig*.json`,
-  `eslint.config.*`, `.prettierrc*`, `svelte.config.js`,
-  `vite.config.*`, `tailwind.config.*`, `commitlint.config.*`, or
-  any first-party source file. Allowed reviewer writes are limited to:
-  - `plans/<NNN>-*/IMPLEMENTATION.md` `Status:` field (one-line edit).
-  - `plans/README.md` index status column (one-line edit).
-  - Git commit messages (via `git commit -m`).
-    Everything else — typos, format passes, lint fixes, broken tests,
-    one-character regressions, a missing semicolon — is delegated to a
-    fresh `wallrus-builder` invocation. **Reason**: Opus implementer
-    time burns the user's quota; Sonnet builder cost is ~5× cheaper
-    per token and the user has explicitly forbidden Opus implementations.
+- **Reviewer NEVER touches code.** The rule is by file _kind_, not by
+  directory.
+  - **Allowed reviewer writes** (any of these is fine):
+    - Any `.md` file anywhere in the repo — including
+      `plans/<NNN>-*/IMPLEMENTATION.md`, `plans/<NNN>-*/TASKS.md`,
+      `plans/<NNN>-*/.builder-notes.md`, `plans/README.md`,
+      `plans/RALPH.md`, `engineering/SCOPE.md`,
+      `engineering/ARCHITECTURE.md`, `docs/**/*.md`, `README.md`,
+      `CLAUDE.md`, `.claude/rules/*.md`,
+      `.claude/agents/*.md`. Reviewer can update narrative,
+      decisions, status, notes, hand-off records, and rule
+      documents freely.
+    - Git commit messages (via `git commit -m`).
+  - **Forbidden reviewer writes** (always delegate to a fresh
+    `wallrus-builder` invocation):
+    - Any source-code extension: `.ts`, `.tsx`, `.js`, `.mjs`,
+      `.cjs`, `.svelte`, `.css`, `.html`, `.sql`, `.json` (when it's
+      a config or schema snapshot, e.g. `package.json`, `bun.lock`,
+      `tsconfig*.json`, `drizzle/**/*.json`).
+    - Config files: `lefthook.yml`, `eslint.config.*`,
+      `.prettierrc*`, `svelte.config.js`, `vite.config.*`,
+      `tailwind.config.*`, `commitlint.config.*`, `bunfig.toml`,
+      `Dockerfile`, `docker-compose.yml`, `playwright.config.*`,
+      any workflow under `.github/`.
+    - Generated migrations under `drizzle/migrations/` (even
+      though `.sql` would be caught above — restating for clarity).
+  - Even trivial code regressions — a typo, a missing semicolon, a
+    `bunx prettier --write` pass on a `.ts` file, a one-character
+    test fix — go to a fresh `wallrus-builder` invocation.
+  - **Reason**: Opus implementer time burns the user's quota; Sonnet
+    builder cost is ~5× cheaper per token and the user has
+    explicitly forbidden Opus implementations of code. Markdown,
+    plan bookkeeping, and rule docs are cheap enough that the
+    reviewer handling them directly is the right trade.
 - **Fix-mode is also delegated.** If verification gates fail, do NOT
   fix locally. Spawn another `wallrus-builder` with a FIX-MODE prompt
   (see §Fix-mode invocation). The reviewer's only responsibility on
