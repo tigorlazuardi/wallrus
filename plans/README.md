@@ -82,7 +82,7 @@ authoritative checklist for the slice.
 | `008-source-booru`          | done        | Danbooru + Gelbooru crawler with tag/rating filters                               |
 | `009-ingest-pipeline`       | done        | Scheduler executor: download, dedup, thumbnail, fan-out to devices                |
 | `010-run-history`           | done        | Run history list/get/active/SSE-stream API, prune-to-100 trigger                  |
-| `011-webui-gallery`         | not-started | Masonry gallery, filter chips, infinite scroll, image modal, NSFW gate            |
+| `011-webui-gallery`         | done        | Masonry gallery, filter chips, infinite scroll, image modal, NSFW gate            |
 | `012-webui-device`          | not-started | Device + subscription editor pages with superforms-driven flows                   |
 | `013-webui-runs`            | not-started | Run dashboard with SSE live updates and per-subscription history                  |
 
