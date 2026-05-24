@@ -47,6 +47,14 @@ export default tseslint.config(
 				parser: tseslint.parser,
 			},
 		},
+		rules: {
+			// Plain anchor links and goto() calls don't need resolve() in this project.
+			// The rule is relevant only when navigation is deferred pending async work.
+			"svelte/no-navigation-without-resolve": [
+				"error",
+				{ ignoreLinks: true, ignoreGoto: true },
+			],
+		},
 	},
 	// `console.*` is banned under `src/` — use `getLogger()` from
 	// `$lib/server/telemetry` instead. See `.claude/rules/telemetry.md`.

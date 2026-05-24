@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test"
 
-// Smoke test — placeholder homepage renders. Real e2e suites land alongside
-// the gallery, auth, devices, and subscriptions surfaces.
+// Smoke test — homepage renders with the wallrus nav brand link.
 test("homepage renders the wallrus title", async ({ page }) => {
 	await page.goto("/")
-	await expect(page.getByRole("heading", { level: 1, name: "wallrus" })).toBeVisible()
+	// The (app) layout renders "wallrus" as a nav link, not an h1.
+	await expect(page.getByRole("link", { name: "wallrus" })).toBeVisible()
 })
