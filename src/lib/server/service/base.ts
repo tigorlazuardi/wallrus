@@ -1,9 +1,14 @@
-import { DeviceService } from "./devices"
+import type { DbClient } from "$lib/server/db/client"
 
-export type Dependencies = {}
+export type Dependencies = {
+	db: DbClient
+}
 
 export class Base {
-	constructor(deps: Dependencies) {}
+	protected deps: Dependencies
+	constructor(deps: Dependencies) {
+		this.deps = deps
+	}
 }
 
 export type Constructor<T extends Base = Base> = new (...args: any[]) => T

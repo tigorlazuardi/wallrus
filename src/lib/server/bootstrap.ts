@@ -4,12 +4,16 @@ import { run_migrations } from "./db/migrate"
 import { run_history } from "./db/schema"
 import { env as env_singleton, init_password_hash, parse_env, type Env } from "./env"
 import { db_file_path, ensure_data_dir, ensure_db_perms } from "./fs/perms"
+import { DeviceService } from "./service/devices"
 import { getLogger, initSDK, setDefaultLogger, type SDKResult } from "./telemetry"
 
 export type Runtime = {
 	env: Env
 	db: DbClient
 	sdk: SDKResult
+	services: {
+		devices: DeviceService
+	}
 }
 
 // Boot sequence for `wallrus serve`. Idempotent — safe to call once per
@@ -63,7 +67,11 @@ export async function boot(): Promise<Runtime> {
 
 	recover_orphan_runs(db)
 
-	return { env, db, sdk }
+	const services = {
+		devices: new DeviceService({ db }),
+	}
+
+	return { env, db, sdk, services }
 }
 
 // Parse the OpenTelemetry-standard `OTEL_RESOURCE_ATTRIBUTES` env format
