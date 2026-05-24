@@ -5,7 +5,7 @@ import starlight from "@astrojs/starlight"
 // Project pages deploy: https://<owner>.github.io/wallrus/
 // `site` + `base` produce correct asset URLs under the /wallrus/ subpath.
 // Override these via env if forking under a different owner / repo name.
-const SITE = process.env.WALLRUS_DOCS_SITE ?? "https://tigorhutasuhut.github.io"
+const SITE = process.env.WALLRUS_DOCS_SITE ?? "https://tigorlazuardi.github.io"
 const BASE = process.env.WALLRUS_DOCS_BASE ?? "/wallrus"
 
 export default defineConfig({
@@ -32,7 +32,7 @@ export default defineConfig({
 				{
 					icon: "github",
 					label: "GitHub",
-					href: "https://github.com/tigorhutasuhut/wallrus",
+					href: "https://github.com/tigorlazuardi/wallrus",
 				},
 			],
 			sidebar: [

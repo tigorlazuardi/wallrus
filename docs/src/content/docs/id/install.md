@@ -47,7 +47,7 @@ import { Tabs, TabItem } from "@astrojs/starlight/components"
 		Butuh [Bun](https://bun.com) terinstal.
 
 		```sh
-		git clone https://github.com/tigorhutasuhut/wallrus
+		git clone https://github.com/tigorlazuardi/wallrus
 		cd wallrus
 		bun install
 		bun run build

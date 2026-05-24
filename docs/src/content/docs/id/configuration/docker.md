@@ -63,7 +63,7 @@ tambahan dari sisi kamu.
 ## Build dari source
 
 ```sh
-git clone https://github.com/tigorhutasuhut/wallrus
+git clone https://github.com/tigorlazuardi/wallrus
 cd wallrus
 docker build -t wallrus .
 ```

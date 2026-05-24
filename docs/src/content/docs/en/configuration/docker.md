@@ -61,7 +61,7 @@ The image ships a `HEALTHCHECK` that probes `GET /healthz` every 30 s. Compose
 ## Building from source
 
 ```sh
-git clone https://github.com/tigorhutasuhut/wallrus
+git clone https://github.com/tigorlazuardi/wallrus
 cd wallrus
 docker build -t wallrus .
 ```

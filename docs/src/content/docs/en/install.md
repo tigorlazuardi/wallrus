@@ -47,7 +47,7 @@ import { Tabs, TabItem } from "@astrojs/starlight/components"
 		Needs [Bun](https://bun.com) installed.
 
 		```sh
-		git clone https://github.com/tigorhutasuhut/wallrus
+		git clone https://github.com/tigorlazuardi/wallrus
 		cd wallrus
 		bun install
 		bun run build
