@@ -6,6 +6,7 @@ out
 dist
 build
 .svelte-kit
+.astro
 *.tgz
 
 # code coverage

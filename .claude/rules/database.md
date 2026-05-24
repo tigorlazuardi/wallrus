@@ -9,7 +9,7 @@ paths:
 
 # wallrus — database & schema rules
 
-Full schema sketch in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §DB schema. This rule restates the enforceable conventions.
+Full schema sketch in [`engineering/ARCHITECTURE.md`](../../engineering/ARCHITECTURE.md) §DB schema. This rule restates the enforceable conventions.
 
 ## ORM and driver
 

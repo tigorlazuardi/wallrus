@@ -15,7 +15,7 @@ paths:
 
 # wallrus — frontend rules
 
-Full detail in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §Frontend. This rule restates the enforceable conventions.
+Full detail in [`engineering/ARCHITECTURE.md`](../../engineering/ARCHITECTURE.md) §Frontend. This rule restates the enforceable conventions.
 
 ## Stack
 

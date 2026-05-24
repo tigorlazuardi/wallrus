@@ -1,0 +1,84 @@
+---
+title: Instalasi
+description: Quick-start dengan Docker atau bare-metal.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components"
+
+## Quick-start
+
+<Tabs>
+	<TabItem label="Docker compose" icon="seti:docker">
+		```yaml
+		# docker-compose.yml
+		services:
+		  wallrus:
+		    image: wallrus:latest      # atau build dari source
+		    container_name: wallrus
+		    restart: unless-stopped
+		    ports:
+		      - "5173:5173"
+		    environment:
+		      WALLRUS_AUTH_ENABLE: "false"   # asumsi ada reverse proxy di atas
+		    volumes:
+		      - wallrus-data:/data/wallrus
+
+		volumes:
+		  wallrus-data:
+		```
+
+		Lalu:
+
+		```sh
+		docker compose up -d
+		```
+
+		Buka <http://localhost:5173/>.
+	</TabItem>
+	<TabItem label="Docker run" icon="seti:docker">
+		```sh
+		docker run --rm -p 5173:5173 \
+		  -e WALLRUS_AUTH_ENABLE=false \
+		  -v wallrus-data:/data/wallrus \
+		  wallrus:latest
+		```
+	</TabItem>
+	<TabItem label="Bare-metal" icon="seti:bash">
+		Butuh [Bun](https://bun.com) terinstal.
+
+		```sh
+		git clone https://github.com/tigorhutasuhut/wallrus
+		cd wallrus
+		bun install
+		bun run build
+		WALLRUS_DATA_DIR=./data WALLRUS_AUTH_ENABLE=false bun run src/cli.ts serve
+		```
+	</TabItem>
+</Tabs>
+
+## Mengaktifkan auth bawaan
+
+Buat secret yang kuat lalu set tiga env kredensial:
+
+```sh
+export WALLRUS_AUTH_ENABLE=true
+export WALLRUS_USERNAME=admin
+export WALLRUS_PASSWORD='ganti-segera-ya'
+export WALLRUS_AUTH_SECRET="$(openssl rand -hex 32)"
+```
+
+Lihat [Autentikasi](../configuration/auth/) untuk alur kredensial lengkap.
+
+## Yang terjadi saat boot pertama
+
+1. wallrus membaca env (menolak start kalau auth aktif tapi
+   `WALLRUS_AUTH_SECRET` kurang dari 32 byte).
+2. Memastikan data dir ada dengan mode `0700`.
+3. Membuka database SQLite, menjalankan migrasi bundled otomatis.
+4. Mengetatkan file DB ke mode `0600`.
+5. Membersihkan baris `run_history` yang ketinggalan status `running` (dari
+   crash sebelumnya) menjadi `failed`.
+6. Menjalankan server HTTP di `WALLRUS_LISTEN_ADDR` (default
+   `0.0.0.0:5173`).
+
+Tidak perlu langkah migrasi manual — wallrus auto-migrate setiap kali start.

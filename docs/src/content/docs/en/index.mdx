@@ -1,0 +1,37 @@
+---
+title: wallrus
+description: Homelab wallpaper collector — pulls images from your favourite sources on a cron, filters per device, serves them via a WebUI and API.
+template: splash
+hero:
+  tagline: Homelab wallpaper collector for your phone, desktop, and TV.
+  actions:
+    - text: Get started
+      link: ./getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/tigorhutasuhut/wallrus
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components"
+
+## What it does
+
+<CardGrid stagger>
+	<Card title="Many sources" icon="seti:default">
+		Reddit and the Booru family today. New sources land as PRs to this repo.
+	</Card>
+	<Card title="Per-device filters" icon="laptop">
+		Resolution, aspect ratio, file size, format, tag include/exclude, NSFW
+		mode — applied per device, not per subscription.
+	</Card>
+	<Card title="Sync-friendly storage" icon="open-book">
+		Local files in stable per-device folders; designed for Syncthing / rsync /
+		restic.
+	</Card>
+	<Card title="Docker-first" icon="rocket">
+		Ships a non-root multi-stage image with a single mountable data volume.
+	</Card>
+</CardGrid>

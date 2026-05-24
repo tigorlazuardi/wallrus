@@ -8,7 +8,7 @@ paths:
 
 # wallrus — API & HTTP rules
 
-Full detail in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §HTTP routing and §Frontend §Listing & pagination contract. This rule restates the enforceable conventions.
+Full detail in [`engineering/ARCHITECTURE.md`](../../engineering/ARCHITECTURE.md) §HTTP routing and §Frontend §Listing & pagination contract. This rule restates the enforceable conventions.
 
 ## API surface
 

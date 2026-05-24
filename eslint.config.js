@@ -11,9 +11,12 @@ export default tseslint.config(
 			"build/",
 			"dist/",
 			".svelte-kit/",
+			".astro/",
 			"out/",
 			"coverage/",
 			"drizzle/migrations/",
+			// Starlight docs site has its own lint lifecycle.
+			"docs/",
 		],
 	},
 	js.configs.recommended,

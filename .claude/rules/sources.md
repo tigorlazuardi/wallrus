@@ -5,7 +5,7 @@ paths:
 
 # wallrus — source module rules
 
-First-party source adapters live under `src/lib/server/sources/<slug>.ts`. One file per source. No plugin system. Full design in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §Source contract.
+First-party source adapters live under `src/lib/server/sources/<slug>.ts`. One file per source. No plugin system. Full design in [`engineering/ARCHITECTURE.md`](../../engineering/ARCHITECTURE.md) §Source contract.
 
 ## Module shape
 
@@ -44,7 +44,7 @@ export const sources: Record<string, SourceModule> = { /* … */ "my-source": my
 
 ## What a source MUST do
 
-1. **Yield items as a structured `SourceItem`** matching the shape declared in `_types.ts` (mirrored in [`docs/SCOPE.md`](../../docs/SCOPE.md) §Source item shape). Required fields:
+1. **Yield items as a structured `SourceItem`** matching the shape declared in `_types.ts` (mirrored in [`engineering/SCOPE.md`](../../engineering/SCOPE.md) §Source item shape). Required fields:
    - `source_id`, `title` (empty string OK), `source_url`, `image_url`, `filename` (globally unique per source item; usually `source_id`), `tags` (array, empty OK), `nsfw` (`sfw` / `nsfw` / `unknown`).
 2. **Paginate via the async generator.** The runtime decides when to stop based on `max_items_inspected`. Yield, await the consumer, yield again. Don't materialize everything in memory.
 3. **Honor `ctx.abort.aborted`.** Check at loop heads. Stop pagination cleanly on abort (shutdown or run cancellation).
@@ -100,4 +100,4 @@ Before merging a new source:
 
 ## MVP source set
 
-`reddit`, `danbooru`, `gelbooru`, `safebooru`, `yandere`, `konachan`. Anything else needs scope confirmation against [`docs/SCOPE.md`](../../docs/SCOPE.md) first.
+`reddit`, `danbooru`, `gelbooru`, `safebooru`, `yandere`, `konachan`. Anything else needs scope confirmation against [`engineering/SCOPE.md`](../../engineering/SCOPE.md) first.

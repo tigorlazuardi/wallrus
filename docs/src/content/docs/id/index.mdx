@@ -1,0 +1,38 @@
+---
+title: wallrus
+description: Kolektor wallpaper untuk homelab — mengunduh gambar dari sumber pilihanmu sesuai jadwal cron, menyaring per perangkat, dan menyajikannya lewat WebUI dan API.
+template: splash
+hero:
+  tagline: Kolektor wallpaper homelab untuk HP, desktop, dan TV-mu.
+  actions:
+    - text: Mulai
+      link: ./getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: Lihat di GitHub
+      link: https://github.com/tigorhutasuhut/wallrus
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components"
+
+## Apa yang dilakukan
+
+<CardGrid stagger>
+	<Card title="Banyak sumber" icon="seti:default">
+		Saat ini Reddit dan keluarga Booru. Sumber baru ditambah lewat PR ke repo ini.
+	</Card>
+	<Card title="Filter per perangkat" icon="laptop">
+		Resolusi, rasio aspek, ukuran file, format, daftar tag (include/exclude),
+		mode NSFW — diterapkan per perangkat, bukan per langganan.
+	</Card>
+	<Card title="Penyimpanan ramah sinkronisasi" icon="open-book">
+		File lokal di folder per perangkat yang stabil; dirancang untuk Syncthing
+		/ rsync / restic.
+	</Card>
+	<Card title="Docker-first" icon="rocket">
+		Image multi-stage berjalan sebagai user non-root dengan satu volume data
+		tunggal yang mudah di-mount.
+	</Card>
+</CardGrid>

@@ -1,14 +1,14 @@
 ---
 paths:
   - "src/**/*"
-  - "docs/**/*.md"
+  - "engineering/**/*.md"
   - "scripts/**/*"
   - "package.json"
 ---
 
 # wallrus — scope & domain model
 
-Canonical scope: [`docs/SCOPE.md`](../../docs/SCOPE.md). Architecture: [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md). Read those for full detail.
+Canonical scope: [`engineering/SCOPE.md`](../../engineering/SCOPE.md). Architecture: [`engineering/ARCHITECTURE.md`](../../engineering/ARCHITECTURE.md). Read those for full detail.
 
 This rule covers the **what** and **why** only. Implementation details live in topic-scoped rules:
 
@@ -96,7 +96,8 @@ Favorites, user tags, blacklist: **global per image**, not per device. Mobile/na
 - Retention: keep images forever. Manual delete only.
 - Observability: `@tigorhutasuhut/telemetry-js` (`/bun` export). Pretty stdout on TTY, JSON otherwise. OTEL optional.
 - Backup: **out of scope**. Rely on FS-level tools.
-- **Deployment**: primary distribution is **Docker**. Multi-stage `Dockerfile`, runs as non-root user, exposes `:5173`, mounts data at `/data/wallrus`. `docker-compose.yml` reference ships with `WALLRUS_AUTH_ENABLE=false` (assumes reverse-proxy upstream). Bare-metal install: `bun install && bun run build && bun run cli.ts serve`. Default `WALLRUS_DATA_DIR=./data` for bare-metal, `/data/wallrus` for Docker. See `docs/ARCHITECTURE.md` §Deployment.
+- **Deployment**: primary distribution is **Docker**. Multi-stage `Dockerfile`, runs as non-root user, exposes `:5173`, mounts data at `/data/wallrus`. `docker-compose.yml` reference ships with `WALLRUS_AUTH_ENABLE=false` (assumes reverse-proxy upstream). Bare-metal install: `bun install && bun run build && bun run src/cli.ts serve`. Default `WALLRUS_DATA_DIR=./data` for bare-metal, `/data/wallrus` for Docker. See `engineering/ARCHITECTURE.md` §Deployment.
+- **User docs site**: Astro Starlight at `docs/`, deployed to GitHub Pages. See [`user-docs.md`](./user-docs.md) — must be updated whenever a user-facing env var, deployment step, config value, default, or workflow changes.
 
 ## Post-MVP — do not build, but design around
 
@@ -106,4 +107,4 @@ Favorites, user tags, blacklist: **global per image**, not per device. Mobile/na
 
 ## Before adding scope
 
-If a request looks like new scope (new source kind beyond MVP set, new processing step, auto-retention, multi-user, plugin/extensibility, etc.), call it out and confirm against `docs/SCOPE.md` before implementing.
+If a request looks like new scope (new source kind beyond MVP set, new processing step, auto-retention, multi-user, plugin/extensibility, etc.), call it out and confirm against `engineering/SCOPE.md` before implementing.

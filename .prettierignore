@@ -2,6 +2,7 @@ node_modules
 build
 dist
 .svelte-kit
+.astro
 out
 coverage
 bun.lock
@@ -11,3 +12,6 @@ pnpm-lock.yaml
 *.min.js
 *.min.css
 drizzle/migrations
+
+# Starlight user docs site has its own format lifecycle
+docs/

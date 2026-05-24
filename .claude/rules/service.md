@@ -218,7 +218,7 @@ Mutations return the final row (using upsert + RETURNING _ where applicable). Ro
 
 ### Ingest pipeline (images)
 
-One transaction per item ingested. Detailed in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §Ingest pipeline. Key invariants:
+One transaction per item ingested. Detailed in [`engineering/ARCHITECTURE.md`](../../engineering/ARCHITECTURE.md) §Ingest pipeline. Key invariants:
 
 - Soft-deleted row resurrection on re-encounter: clear `deleted_at`, re-download, re-fanout.
 - Blacklisted row: skip entirely (no download, no fanout).
