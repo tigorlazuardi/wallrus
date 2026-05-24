@@ -38,6 +38,13 @@ wallrus membaca nama env **standar** OpenTelemetry. Gunakan variabel yang sama y
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | tidak diset | URL dasar OpenTelemetry collector (mis. `http://otel-collector:4318`). Bila tidak di-set, ekspor OTLP dimatikan dan log hanya ke stderr.                                                        |
 | `OTEL_SERVICE_NAME`           | `wallrus`   | Nama service yang dilaporkan di setiap span / log / metric. Override bila kamu menjalankan beberapa instance wallrus di belakang satu collector.                                                |
 | `OTEL_RESOURCE_ATTRIBUTES`    | tidak diset | Pasangan `key=value` yang dipisah koma, digabung ke OpenTelemetry Resource (mis. `deployment.environment=prod,service.instance.id=tv-rack`). Default sudah berisi `service.namespace=homelab`. |
+| `OTEL_EXPORTER_OTLP_HEADERS`  | tidak diset | Pasangan `key=value` dipisah koma (split di `=` pertama per pair, JWT yang berisi `=` aman). Di-inject oleh exporter daemon sendiri dan proxy `/otlp` untuk browser. Pakai untuk `Authorization=Bearer …` atau `x-api-key=…`. |
+
+## Proxy telemetry browser
+
+| Variabel                | Default  | Deskripsi                                                                                                                                                                              |
+| ----------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WALLRUS_OTEL_FRONTEND` | `enable` | Salah satu dari `enable`, `auth`, `disable`. Mengontrol proxy `/otlp` yang meneruskan sinyal OTel browser ke upstream. Lihat [Telemetry browser](./browser-telemetry/) untuk matriks posture lengkap. |
 
 ## Perilaku fail-fast
 

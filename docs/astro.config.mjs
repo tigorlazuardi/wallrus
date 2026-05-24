@@ -63,6 +63,11 @@ export default defineConfig({
 							label: "Docker",
 							translations: { id: "Docker" },
 						},
+						{
+							slug: "configuration/browser-telemetry",
+							label: "Browser telemetry",
+							translations: { id: "Telemetry browser" },
+						},
 					],
 				},
 			],

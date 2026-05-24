@@ -38,6 +38,13 @@ wallrus reads the **standard** OpenTelemetry env names. Set the same variables y
 | `OTEL_EXPORTER_OTLP_ENDPOINT`  | unset      | Base URL of an OpenTelemetry collector (e.g. `http://otel-collector:4318`). When unset, OTLP export is disabled and logs go to stderr only.                |
 | `OTEL_SERVICE_NAME`            | `wallrus`  | Service name reported in every span / log / metric. Override if you run multiple wallrus instances behind one collector.                                   |
 | `OTEL_RESOURCE_ATTRIBUTES`     | unset      | Comma-separated `key=value` pairs merged into the OpenTelemetry Resource (e.g. `deployment.environment=prod,service.instance.id=tv-rack`). Defaults include `service.namespace=homelab`. |
+| `OTEL_EXPORTER_OTLP_HEADERS`   | unset      | Comma-separated `key=value` pairs (split on first `=` per pair, so JWTs survive). Injected by both the daemon's own exporter and the `/otlp` browser proxy. Use for `Authorization=Bearer …` or `x-api-key=…`. |
+
+## Browser telemetry proxy
+
+| Variable                  | Default  | Description |
+| ------------------------- | -------- | ----------- |
+| `WALLRUS_OTEL_FRONTEND`   | `enable` | One of `enable`, `auth`, `disable`. Controls the `/otlp` proxy that forwards browser OTel signals upstream. See [Browser telemetry](./browser-telemetry/) for the full posture matrix. |
 
 ## Fail-fast behavior
 

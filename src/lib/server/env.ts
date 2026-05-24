@@ -20,9 +20,18 @@ const RawEnv = z
 			.union([z.literal("true"), z.literal("false")])
 			.default("false")
 			.transform((v) => v === "true"),
+
+		// Browser → /otlp proxy gate. See `.claude/rules/telemetry.md` §Browser
+		// telemetry proxy. `enable` mirrors the main auth posture, `auth`
+		// forces authenticated submission, `disable` turns the proxy off.
+		WALLRUS_OTEL_FRONTEND: z
+			.union([z.literal("enable"), z.literal("auth"), z.literal("disable")])
+			.default("enable"),
+
 		// Standard OpenTelemetry env names — same vars an OTel SDK already picks
 		// up automatically. wallrus reads them through Zod so they're typed.
 		OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+		OTEL_EXPORTER_OTLP_HEADERS: z.string().optional(),
 		OTEL_SERVICE_NAME: z.string().default("wallrus"),
 		OTEL_RESOURCE_ATTRIBUTES: z.string().optional(),
 	})
@@ -64,4 +73,48 @@ export function parse_env(source: Record<string, string | undefined> = Bun.env):
 		throw new Error(`invalid env:\n${lines.join("\n")}`)
 	}
 	return result.data
+}
+
+// Lazy-cached env singleton. Bootstrap warms it first; route handlers call
+// `env()` to read the same parsed config without re-running Zod each request.
+let _env: Env | null = null
+
+export function env(): Env {
+	if (!_env) _env = parse_env()
+	return _env
+}
+
+// Parses the OpenTelemetry-standard `OTEL_EXPORTER_OTLP_HEADERS` format
+// (`key1=value1,key2=value2`). Values may contain `=`, so only the first `=`
+// per pair splits. Trims whitespace around keys + values. Used by the
+// `/otlp` proxy to inject Authorization / API key headers server-side.
+export function parse_otlp_headers(raw: string | undefined): Record<string, string> {
+	const out: Record<string, string> = {}
+	if (!raw) return out
+	for (const pair of raw.split(",")) {
+		const idx = pair.indexOf("=")
+		if (idx < 1) continue
+		const k = pair.slice(0, idx).trim()
+		const v = pair.slice(idx + 1).trim()
+		if (k && v) out[k] = v
+	}
+	return out
+}
+
+// Browser telemetry posture derived from WALLRUS_OTEL_FRONTEND + the rest of
+// the env. Used by both the /otlp proxy gate and the /api/v1/otel/discover
+// endpoint so clients can decide whether to even attempt forwarding spans.
+export type OtelFrontendPosture = {
+	enabled: boolean
+	auth_required: boolean
+	mode: Env["WALLRUS_OTEL_FRONTEND"]
+}
+
+export function otel_frontend_posture(env: Env): OtelFrontendPosture {
+	const has_collector = Boolean(env.OTEL_EXPORTER_OTLP_ENDPOINT)
+	const enabled = env.WALLRUS_OTEL_FRONTEND !== "disable" && has_collector
+	const auth_required =
+		env.WALLRUS_OTEL_FRONTEND === "auth" ||
+		(env.WALLRUS_OTEL_FRONTEND === "enable" && env.WALLRUS_AUTH_ENABLE)
+	return { enabled, auth_required, mode: env.WALLRUS_OTEL_FRONTEND }
 }
