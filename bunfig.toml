@@ -1,0 +1,5 @@
+[test]
+# `bun test` covers unit + integration only. Playwright e2e specs in
+# `tests/e2e/` are run via `bun run test:e2e` (Playwright runner) and must
+# stay out of bun's discovery path.
+root = "./src"

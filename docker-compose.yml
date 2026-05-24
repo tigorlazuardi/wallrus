@@ -1,0 +1,32 @@
+# Reference compose for wallrus. Tune env + volume path to taste.
+#
+#   docker compose up -d
+#
+# By default this exposes wallrus on http://localhost:5173 with auth DISABLED
+# (suitable when behind a reverse proxy like Authelia / Tailscale / Caddy).
+# To enable built-in auth, set WALLRUS_AUTH_ENABLE=true and supply the
+# WALLRUS_USERNAME / WALLRUS_PASSWORD / WALLRUS_AUTH_SECRET env vars.
+#
+# See docs/ARCHITECTURE.md §Deployment.
+
+services:
+  wallrus:
+    build: .
+    image: wallrus:latest
+    container_name: wallrus
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      WALLRUS_AUTH_ENABLE: "false"
+      # WALLRUS_USERNAME: "admin"
+      # WALLRUS_PASSWORD: "change-me"
+      # WALLRUS_AUTH_SECRET: "<openssl rand -hex 32>"
+      # WALLRUS_TRUST_PROXY: "true"
+      # WALLRUS_OTEL_ENDPOINT: "http://otel-collector:4318"
+    volumes:
+      - wallrus-data:/data/wallrus
+
+volumes:
+  wallrus-data:
+    driver: local

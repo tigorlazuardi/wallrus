@@ -6,8 +6,8 @@ Companion to [`SCOPE.md`](./SCOPE.md). Scope says _what_ and _why_; this doc say
 
 ## Process model
 
-- One Bun process. Entry: `bun run cli.ts serve`.
-- `cli.ts` uses **commander**. Only `serve` is implemented in MVP — other subcommands (per scope: `source list`, `device …`, `subscription …`, `run-once`) are **deferred**. WebUI + API cover everything for now; CLI returns post-MVP.
+- One Bun process. Entry: `bun run src/cli.ts serve`.
+- `src/cli.ts` uses **commander**. Only `serve` is implemented in MVP — other subcommands (per scope: `source list`, `device …`, `subscription …`, `run-once`) are **deferred**. WebUI + API cover everything for now; CLI returns post-MVP.
 - The `serve` command bootstraps the runtime, starts the scheduler, then starts the HTTP server. Same process, async.
 - Dev mode (`bun run dev`) uses Vite + SvelteKit dev server. `bootstrap.ts` guards initialisation so the scheduler runs in dev too.
 
@@ -32,8 +32,8 @@ Companion to [`SCOPE.md`](./SCOPE.md). Scope says _what_ and _why_; this doc say
 ## Directory layout
 
 ```
-cli.ts                                 # commander entrypoint
 src/
+  cli.ts                               # commander entrypoint
   app.html
   hooks.server.ts                      # auth gate + per-request telemetry span
   lib/
@@ -974,6 +974,71 @@ async function link_or_copy(src: string, dst: string) {
 9. start Bun.serve with SvelteKit handler
 10. install signal handlers (SIGTERM/SIGINT): abort scheduler signals, drain HTTP, close DB, exit
 ```
+
+## Deployment
+
+The primary distribution channel is **Docker**. The `Dockerfile` produces a multi-stage image that runs as a non-root user and exposes a single mountable data volume.
+
+### Image layout
+
+```
+FROM oven/bun:1            (deps)      install --frozen-lockfile
+FROM oven/bun:1            (build)     bun run build  →  ./build (SvelteKit + adapter-bun output)
+FROM oven/bun:1-slim       (runtime)   non-root user `wallrus`, /data/wallrus owned + chmod 700
+                                       COPY: build/, node_modules/, drizzle/, src/ (including src/cli.ts)
+                                       ENV:  WALLRUS_DATA_DIR=/data/wallrus
+                                             WALLRUS_LISTEN_ADDR=0.0.0.0:5173
+                                       VOLUME ["/data/wallrus"]
+                                       EXPOSE 5173
+                                       CMD bun run src/cli.ts serve
+```
+
+### Volume + path conventions (Docker)
+
+| Env                   | Docker default               | Bare-metal dev default     |
+| --------------------- | ---------------------------- | -------------------------- |
+| `WALLRUS_DATA_DIR`    | `/data/wallrus` (mount this) | `./data` (relative to cwd) |
+| `WALLRUS_LISTEN_ADDR` | `0.0.0.0:5173`               | `0.0.0.0:5173`             |
+
+The data dir contains everything wallrus persists — SQLite DB + WAL + SHM, thumbnails, staging files, hardlinked images per device, derived secret files (`.auth_secret`):
+
+```
+/data/wallrus/
+  wallrus.db, wallrus.db-wal, wallrus.db-shm
+  .thumbs/<image-uuid>.webp
+  .staging/<uuid>
+  <device-slug>/<source-slug>-<filename>.<ext>
+```
+
+Operators mount a host directory or a named volume at `/data/wallrus`. Snapshot / backup / syncthing-replicate the host side — the path scheme is sync-friendly by design.
+
+### Reference `docker-compose.yml`
+
+Ships a `wallrus` service with `WALLRUS_AUTH_ENABLE=false` (assumes reverse-proxy auth upstream) and a named volume `wallrus-data` mounted at `/data/wallrus`. Operators flip to built-in auth by uncommenting the three credential env vars and setting `WALLRUS_AUTH_ENABLE=true`.
+
+### Bare-metal install
+
+For users who don't want Docker:
+
+```
+bun install
+bun run build
+WALLRUS_DATA_DIR=./data bun run src/cli.ts serve
+```
+
+Same env contract. The bare-metal default `./data` lives next to the cwd; pick a stable absolute path in production.
+
+### Healthcheck
+
+`HEALTHCHECK` hits `GET /healthz` (lands when SvelteKit is fully integrated). Docker / compose / Kubernetes liveness probes rely on this.
+
+### Image hardening
+
+- Runs as non-root `wallrus` user (uid/gid resolved at build time).
+- Data dir created with mode 0700 + ownership before USER drop.
+- DB file mode 0600 enforced by `fs/perms.ts` on every boot, regardless of how it got into the container.
+- No shell-required tooling in runtime image. `slim` base only.
+- `.dockerignore` excludes secrets / dev artifacts (`data/`, `*.sock`, `.auth_secret`, `.svelte-kit`, etc.) from the build context.
 
 ## Telemetry wiring
 

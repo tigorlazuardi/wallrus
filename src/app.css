@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Dark-first minimal + glass chrome. Violet #7c5cff accent. */
+@theme {
+	--color-bg: #0a0a0c;
+	--color-bg-elev: #131316;
+	--color-surface: rgb(255 255 255 / 0.04);
+	--color-surface-hi: rgb(255 255 255 / 0.08);
+	--color-glass: rgb(20 20 24 / 0.55);
+	--color-glass-border: rgb(255 255 255 / 0.08);
+	--color-fg: #e8e8ec;
+	--color-fg-muted: #9a9aa3;
+	--color-accent: #7c5cff;
+	--color-accent-fg: #f3f0ff;
+	--color-ring: rgb(124 92 255 / 0.4);
+	--radius-card: 12px;
+	--blur-chrome: 20px;
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+	color-scheme: light;
+	--color-bg: #fafafa;
+	--color-bg-elev: #ffffff;
+	--color-surface: rgb(0 0 0 / 0.04);
+	--color-surface-hi: rgb(0 0 0 / 0.08);
+	--color-glass: rgb(255 255 255 / 0.65);
+	--color-glass-border: rgb(0 0 0 / 0.08);
+	--color-fg: #18181b;
+	--color-fg-muted: #5f5f6a;
+}
+
+body {
+	background: var(--color-bg);
+	color: var(--color-fg);
+	font-family:
+		"Inter",
+		system-ui,
+		-apple-system,
+		"Segoe UI",
+		Roboto,
+		"Helvetica Neue",
+		Arial,
+		sans-serif;
+	min-height: 100dvh;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	.glass {
+		background: var(--color-bg-elev) !important;
+		backdrop-filter: none !important;
+	}
+}

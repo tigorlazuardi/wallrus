@@ -20,20 +20,58 @@ Full schema sketch in [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) §DB 
 
 ## Migration strategy
 
-- Hand-written SQL in `drizzle/migrations/`, fed to `drizzle-kit`'s migrator.
-- **First migration**: `0000_pragma.sql` sets PRAGMAs:
-  ```sql
-  PRAGMA journal_mode = WAL;
-  PRAGMA synchronous = NORMAL;
-  PRAGMA foreign_keys = ON;
-  PRAGMA busy_timeout = 5000;
-  PRAGMA cache_size = -64000;
-  PRAGMA temp_store = MEMORY;
-  PRAGMA mmap_size = 268435456;
-  ```
-- `journal_mode = WAL` persists on the file. Session-level PRAGMAs (foreign_keys, busy_timeout, etc.) are reapplied on every connection open by `client.ts`.
-- Second migration onward: `0001_initial_schema.sql` and onward.
-- Crash recovery sweep (mark `status='running'` rows as `failed` with `stop_reason='daemon_crash'`) runs at bootstrap, after migrations, **before** the scheduler tick starts.
+Migrations live in `drizzle/migrations/`. **Schema-derived** migrations come from `drizzle-kit generate`; **everything Drizzle can't express** (PRAGMAs, FTS5 virtual tables, triggers, custom indexes Drizzle's builder lacks, views) is **hand-written as a `--custom` migration**.
+
+### Two migration kinds in this codebase
+
+| Kind                                      | Authored how                                          | Example                     |
+| ----------------------------------------- | ----------------------------------------------------- | --------------------------- |
+| Tables / columns / standard indexes / FKs | Generated from `schema.ts` via `drizzle-kit generate` | `0000_initial_schema.sql`   |
+| FTS5 virtual tables + sync triggers       | `--custom` (hand-written SQL)                         | `0001_fts5_search_text.sql` |
+
+`drizzle-kit migrate` runs every file in order via the journal. **PRAGMAs are NOT a migration** — see §PRAGMA handling below.
+
+### Stable migration filenames — mandatory
+
+`drizzle-kit generate` defaults to random suffixes (e.g. `0001_dazzling_kraven.sql`). **Always pass `--name <descriptive_snake_case>`** so filenames are stable, reviewable, and bisect-friendly:
+
+```bash
+# schema change → derived migration
+bunx drizzle-kit generate --name add_collection_tables
+
+# custom migration (FTS5, PRAGMA, trigger, view)
+bunx drizzle-kit generate --custom --name fts5_search_text
+```
+
+Result: `0003_add_collection_tables.sql`, `0004_fts5_search_text.sql`. **No random adjective+noun filenames in the repo.** PR review will block a migration whose suffix is not descriptive.
+
+### PRAGMA handling — all in `db/client.ts`, not a migration
+
+| PRAGMA                  | Lifetime                | Why client.ts                                                                                                                                                                                          |
+| ----------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `journal_mode = WAL`    | persists on the DB file | Setting WAL inside a drizzle migration transaction errors with `cannot change into wal mode from within a transaction`. Must be applied before drizzle wraps any SQL. Idempotent — safe on every open. |
+| `foreign_keys = ON`     | per-connection          | reapplied on every connection                                                                                                                                                                          |
+| `synchronous = NORMAL`  | per-connection          | same                                                                                                                                                                                                   |
+| `busy_timeout = 5000`   | per-connection          | same                                                                                                                                                                                                   |
+| `cache_size = -64000`   | per-connection          | same                                                                                                                                                                                                   |
+| `temp_store = MEMORY`   | per-connection          | same                                                                                                                                                                                                   |
+| `mmap_size = 268435456` | per-connection          | same                                                                                                                                                                                                   |
+
+`db/client.ts` applies all of these right after `new Database(...)`, before handing the connection to `drizzle()`. Never put PRAGMAs in a migration file.
+
+### Where the migration runner sits
+
+- `src/lib/server/db/migrate.ts` invokes `drizzle-orm/bun-sqlite/migrator`'s `migrate(db, { migrationsFolder: 'drizzle/migrations' })`.
+- Called by `bootstrap.ts` **after** opening the DB and **before** the crash-recovery sweep.
+- Crash recovery (`UPDATE run_history SET status='failed', stop_reason='daemon_crash' WHERE status='running'`) runs at bootstrap, **after migrations**, **before** the scheduler tick starts.
+
+### Rules for editing migrations
+
+- **Never edit a migration that has already been applied** to your dev DB or any deployed instance. Generate a new one instead.
+- **Never delete or renumber** an existing migration file.
+- A new schema feature = update `schema.ts` + `drizzle-kit generate --name <descriptive>`. Review the generated SQL before committing.
+- A new FTS5 mirror / trigger / view = `drizzle-kit generate --custom --name <descriptive>`, fill in the SQL.
+- For any new table that's a junction: also add its reverse composite index in the SAME migration (see §Junction tables).
 
 ## SQLite conventions (enforce on every new table or migration)
 

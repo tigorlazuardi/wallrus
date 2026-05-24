@@ -96,6 +96,7 @@ Favorites, user tags, blacklist: **global per image**, not per device. Mobile/na
 - Retention: keep images forever. Manual delete only.
 - Observability: `@tigorhutasuhut/telemetry-js` (`/bun` export). Pretty stdout on TTY, JSON otherwise. OTEL optional.
 - Backup: **out of scope**. Rely on FS-level tools.
+- **Deployment**: primary distribution is **Docker**. Multi-stage `Dockerfile`, runs as non-root user, exposes `:5173`, mounts data at `/data/wallrus`. `docker-compose.yml` reference ships with `WALLRUS_AUTH_ENABLE=false` (assumes reverse-proxy upstream). Bare-metal install: `bun install && bun run build && bun run cli.ts serve`. Default `WALLRUS_DATA_DIR=./data` for bare-metal, `/data/wallrus` for Docker. See `docs/ARCHITECTURE.md` §Deployment.
 
 ## Post-MVP — do not build, but design around
 
