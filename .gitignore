@@ -54,3 +54,6 @@ data/
 .staging/
 .auth_secret
 .cookie_secret
+
+# ralph-loop plugin state (session id, iteration counter)
+.claude/ralph-loop.local.md

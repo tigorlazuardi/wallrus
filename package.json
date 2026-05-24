@@ -15,6 +15,7 @@
     "lint:fix": "bunx eslint . --fix",
     "format": "bunx prettier --write .",
     "format:check": "bunx prettier --check .",
+    "gates": "bun run check && bun test && bunx eslint . && bunx prettier --check .",
     "check": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json --watch",
     "db:generate": "bunx drizzle-kit generate",

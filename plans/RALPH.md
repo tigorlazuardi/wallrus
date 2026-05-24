@@ -25,6 +25,28 @@ the Stop hook on the _main_ session — whoever's driving the main session
 is the reviewer. If you `/model sonnet` and then `/ralph-loop`, you lose
 the review layer.
 
+## Pre-flight (read before the first /ralph-loop run)
+
+The `wallrus-builder` subagent is defined in
+`.claude/agents/wallrus-builder.md`. Claude Code's agent registry
+**scans this directory only at session start**. If the file was added
+or edited during the current session, the registry does NOT see it —
+`Agent({ subagent_type: "wallrus-builder" })` will fail with
+`agent type not found`.
+
+**Before triggering `/ralph-loop` for the first time** (or after any
+edit to `.claude/agents/wallrus-builder.md`):
+
+1. Exit Claude Code (`Ctrl+C` twice or `/exit`).
+2. Re-open Claude Code from the same project directory.
+3. Confirm registration: `/agents` should list `wallrus-builder`.
+4. Then run the trigger command.
+
+Skipping the restart wastes iterations and burns Opus tokens — the
+reviewer cannot spawn the builder and the loop spins on the same
+blocker until you `/cancel-ralph`. (See also the fallback in the Hard
+rules section.)
+
 ## Trigger commands
 
 The recommended way is to point at this file so the loop instructions stay
@@ -179,6 +201,21 @@ unless tagged `[builder]`.)
   `origin` before the next iteration starts.
 - **Trust but verify the builder.** Always re-run gates locally — the
   builder's report describes intent, the gate output describes truth.
+- **Builder unavailable → halt loop, do NOT improvise.** If
+  `Agent({ subagent_type: "wallrus-builder" })` returns
+  `agent type not found`, the registry didn't pick up
+  `.claude/agents/wallrus-builder.md` (typically: agent file added or
+  edited mid-session — see §Pre-flight). Do NOT fall back to
+  `general-purpose` + `model: sonnet` to "keep the loop moving" — that
+  bypasses the agent's hard prohibitions (no git writes, no plan
+  status edits) and a misbehaving fallback can corrupt plan state. Do
+  NOT implement the slice yourself (reviewer-never-touches-code stands).
+  Action:
+  1. State the blocker plainly in the iteration output.
+  2. Do NOT emit the completion promise (it would be false).
+  3. Do NOT commit any bookkeeping.
+  4. Ask the user to `/cancel-ralph`, restart Claude Code, then
+     re-trigger the loop. The tree stays at the last good commit.
 
 ## Hard rules (builder — enforced by `.claude/agents/wallrus-builder.md`)
 
