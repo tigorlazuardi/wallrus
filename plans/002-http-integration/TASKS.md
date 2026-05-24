@@ -1,60 +1,95 @@
 # 002 — HTTP integration: tasks
 
-## Core wiring
+## Env + parsing
 
-- [ ] Parse `WALLRUS_LISTEN_ADDR` into `{ hostname, port }` (small helper in `src/lib/server/env.ts` or inline in `cli.ts`)
-- [ ] Wire `Bun.serve` to host the SvelteKit handler imported from `./build/handler.js`
-- [ ] Gate the production path on `process.env.NODE_ENV === "production"` (or a `--mode prod` flag); skip in dev
-- [ ] Keep `serve` subcommand long-running — daemon stays alive until signalled
+- [ ] Add `parse_listen_addr(raw: string): { hostname: string; port: number }` to `src/lib/server/env.ts`
+- [ ] `parse_listen_addr` throws `AppError("env.invalid", …)` on malformed input
+- [ ] Unit test: `src/lib/server/env.test.ts` — 4+ cases (`"0.0.0.0:5173"`, `"5173"` rejects, `"foo:bar"` rejects, `":5173"` defaults host)
+- [ ] Add `WALLRUS_MODE: z.enum(["prod","dev"]).default("prod")` to env schema if not already present
 
-## Healthcheck
+## Runtime singleton
 
-- [ ] `src/routes/healthz/+server.ts` returns `200 ok` with `db.run("select 1")` ping
-- [ ] Path bypasses auth gate (noted explicitly in `hooks.server.ts` once it has one — for now the hook is a no-op)
-- [ ] Verify `docker run` healthcheck transitions to `healthy`
+- [ ] Create `src/lib/server/runtime.ts` exporting `set_runtime(r)` + `runtime_ref()`
+- [ ] `runtime_ref()` throws if `set_runtime` not yet called (no silent undefined)
+- [ ] Unit test: `runtime_ref()` before `set_runtime` throws; after set returns the same instance
 
-## Scheduler
+## Scheduler queue
 
-- [ ] Promote `src/lib/server/scheduler/cron.ts` from stub to functional
-- [ ] On boot: load enabled + non-soft-deleted subscriptions, build a per-subscription croner instance
-- [ ] `setInterval(tick, 60_000)` evaluates which subscriptions fire now and `queue.enqueue`s them
-- [ ] Executor body stays a `getLogger().info("would run", { subscription_id })` placeholder — real ingest is `005-ingest`
-- [ ] Skip scheduler start in dev mode
+- [ ] Create `src/lib/server/scheduler/queue.ts`
+- [ ] Export `enqueue(source_slug, fn): Promise<void>` with per-slug serial chaining
+- [ ] Export `wait_idle(): Promise<void>` resolving when all chains drain
+- [ ] Unit test: two enqueues same slug run sequentially (timestamps assert order)
+- [ ] Unit test: enqueues across different slugs overlap (timestamps assert concurrency)
+- [ ] Unit test: `wait_idle` resolves only after all in-flight chains complete
 
-## Shutdown
+## Scheduler tick
 
-- [ ] `cli.ts` registers `process.on("SIGTERM" | "SIGINT", handler)`
-- [ ] Handler: stop scheduler tick, call `Bun.serve` instance `stop()`, await `runtime.sdk.shutdown()`, close DB, `process.exit(0)`
-- [ ] Default 5s timeout — exit anyway after that
+- [ ] Promote `src/lib/server/scheduler/cron.ts` from stub
+- [ ] Export `start(runtime: Runtime): void` loading enabled, non-soft-deleted subscriptions once
+- [ ] Build per-subscription `croner` `Cron` instances keyed by subscription id
+- [ ] `setInterval(tick, 60_000)` evaluates `nextRun()` in the next 60s and `queue.enqueue`s
+- [ ] Executor body = `getLogger({ module: "scheduler" }).info("would run", { subscription_id })`
+- [ ] Export `stop(): Promise<void>` clearing interval + awaiting `queue.wait_idle()` (5s cap)
+- [ ] Unit test: fake `Date.now` + one subscription row → executor stub invoked once per tick window
+- [ ] Unit test: `stop` after `start` clears interval and drains queue
 
-## Smoke + tests
+## Healthcheck route
 
-- [ ] Unit test for `parse_listen_addr()` (or whatever the helper is named)
-- [ ] Smoke: `bun run build && bun run serve` then `curl /healthz` → 200
-- [ ] Smoke: SIGTERM → clean exit, telemetry flushed
-- [ ] Playwright already has a smoke spec hitting `/`; verify still green against built handler under `Bun.serve` (or accept it stays as a Vite-only spec for now)
+- [ ] Create `src/routes/healthz/+server.ts` exporting `GET`
+- [ ] Returns `200 ok` text/plain on `db.run("select 1")` success
+- [ ] Returns `503 db not ready` when the ping throws (caught + logged)
+- [ ] No external deps, no auth checks
+- [ ] Add `db` to `Locals` interface in `src/app.d.ts`
+
+## Hooks wiring
+
+- [ ] `src/hooks.server.ts`: set `event.locals.db = runtime_ref().db`
+- [ ] Keep `event.locals.user = null` for now (auth lands in 003)
+
+## CLI serve
+
+- [ ] `src/cli.ts` `serve` action no longer exits after `boot()`
+- [ ] Gate Bun.serve block on `env.WALLRUS_MODE === "prod" || process.env.NODE_ENV === "production"`
+- [ ] Dynamic `import("../build/handler.js")` wrapped in try/catch; ENOENT logs build-missing + exit 1
+- [ ] `set_runtime(runtime)` called pre-server-start
+- [ ] `scheduler.start(runtime)` called pre-server-start
+- [ ] `const server = Bun.serve({ port, hostname, fetch: handler })` running
+- [ ] `getLogger({ module: "http" }).info("listening", { hostname, port })`
+- [ ] SIGTERM + SIGINT handlers registered (same `shutdown(signal)` body)
+- [ ] Shutdown body: `scheduler.stop()` → `server.stop()` → `runtime.sdk.shutdown()` → `runtime.db.close()` → `process.exit(0)`
+- [ ] Hard-exit fallback via `setTimeout(() => process.exit(1), 5_000).unref()`
 
 ## Docs
 
-- [ ] If healthcheck path / behaviour changed, update `docs/src/content/docs/{en,id}/configuration/docker.md`
-- [ ] If install steps shifted, update `docs/src/content/docs/{en,id}/install.md`
-- [ ] `engineering/ARCHITECTURE.md` §Bootstrap sequence: reflect the new "start scheduler → start HTTP → wait" order
+- [ ] `engineering/ARCHITECTURE.md` §Bootstrap sequence reflects new order (boot → scheduler → HTTP → wait)
+- [ ] `engineering/ARCHITECTURE.md` §Scheduler clarifies in-process tick + 60s interval + queue
+- [ ] `docs/src/content/docs/en/configuration/docker.md` healthcheck section verified accurate
+- [ ] `docs/src/content/docs/id/configuration/docker.md` mirrors the EN update
 
-## Verification gates
+## Verification gates (run before commit)
 
 - [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` 0 errors (warnings on placeholder mixins still OK)
+- [ ] `bun test` green (new cases covered)
+- [ ] `bunx eslint .` zero errors
 - [ ] `bunx prettier --check .` clean
+- [ ] `bun run build` succeeds
+- [ ] Smoke: `WALLRUS_MODE=prod bun run src/cli.ts serve` boots; `curl http://127.0.0.1:5173/healthz` → 200 `ok`
+- [ ] Smoke: `kill -TERM <pid>` exits 0 within 5s, log shows `shutdown` + OTel flush
 - [ ] `lefthook` pre-commit + commit-msg pass
 
-## Commit
+## Commit + push
 
-- [ ] One commit `feat(http-integration): serve SvelteKit + scheduler from cli.ts, add /healthz`
-- [ ] Push, watch the GH Pages workflow stay green (it should — this slice doesn't touch `docs/**`)
+- [ ] Single commit: `feat(http-integration): serve SvelteKit + scheduler from cli.ts, add /healthz`
+- [ ] Body lists Bun.serve, scheduler tick stub, /healthz, SIGTERM/SIGINT, parse_listen_addr
+- [ ] `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer present
+- [ ] `git push`
+- [ ] Set `Status: done` in this slice's `IMPLEMENTATION.md`
+- [ ] Update `plans/README.md` index row for `002-http-integration` to `done`
+- [ ] Commit + push the bookkeeping: `chore(plans): mark 002-http-integration done`
 
 ## Deferred from this slice
 
 - Real auth gate logic + `/healthz` exception → `003-auth`
-- Real scheduler executor body → `005-ingest`
-- Admin Unix socket for CLI mutations → post-MVP
+- Real scheduler executor body → `009-ingest-pipeline`
+- `scheduler.reload()` on subscription mutations → `005-service-subscriptions`
+- Admin Unix socket for CLI mutations → post-MVP per scope
