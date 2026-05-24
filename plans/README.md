@@ -79,7 +79,7 @@ authoritative checklist for the slice.
 | `005-service-subscriptions` | done        | Subscriptions CRUD + soft-delete + device link, cron validation, scheduler reload |
 | `006-service-images`        | done        | Images list/search/get/favorite/tag/delete/blacklist/restore + per-device images  |
 | `007-source-reddit`         | done        | Async-generator Reddit crawler with OAuth + gallery expansion                     |
-| `008-source-booru`          | not-started | Danbooru + Gelbooru crawler with tag/rating filters                               |
+| `008-source-booru`          | done        | Danbooru + Gelbooru crawler with tag/rating filters                               |
 | `009-ingest-pipeline`       | not-started | Scheduler executor: download, dedup, thumbnail, fan-out to devices                |
 | `010-run-history`           | not-started | Run history list/get/active/SSE-stream API, prune-to-100 trigger                  |
 | `011-webui-gallery`         | not-started | Masonry gallery, filter chips, infinite scroll, image modal, NSFW gate            |
