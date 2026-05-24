@@ -2,43 +2,40 @@
 
 ## Components
 
-- [ ] `src/lib/components/RunStatusBadge.svelte` — colours per status, pulse on running
-- [ ] `src/lib/components/RunRow.svelte` — row layout
-- [ ] `src/lib/components/RunDetail.svelte` — counters + params snapshot + error
-- [ ] `src/lib/components/Sparkline.svelte` — bar of last-N statuses (optional but ship)
+- [x] `src/lib/components/RunStatusBadge.svelte` — colours per status, pulse on running
+- [x] `src/lib/components/RunRow.svelte` — row layout
+- [x] `src/lib/components/RunDetail.svelte` — counters + params snapshot + error
+- [x] `src/lib/components/Sparkline.svelte` — bar of last-N statuses (optional but ship)
 
 ## Pages
 
-- [ ] `src/routes/(app)/runs/+page.svelte` + `+page.ts` — paginated list + EventSource subscribe
-- [ ] `src/routes/(app)/runs/[id]/+page.svelte` + `+page.ts` — detail
-- [ ] `src/routes/(app)/subscriptions/[id]/runs/+page.svelte` — scoped history
+- [x] `src/routes/(app)/runs/+page.svelte` + `+page.ts` — paginated list + EventSource subscribe
+- [x] `src/routes/(app)/runs/[id]/+page.svelte` + `+page.ts` — detail
+- [x] `src/routes/(app)/subscriptions/[id]/runs/+page.svelte` — scoped history
 
 ## SSE client
 
-- [ ] `src/lib/client/runs-stream.ts` — `subscribe(callback): () => void`
-- [ ] Exponential backoff (1s, 2s, 4s) on reconnect
-- [ ] Falls back to `setInterval(fetch_active, 10_000)` after 3 failed reconnects
-- [ ] Cleanup closes EventSource + clears timers
+- [x] `src/lib/client/runs-stream.ts` — `subscribe(callback): () => void`
+- [x] Exponential backoff (1s, 2s, 4s) on reconnect
+- [x] Falls back to `setInterval(fetch_active, 10_000)` after 3 failed reconnects
+- [x] Cleanup closes EventSource + clears timers
 
 ## Tests
 
-- [ ] `RunStatusBadge.test.ts` — renders per status
-- [ ] `RunRow.test.ts` — formats duration, counters
-- [ ] `RunDetail.test.ts` — error string visible when present
-- [ ] `runs-stream.test.ts` — reconnect logic with fake EventSource + fake timers
-- [ ] Playwright `tests/e2e/runs.spec.ts`:
-  - Start daemon with a subscription cron `* * * * *`
-  - Visit `/runs`
-  - Within 90s a row transitions from `running` → `success`
+- [x] `RunStatusBadge.test.ts` — renders per status
+- [x] `RunRow.test.ts` — formats duration, counters
+- [x] `RunDetail.test.ts` — error string visible when present
+- [x] `runs-stream.test.ts` — reconnect logic with fake EventSource + fake timers
+- [-] Playwright `tests/e2e/runs.spec.ts`: Playwright webServer doesn't call set_runtime() — same blocker as slices 011 + 012. Defer until a Playwright-bootstrap slice rewires `webServer`.
 
 ## Verification gates
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bun run test:e2e` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
-- [ ] Manual smoke: SSE updates UI live
+- [x] `bun run check` clean
+- [x] `bun test` green
+- [-] `bun run test:e2e` — Playwright bootstrap blocker (same as slices 011 + 012)
+- [x] `bunx eslint .` zero errors
+- [x] `bunx prettier --check .` clean
+- [-] Manual smoke: SSE updates UI live — requires running daemon + browser session, outside builder scope
 - [ ] `lefthook` pre-commit + commit-msg pass
 
 ## Commit + push
