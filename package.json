@@ -1,0 +1,16 @@
+{
+  "name": "wallrus",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@tigorhutasuhut/telemetry-js": "^1.10.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
