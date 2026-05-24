@@ -1,0 +1,105 @@
+<script lang="ts">
+	import { superForm } from "sveltekit-superforms"
+	import { zod4Client as zodClient } from "sveltekit-superforms/adapters"
+	import { goto } from "$app/navigation"
+	import { Input } from "$lib/components/ui/input"
+	import { Label } from "$lib/components/ui/label"
+	import FilterEditor from "$lib/components/FilterEditor.svelte"
+	import { UpdateDeviceRequestSchema } from "$lib/schemas/devices/UpdateDevice"
+	import type { PageData } from "./$types"
+
+	let { data }: { data: PageData } = $props()
+
+	const { form, errors, enhance, submitting } = superForm(data.form, {
+		dataType: "json",
+		validators: zodClient(UpdateDeviceRequestSchema),
+		onResult: ({ result }) => {
+			if (result.type === "redirect") {
+				goto(result.location)
+			}
+		},
+	})
+</script>
+
+<svelte:head>
+	<title>Edit {data.device.name} — wallrus</title>
+</svelte:head>
+
+<div class="container mx-auto max-w-2xl px-4 py-8">
+	<!-- Breadcrumb -->
+	<div class="mb-6 flex items-center gap-2 text-sm text-[var(--fg-muted)]">
+		<a href="/devices" class="hover:text-[var(--fg)]">Devices</a>
+		<span>/</span>
+		<a href="/devices/{data.device.slug}" class="hover:text-[var(--fg)]">
+			{data.device.name}
+		</a>
+		<span>/</span>
+		<span class="text-[var(--fg)]">Edit</span>
+	</div>
+
+	<h1 class="mb-6 text-2xl font-bold text-[var(--fg)]">Edit {data.device.name}</h1>
+
+	{#if $errors._errors}
+		<div
+			class="mb-4 rounded-[var(--radius)] border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+		>
+			{$errors._errors.join(", ")}
+		</div>
+	{/if}
+
+	<form method="POST" use:enhance class="space-y-6">
+		<!-- Hidden id field -->
+		<input type="hidden" name="id" value={$form.id} />
+
+		<div class="space-y-1.5">
+			<Label for="slug">Slug</Label>
+			<Input
+				id="slug"
+				type="text"
+				value={data.device.slug}
+				disabled
+				class="cursor-not-allowed opacity-60"
+			/>
+			<p class="text-xs text-[var(--fg-muted)]">Slug cannot be changed after creation.</p>
+		</div>
+
+		<div class="space-y-1.5">
+			<Label for="name">Name</Label>
+			<Input
+				id="name"
+				type="text"
+				bind:value={$form.name}
+				placeholder="e.g. Pixel 9 Pro"
+				required
+			/>
+			{#if $errors.name}
+				<p class="text-xs text-red-500">{$errors.name[0]}</p>
+			{/if}
+		</div>
+
+		<div
+			class="rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+		>
+			<h2 class="mb-4 text-sm font-semibold text-[var(--fg)]">Filter criteria</h2>
+			<FilterEditor bind:value={$form.filter_criteria} />
+		</div>
+
+		<div class="flex gap-3 pt-2">
+			<button
+				type="submit"
+				disabled={$submitting}
+				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
+				style="background: var(--accent);"
+			>
+				{$submitting ? "Saving…" : "Save changes"}
+			</button>
+			<a
+				href="/devices/{data.device.slug}"
+				class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
+				style="border-color: var(--glass-border);"
+			>
+				Cancel
+			</a>
+		</div>
+	</form>
+</div>
