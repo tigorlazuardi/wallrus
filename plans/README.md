@@ -83,7 +83,7 @@ authoritative checklist for the slice.
 | `009-ingest-pipeline`       | done        | Scheduler executor: download, dedup, thumbnail, fan-out to devices                |
 | `010-run-history`           | done        | Run history list/get/active/SSE-stream API, prune-to-100 trigger                  |
 | `011-webui-gallery`         | done        | Masonry gallery, filter chips, infinite scroll, image modal, NSFW gate            |
-| `012-webui-device`          | not-started | Device + subscription editor pages with superforms-driven flows                   |
+| `012-webui-device`          | done        | Device + subscription editor pages with superforms-driven flows                   |
 | `013-webui-runs`            | not-started | Run dashboard with SSE live updates and per-subscription history                  |
 
 Completion promise (last slice emits): `<promise>WALLRUS-MVP-COMPLETE</promise>`.
