@@ -42,6 +42,7 @@ beforeEach(() => {
 		devices: new DeviceService({ db }),
 		subscriptions: new SubscriptionService({ db }),
 		images: new ImageService({ db }),
+		runs: {} as never,
 	}
 	set_runtime({ db, services, env: {} as never, sdk: {} as never } as Runtime)
 	seed_images(db)

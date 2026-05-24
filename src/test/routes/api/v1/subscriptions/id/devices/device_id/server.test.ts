@@ -50,7 +50,12 @@ beforeEach(() => {
 	db = create_test_db()
 	sub_svc = new SubscriptionService({ db })
 	dev_svc = new DeviceService({ db })
-	const services = { devices: dev_svc, subscriptions: sub_svc, images: new ImageService({ db }) }
+	const services = {
+		devices: dev_svc,
+		subscriptions: sub_svc,
+		images: new ImageService({ db }),
+		runs: {} as never,
+	}
 	set_runtime({ db, services, env: {} as never, sdk: {} as never } as Runtime)
 
 	sources[MOCK_SOURCE_SLUG] = {

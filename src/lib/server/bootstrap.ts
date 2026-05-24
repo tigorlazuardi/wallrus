@@ -7,6 +7,7 @@ import { db_file_path, ensure_data_dir, ensure_db_perms } from "./fs/perms"
 import { DeviceService } from "./service/devices"
 import { SubscriptionService } from "./service/subscriptions"
 import { ImageService } from "./service/images"
+import { RunService } from "./service/runs"
 import { register_sources } from "./sources/_registry"
 import { getLogger, initSDK, setDefaultLogger, type SDKResult } from "./telemetry"
 
@@ -18,6 +19,7 @@ export type Runtime = {
 		devices: DeviceService
 		subscriptions: SubscriptionService
 		images: ImageService
+		runs: RunService
 	}
 }
 
@@ -78,6 +80,7 @@ export async function boot(): Promise<Runtime> {
 		devices: new DeviceService({ db }),
 		subscriptions: new SubscriptionService({ db }),
 		images: new ImageService({ db }),
+		runs: new RunService({ db }),
 	}
 
 	return { env, db, sdk, services }

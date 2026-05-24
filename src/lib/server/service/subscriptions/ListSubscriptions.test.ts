@@ -12,7 +12,12 @@ function make_runtime(db: ReturnType<typeof create_test_db>): Runtime {
 	const subscriptions = new SubscriptionService({ db })
 	return {
 		db,
-		services: { devices: {} as never, subscriptions, images: new ImageService({ db }) },
+		services: {
+			devices: {} as never,
+			subscriptions,
+			images: new ImageService({ db }),
+			runs: {} as never,
+		},
 		env: {} as never,
 		sdk: {} as never,
 	}

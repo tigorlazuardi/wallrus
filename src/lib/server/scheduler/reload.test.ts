@@ -19,6 +19,7 @@ function make_runtime(): Runtime {
 			devices: {} as never,
 			subscriptions,
 			images: new ImageService({ db }),
+			runs: {} as never,
 		},
 		env: {} as never,
 		sdk: {} as never,

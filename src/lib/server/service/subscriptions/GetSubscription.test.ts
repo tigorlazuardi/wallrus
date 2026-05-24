@@ -16,6 +16,7 @@ function make_runtime(db: ReturnType<typeof create_test_db>): Runtime {
 			devices: {} as never,
 			subscriptions: new SubscriptionService({ db }),
 			images: new ImageService({ db }),
+			runs: {} as never,
 		},
 		env: {} as never,
 		sdk: {} as never,

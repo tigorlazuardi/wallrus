@@ -37,6 +37,7 @@ import { make_source_context } from "../sources/_context"
 import { check } from "./dedup"
 import { evaluate, type ImageMeta } from "./filters"
 import { atomic_write, compute_thumbnail, link_or_copy } from "./fs"
+import { update_run } from "../runs/update"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -672,22 +673,17 @@ export async function run_subscription(runtime: Runtime, subscription_id: string
 		// -------------------------------------------------------------------
 		const final_status = stop_reason === "error" ? "failed" : "success"
 
-		await withQueryName("ingest.finalize_run", () =>
-			db
-				.update(run_history)
-				.set({
-					status: final_status,
-					stop_reason,
-					error: run_error ?? null,
-					ended_at: Date.now(),
-					items_seen,
-					items_new,
-					items_failed_download,
-					items_skipped_no_device,
-					device_adds,
-				})
-				.where(eq(run_history.id, run_id)),
-		)
+		await update_run(runtime, run_id, {
+			status: final_status,
+			stop_reason,
+			error: run_error ?? null,
+			ended_at: Date.now(),
+			items_seen,
+			items_new,
+			items_failed_download,
+			items_skipped_no_device,
+			device_adds,
+		})
 
 		log.info("ingest run finished", {
 			module: "ingest",
