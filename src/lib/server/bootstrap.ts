@@ -5,6 +5,8 @@ import { run_history } from "./db/schema"
 import { env as env_singleton, init_password_hash, parse_env, type Env } from "./env"
 import { db_file_path, ensure_data_dir, ensure_db_perms } from "./fs/perms"
 import { DeviceService } from "./service/devices"
+import { SubscriptionService } from "./service/subscriptions"
+import { register_sources } from "./sources/_registry"
 import { getLogger, initSDK, setDefaultLogger, type SDKResult } from "./telemetry"
 
 export type Runtime = {
@@ -13,6 +15,7 @@ export type Runtime = {
 	sdk: SDKResult
 	services: {
 		devices: DeviceService
+		subscriptions: SubscriptionService
 	}
 }
 
@@ -67,8 +70,11 @@ export async function boot(): Promise<Runtime> {
 
 	recover_orphan_runs(db)
 
+	register_sources()
+
 	const services = {
 		devices: new DeviceService({ db }),
+		subscriptions: new SubscriptionService({ db }),
 	}
 
 	return { env, db, sdk, services }

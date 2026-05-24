@@ -122,8 +122,9 @@ export async function stop(): Promise<void> {
 /**
  * Explicit reload — call after subscription mutations (005-service-subscriptions).
  * Does NOT stop/restart the tick interval; just replaces the registry in place.
+ * Safe to call when `start` hasn't run yet — acts as a no-op warm-up.
  */
-export function reload(runtime: Runtime): void {
+export async function reload(runtime: Runtime): Promise<void> {
 	_registry = load_registry(runtime)
 	getLogger().info("scheduler registry reloaded", {
 		module: "scheduler",
