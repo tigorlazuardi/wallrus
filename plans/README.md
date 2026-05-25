@@ -88,5 +88,6 @@ authoritative checklist for the slice.
 | `014-ui-theme`              | done                   | Warm Catppuccin Mocha Latte primary + Mocha dark + cycling theme toggle                                      |
 | `015-shared-ui`             | not-started            | Presenter + hook + thin container split, dynamic API base, universal load, SPA superforms (web-only outcome) |
 | `016-mobile-shell`          | not-started (deferred) | Dual adapter build, Capacitor scaffold, native wallpaper plugin, internal distribution                       |
+| `017-device-form-polish`    | done                   | Native res columns + AR auto-derive + tolerance UI + slug auto-gen + muted placeholder                       |
 
 Completion promise (last slice emits): `<promise>WALLRUS-MVP-COMPLETE</promise>`.
