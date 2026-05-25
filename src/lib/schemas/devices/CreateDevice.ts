@@ -15,6 +15,8 @@ export const CreateDeviceRequestSchema = z.object({
 		)
 		.transform((s) => s.toLowerCase()),
 	name: z.string().min(1).max(255),
+	native_width: z.number().int().positive().max(32768).optional().nullable(),
+	native_height: z.number().int().positive().max(32768).optional().nullable(),
 	filter_criteria: z
 		.preprocess((v) => (v === undefined ? {} : v), DeviceFiltersSchema)
 		.default({ nsfw: "all" }),

@@ -182,6 +182,8 @@ export const devices = sqliteTable(
 		name: text("name").notNull(),
 		enabled: boolCol("enabled").notNull().default(true),
 		filter_criteria: jsonCol<DeviceFilterCriteria>("filter_criteria").notNull(),
+		native_width: integer("native_width"),
+		native_height: integer("native_height"),
 		created_at: integer("created_at").notNull(),
 	},
 	(t) => [uniqueIndex("devices_slug_unique").on(t.slug)],

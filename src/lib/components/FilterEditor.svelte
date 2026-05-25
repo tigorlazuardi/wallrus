@@ -2,7 +2,6 @@
 	import type { DeviceFilters } from "$lib/schemas/devices/DeviceFilters"
 	import { Input } from "$lib/components/ui/input"
 	import { Label } from "$lib/components/ui/label"
-	import { Slider } from "$lib/components/ui/slider"
 	import { Checkbox } from "$lib/components/ui/checkbox"
 	import { RadioGroup, RadioGroupItem } from "$lib/components/ui/radio-group"
 	import TagsInput from "./TagsInput.svelte"
@@ -12,6 +11,16 @@
 
 	interface Props {
 		value?: DeviceFilters
+		/** Device's native width in pixels — used to auto-derive AR target. */
+		native_width?: number | null
+		/** Device's native height in pixels — used to auto-derive AR target. */
+		native_height?: number | null
+		/**
+		 * Initialize the AR dirty flag.
+		 * true = preserve existing target (use on edit when target already set).
+		 * false = allow native-res auto-derive (use on new device).
+		 */
+		ar_target_dirty_init?: boolean
 		class?: string
 	}
 
@@ -19,8 +28,15 @@
 		value = $bindable({
 			nsfw: "all",
 		}),
+		native_width = $bindable(null),
+		native_height = $bindable(null),
+		ar_target_dirty_init = false,
 		class: klass = "",
 	}: Props = $props()
+
+	// Native resolution strings (for input binding)
+	let native_width_str = $state(native_width != null ? String(native_width) : "")
+	let native_height_str = $state(native_height != null ? String(native_height) : "")
 
 	// Resolution inputs — convert undefined ↔ "" for input binding
 	let min_width_str = $state(value.min_width !== undefined ? String(value.min_width) : "")
@@ -32,9 +48,12 @@
 	let aspect_target_str = $state(
 		value.aspect_ratio !== undefined ? String(value.aspect_ratio.target) : "",
 	)
-	let aspect_tolerance = $state(
-		value.aspect_ratio !== undefined ? [value.aspect_ratio.tolerance] : [0.15],
+	let aspect_tolerance_str = $state(
+		value.aspect_ratio !== undefined ? String(value.aspect_ratio.tolerance) : "",
 	)
+
+	// AR auto-derive dirty flag: true if user has manually typed the target
+	let ar_target_dirty = $state(ar_target_dirty_init)
 
 	// File size inputs (MB in UI, bytes in payload)
 	let min_mb_str = $state(
@@ -54,6 +73,26 @@
 	// NSFW radio
 	let nsfw = $state(value.nsfw ?? "all")
 
+	// AR auto-derive: when native_width + native_height are set and target not dirtied
+	$effect(() => {
+		const w = native_width_str !== "" ? parseInt(native_width_str, 10) : null
+		const h = native_height_str !== "" ? parseInt(native_height_str, 10) : null
+		if (w !== null && h !== null && !isNaN(w) && !isNaN(h) && h > 0 && !ar_target_dirty) {
+			aspect_target_str = parseFloat((w / h).toFixed(4)).toString()
+		}
+	})
+
+	// Sync native resolution strings → bound `native_width` / `native_height` props
+	$effect(() => {
+		const w = native_width_str !== "" ? parseInt(native_width_str, 10) : null
+		native_width = w !== null && !isNaN(w) ? w : null
+	})
+
+	$effect(() => {
+		const h = native_height_str !== "" ? parseInt(native_height_str, 10) : null
+		native_height = h !== null && !isNaN(h) ? h : null
+	})
+
 	// Sync local state → bound `value`
 	$effect(() => {
 		const min_w = min_width_str !== "" ? parseInt(min_width_str, 10) : undefined
@@ -62,9 +101,17 @@
 		const max_h = max_height_str !== "" ? parseInt(max_height_str, 10) : undefined
 
 		const aspect_target = aspect_target_str !== "" ? parseFloat(aspect_target_str) : undefined
+		const tolerance_val =
+			aspect_tolerance_str !== "" ? parseFloat(aspect_tolerance_str) : undefined
 		const aspect =
 			aspect_target !== undefined
-				? { target: aspect_target, tolerance: aspect_tolerance[0] ?? 0.15 }
+				? {
+						target: aspect_target,
+						tolerance:
+							tolerance_val !== undefined && !isNaN(tolerance_val)
+								? tolerance_val
+								: 0,
+					}
 				: undefined
 
 		const min_bytes = min_mb_str !== "" ? parseFloat(min_mb_str) * 1_000_000 : undefined
@@ -96,10 +143,52 @@
 			selected_formats = [...selected_formats, fmt]
 		}
 	}
+
+	function handle_ar_target_input(e: Event) {
+		const target = e.target as HTMLInputElement
+		aspect_target_str = target.value
+		ar_target_dirty = true
+		// Default-populate tolerance to 0.1 on first target edit if tolerance is empty/0
+		if (aspect_tolerance_str === "" || parseFloat(aspect_tolerance_str) === 0) {
+			aspect_tolerance_str = "0.1"
+		}
+	}
 </script>
 
 <div class="space-y-6 {klass}">
-	<!-- Resolution -->
+	<!-- Native resolution (for AR auto-derive) -->
+	<fieldset class="space-y-3">
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">Native resolution</legend>
+		<p class="text-xs text-[var(--color-fg-muted)]">
+			Used to auto-derive AR target below. Leave empty if unknown.
+		</p>
+		<div class="grid grid-cols-2 gap-3">
+			<div class="space-y-1.5">
+				<Label for="native-width">Width (px)</Label>
+				<Input
+					id="native-width"
+					type="number"
+					min="1"
+					max="32768"
+					placeholder="e.g. 1440"
+					bind:value={native_width_str}
+				/>
+			</div>
+			<div class="space-y-1.5">
+				<Label for="native-height">Height (px)</Label>
+				<Input
+					id="native-height"
+					type="number"
+					min="1"
+					max="32768"
+					placeholder="e.g. 3120"
+					bind:value={native_height_str}
+				/>
+			</div>
+		</div>
+	</fieldset>
+
+	<!-- Resolution (acceptance filter) -->
 	<fieldset class="space-y-3">
 		<legend class="text-sm font-semibold text-[var(--color-fg)]">Resolution</legend>
 		<div class="grid grid-cols-2 gap-3">
@@ -149,23 +238,36 @@
 	<!-- Aspect ratio -->
 	<fieldset class="space-y-3">
 		<legend class="text-sm font-semibold text-[var(--color-fg)]">Aspect ratio</legend>
-		<div class="space-y-1.5">
-			<Label for="aspect-target">Target (e.g. 1.78 for 16:9)</Label>
-			<Input
-				id="aspect-target"
-				type="number"
-				step="0.01"
-				min="0.1"
-				placeholder="e.g. 1.78"
-				bind:value={aspect_target_str}
-			/>
-		</div>
-		{#if aspect_target_str !== ""}
+		<div class="grid grid-cols-2 gap-3">
 			<div class="space-y-1.5">
-				<Label>Tolerance: ±{(aspect_tolerance[0] ?? 0.15).toFixed(2)}</Label>
-				<Slider bind:value={aspect_tolerance} min={0} max={1} step={0.01} />
+				<Label for="aspect-target">Target (auto from native res)</Label>
+				<Input
+					id="aspect-target"
+					type="number"
+					step="0.0001"
+					min="0.1"
+					placeholder="e.g. 1.7778"
+					value={aspect_target_str}
+					oninput={handle_ar_target_input}
+				/>
 			</div>
-		{/if}
+			<div class="space-y-1.5">
+				<Label for="aspect-tolerance">Tolerance (± fraction)</Label>
+				<Input
+					id="aspect-tolerance"
+					type="number"
+					step="0.01"
+					min="0"
+					max="1"
+					placeholder="0.10"
+					bind:value={aspect_tolerance_str}
+				/>
+			</div>
+		</div>
+		<p class="text-xs text-[var(--color-fg-muted)]">
+			Image AR must be within target × (1 ± tolerance). e.g. target 1.78, tolerance 0.1 →
+			accepts 1.60–1.96.
+		</p>
 	</fieldset>
 
 	<!-- File size -->

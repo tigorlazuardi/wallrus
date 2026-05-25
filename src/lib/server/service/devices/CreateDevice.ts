@@ -22,6 +22,8 @@ export function CreateDevice<T extends Constructor>(Sup: T) {
 						name: req.name,
 						enabled: true,
 						filter_criteria: req.filter_criteria,
+						native_width: req.native_width ?? null,
+						native_height: req.native_height ?? null,
 						created_at: now,
 					})
 					.returning()

@@ -16,6 +16,8 @@ export function UpdateDevice<T extends Constructor>(Sup: T) {
 			const set_values: Partial<typeof devices.$inferInsert> = {}
 			if (req.name !== undefined) set_values.name = req.name
 			if (req.filter_criteria !== undefined) set_values.filter_criteria = req.filter_criteria
+			if (req.native_width !== undefined) set_values.native_width = req.native_width
+			if (req.native_height !== undefined) set_values.native_height = req.native_height
 
 			if (Object.keys(set_values).length === 0) {
 				// Nothing to update — fetch and return current row

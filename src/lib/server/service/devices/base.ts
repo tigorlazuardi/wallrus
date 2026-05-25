@@ -20,6 +20,8 @@ export function to_device_dto(row: typeof devices.$inferSelect): Device {
 		name: row.name,
 		enabled: row.enabled,
 		filter_criteria: row.filter_criteria,
+		native_width: row.native_width ?? undefined,
+		native_height: row.native_height ?? undefined,
 		created_at: row.created_at,
 	}
 }

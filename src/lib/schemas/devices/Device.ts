@@ -13,6 +13,8 @@ export const DeviceSchema = z.object({
 	name: z.string(),
 	enabled: z.boolean(),
 	filter_criteria: DeviceFiltersSchema,
+	native_width: z.number().int().positive().max(32768).optional().nullable(),
+	native_height: z.number().int().positive().max(32768).optional().nullable(),
 	created_at: z.number().int(),
 })
 

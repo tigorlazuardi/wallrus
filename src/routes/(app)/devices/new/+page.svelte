@@ -6,6 +6,7 @@
 	import { Label } from "$lib/components/ui/label"
 	import FilterEditor from "$lib/components/FilterEditor.svelte"
 	import { CreateDeviceRequestSchema } from "$lib/schemas/devices/CreateDevice"
+	import { slugify } from "$lib/util/slugify"
 	import type { PageData } from "./$types"
 
 	let { data }: { data: PageData } = $props()
@@ -19,6 +20,23 @@
 			}
 		},
 	})
+
+	// Slug auto-gen from name until user manually edits slug
+	let slug_dirty = $state(false)
+
+	function handle_name_input(e: Event) {
+		const target = e.target as HTMLInputElement
+		$form.name = target.value
+		if (!slug_dirty) {
+			$form.slug = slugify($form.name)
+		}
+	}
+
+	function handle_slug_input(e: Event) {
+		const target = e.target as HTMLInputElement
+		$form.slug = target.value
+		slug_dirty = true
+	}
 </script>
 
 <svelte:head>
@@ -45,30 +63,14 @@
 	{/if}
 
 	<form method="POST" use:enhance class="space-y-6">
-		<div class="space-y-1.5">
-			<Label for="slug">Slug</Label>
-			<Input
-				id="slug"
-				type="text"
-				bind:value={$form.slug}
-				placeholder="e.g. phone-pixel"
-				required
-			/>
-			{#if $errors.slug}
-				<p class="text-xs text-red-500">{$errors.slug[0]}</p>
-			{:else}
-				<p class="text-xs text-[var(--color-fg-muted)]">
-					Lowercase, alphanumeric + hyphens. Used in API paths and on-disk directories.
-				</p>
-			{/if}
-		</div>
-
+		<!-- Name first -->
 		<div class="space-y-1.5">
 			<Label for="name">Name</Label>
 			<Input
 				id="name"
 				type="text"
-				bind:value={$form.name}
+				value={$form.name}
+				oninput={handle_name_input}
 				placeholder="e.g. Pixel 9 Pro"
 				required
 			/>
@@ -77,11 +79,36 @@
 			{/if}
 		</div>
 
+		<!-- Slug second — auto-derives from name until edited -->
+		<div class="space-y-1.5">
+			<Label for="slug">Slug</Label>
+			<Input
+				id="slug"
+				type="text"
+				value={$form.slug}
+				oninput={handle_slug_input}
+				placeholder="e.g. pixel-9-pro"
+				required
+			/>
+			{#if $errors.slug}
+				<p class="text-xs text-red-500">{$errors.slug[0]}</p>
+			{:else}
+				<p class="text-xs text-[var(--color-fg-muted)]">
+					Auto-derived from name until you edit it. Lowercase, alphanumeric + hyphens.
+				</p>
+			{/if}
+		</div>
+
 		<div
 			class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 		>
 			<h2 class="mb-4 text-sm font-semibold text-[var(--color-fg)]">Filter criteria</h2>
-			<FilterEditor bind:value={$form.filter_criteria} />
+			<FilterEditor
+				bind:value={$form.filter_criteria}
+				bind:native_width={$form.native_width}
+				bind:native_height={$form.native_height}
+				ar_target_dirty_init={false}
+			/>
 		</div>
 
 		<div class="flex gap-3 pt-2">

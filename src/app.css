@@ -57,6 +57,19 @@ body {
 	min-height: 100dvh;
 }
 
+/* Mute placeholder text — browser default is too dark against warm latte bg.
+   0.5 reads well in light mode. Dark mode `--color-fg-muted` (#a6adc8) at 0.5
+   is still legible against #1e1e2e, but bump to 0.55 for dark so it doesn't
+   disappear into the base. */
+::placeholder {
+	color: var(--color-fg-muted);
+	opacity: 0.5;
+}
+
+[data-theme="dark"] ::placeholder {
+	opacity: 0.55;
+}
+
 @media (prefers-reduced-transparency: reduce) {
 	.glass {
 		background: var(--color-bg-elev) !important;

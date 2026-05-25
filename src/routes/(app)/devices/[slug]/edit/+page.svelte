@@ -19,6 +19,10 @@
 			}
 		},
 	})
+
+	// On edit: if a target already exists, mark dirty so it isn't overwritten
+	// when the user opens the form.
+	const ar_target_dirty_init = $form.filter_criteria?.aspect_ratio?.target != null
 </script>
 
 <svelte:head>
@@ -52,20 +56,6 @@
 		<input type="hidden" name="id" value={$form.id} />
 
 		<div class="space-y-1.5">
-			<Label for="slug">Slug</Label>
-			<Input
-				id="slug"
-				type="text"
-				value={data.device.slug}
-				disabled
-				class="cursor-not-allowed opacity-60"
-			/>
-			<p class="text-xs text-[var(--color-fg-muted)]">
-				Slug cannot be changed after creation.
-			</p>
-		</div>
-
-		<div class="space-y-1.5">
 			<Label for="name">Name</Label>
 			<Input
 				id="name"
@@ -79,11 +69,30 @@
 			{/if}
 		</div>
 
+		<div class="space-y-1.5">
+			<Label for="slug">Slug</Label>
+			<Input
+				id="slug"
+				type="text"
+				value={data.device.slug}
+				disabled
+				class="cursor-not-allowed opacity-60"
+			/>
+			<p class="text-xs text-[var(--color-fg-muted)]">
+				Slug cannot be changed after creation.
+			</p>
+		</div>
+
 		<div
 			class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 		>
 			<h2 class="mb-4 text-sm font-semibold text-[var(--color-fg)]">Filter criteria</h2>
-			<FilterEditor bind:value={$form.filter_criteria} />
+			<FilterEditor
+				bind:value={$form.filter_criteria}
+				bind:native_width={$form.native_width}
+				bind:native_height={$form.native_height}
+				{ar_target_dirty_init}
+			/>
 		</div>
 
 		<div class="flex gap-3 pt-2">
