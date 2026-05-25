@@ -89,5 +89,6 @@ authoritative checklist for the slice.
 | `015-shared-ui`             | not-started            | Presenter + hook + thin container split, dynamic API base, universal load, SPA superforms (web-only outcome) |
 | `016-mobile-shell`          | not-started (deferred) | Dual adapter build, Capacitor scaffold, native wallpaper plugin, internal distribution                       |
 | `017-device-form-polish`    | done                   | Native res columns + AR auto-derive + tolerance UI + slug auto-gen + muted placeholder                       |
+| `018-ar-tolerance-percent`  | done                   | AR tolerance is fractional percent (not absolute delta); UI displays as %                                    |
 
 Completion promise (last slice emits): `<promise>WALLRUS-MVP-COMPLETE</promise>`.
