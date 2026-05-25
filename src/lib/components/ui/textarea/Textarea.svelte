@@ -9,6 +9,6 @@
 </script>
 
 <textarea
-	class="flex min-h-[60px] w-full rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--fg)] shadow-sm placeholder:text-[var(--fg-muted)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50 {klass}"
+	class="flex min-h-[60px] w-full rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-fg)] shadow-sm placeholder:text-[var(--color-fg-muted)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] disabled:cursor-not-allowed disabled:opacity-50 {klass}"
 	{...rest}
 ></textarea>

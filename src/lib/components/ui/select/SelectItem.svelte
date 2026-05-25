@@ -15,7 +15,7 @@
 	{value}
 	{label}
 	{disabled}
-	class="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-[var(--surface-hi)] focus:text-[var(--fg)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 {klass}"
+	class="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-[var(--color-surface-hi)] focus:text-[var(--color-fg)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 {klass}"
 >
 	{#snippet children({ selected })}
 		{#if selected}

@@ -101,7 +101,7 @@
 <div class="space-y-6 {klass}">
 	<!-- Resolution -->
 	<fieldset class="space-y-3">
-		<legend class="text-sm font-semibold text-[var(--fg)]">Resolution</legend>
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">Resolution</legend>
 		<div class="grid grid-cols-2 gap-3">
 			<div class="space-y-1.5">
 				<Label for="min-width">Min width (px)</Label>
@@ -148,7 +148,7 @@
 
 	<!-- Aspect ratio -->
 	<fieldset class="space-y-3">
-		<legend class="text-sm font-semibold text-[var(--fg)]">Aspect ratio</legend>
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">Aspect ratio</legend>
 		<div class="space-y-1.5">
 			<Label for="aspect-target">Target (e.g. 1.78 for 16:9)</Label>
 			<Input
@@ -170,7 +170,7 @@
 
 	<!-- File size -->
 	<fieldset class="space-y-3">
-		<legend class="text-sm font-semibold text-[var(--fg)]">File size</legend>
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">File size</legend>
 		<div class="grid grid-cols-2 gap-3">
 			<div class="space-y-1.5">
 				<Label for="min-mb">Min size (MB)</Label>
@@ -199,7 +199,7 @@
 
 	<!-- Formats -->
 	<fieldset class="space-y-3">
-		<legend class="text-sm font-semibold text-[var(--fg)]">Allowed formats</legend>
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">Allowed formats</legend>
 		<div class="flex flex-wrap gap-4">
 			{#each FORMATS as fmt (fmt)}
 				<div class="flex items-center gap-2">
@@ -218,7 +218,7 @@
 
 	<!-- Tags -->
 	<fieldset class="space-y-3">
-		<legend class="text-sm font-semibold text-[var(--fg)]">Tags</legend>
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">Tags</legend>
 		<div class="space-y-1.5">
 			<Label>Include tags</Label>
 			<TagsInput bind:value={tags_include} placeholder="Add included tag…" />
@@ -231,7 +231,7 @@
 
 	<!-- NSFW -->
 	<fieldset class="space-y-3">
-		<legend class="text-sm font-semibold text-[var(--fg)]">NSFW filter</legend>
+		<legend class="text-sm font-semibold text-[var(--color-fg)]">NSFW filter</legend>
 		<RadioGroup
 			bind:value={nsfw}
 			onValueChange={(v) => {

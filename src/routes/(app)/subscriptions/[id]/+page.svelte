@@ -88,17 +88,19 @@
 
 <div class="container mx-auto max-w-2xl px-4 py-8">
 	<!-- Breadcrumb -->
-	<div class="mb-6 flex items-center gap-2 text-sm text-[var(--fg-muted)]">
-		<a href="/subscriptions" class="hover:text-[var(--fg)]">Subscriptions</a>
+	<div class="mb-6 flex items-center gap-2 text-sm text-[var(--color-fg-muted)]">
+		<a href="/subscriptions" class="hover:text-[var(--color-fg)]">Subscriptions</a>
 		<span>/</span>
-		<span class="text-[var(--fg)]">{data.subscription.name}</span>
+		<span class="text-[var(--color-fg)]">{data.subscription.name}</span>
 	</div>
 
 	<div class="mb-6 flex items-start justify-between gap-4">
 		<div>
-			<h1 class="text-2xl font-bold text-[var(--fg)]">{data.subscription.name}</h1>
-			<p class="mt-1 text-sm text-[var(--fg-muted)]">
-				Source: <strong class="text-[var(--fg)]">{data.subscription.source_slug}</strong>
+			<h1 class="text-2xl font-bold text-[var(--color-fg)]">{data.subscription.name}</h1>
+			<p class="mt-1 text-sm text-[var(--color-fg-muted)]">
+				Source: <strong class="text-[var(--color-fg)]"
+					>{data.subscription.source_slug}</strong
+				>
 			</p>
 		</div>
 		<div class="flex gap-2">
@@ -107,8 +109,8 @@
 					type="submit"
 					class="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors {data
 						.subscription.enabled
-						? 'border-[var(--glass-border)] bg-[var(--surface)] text-[var(--fg)] hover:bg-[var(--surface-hi)]'
-						: 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-fg)] hover:opacity-90'}"
+						? 'border-[var(--color-glass-border)] bg-[var(--color-surface)] text-[var(--color-fg)] hover:bg-[var(--color-surface-hi)]'
+						: 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-fg)] hover:opacity-90'}"
 				>
 					{data.subscription.enabled ? "Disable" : "Enable"}
 				</button>
@@ -118,8 +120,8 @@
 				type="button"
 				onclick={() => (editing = !editing)}
 				class="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors {editing
-					? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-fg)]'
-					: 'border-[var(--glass-border)] bg-[var(--surface)] text-[var(--fg)] hover:bg-[var(--surface-hi)]'}"
+					? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-fg)]'
+					: 'border-[var(--color-glass-border)] bg-[var(--color-surface)] text-[var(--color-fg)] hover:bg-[var(--color-surface-hi)]'}"
 			>
 				{editing ? "Cancel edit" : "Edit"}
 			</button>
@@ -151,34 +153,34 @@
 		<!-- Read-only view -->
 		<div class="space-y-4">
 			<div
-				class="rounded-[var(--radius-card)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+				class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 			>
 				<dl class="space-y-3 text-sm">
 					<div class="flex justify-between">
-						<dt class="text-[var(--fg-muted)]">Status</dt>
+						<dt class="text-[var(--color-fg-muted)]">Status</dt>
 						<dd
 							class="font-medium {data.subscription.enabled
 								? 'text-green-400'
-								: 'text-[var(--fg-muted)]'}"
+								: 'text-[var(--color-fg-muted)]'}"
 						>
 							{data.subscription.enabled ? "Enabled" : "Disabled"}
 						</dd>
 					</div>
 					<div class="flex justify-between">
-						<dt class="text-[var(--fg-muted)]">Schedule</dt>
-						<dd class="font-mono text-[var(--fg)]">{data.subscription.cron}</dd>
+						<dt class="text-[var(--color-fg-muted)]">Schedule</dt>
+						<dd class="font-mono text-[var(--color-fg)]">{data.subscription.cron}</dd>
 					</div>
 					{#if data.subscription.max_items_inspected}
 						<div class="flex justify-between">
-							<dt class="text-[var(--fg-muted)]">Max items</dt>
-							<dd class="text-[var(--fg)]">
+							<dt class="text-[var(--color-fg-muted)]">Max items</dt>
+							<dd class="text-[var(--color-fg)]">
 								{data.subscription.max_items_inspected}
 							</dd>
 						</div>
 					{/if}
 					<div class="flex justify-between">
-						<dt class="text-[var(--fg-muted)]">Created</dt>
-						<dd class="text-[var(--fg)]">
+						<dt class="text-[var(--color-fg-muted)]">Created</dt>
+						<dd class="text-[var(--color-fg)]">
 							{format_date(data.subscription.created_at)}
 						</dd>
 					</div>
@@ -187,14 +189,16 @@
 
 			{#if Object.keys(data.subscription.input_params ?? {}).length > 0}
 				<div
-					class="rounded-[var(--radius-card)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+					class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 				>
-					<h2 class="mb-3 text-sm font-semibold text-[var(--fg)]">Source parameters</h2>
+					<h2 class="mb-3 text-sm font-semibold text-[var(--color-fg)]">
+						Source parameters
+					</h2>
 					<dl class="space-y-2 text-sm">
 						{#each Object.entries(data.subscription.input_params ?? {}) as [key, val] (key)}
 							<div class="flex justify-between gap-4">
-								<dt class="text-[var(--fg-muted)]">{key}</dt>
-								<dd class="truncate font-mono text-xs text-[var(--fg)]">
+								<dt class="text-[var(--color-fg-muted)]">{key}</dt>
+								<dd class="truncate font-mono text-xs text-[var(--color-fg)]">
 									{Array.isArray(val) ? val.join(", ") : String(val)}
 								</dd>
 							</div>
@@ -205,14 +209,16 @@
 
 			{#if data.linked_device_ids.length > 0}
 				<div
-					class="rounded-[var(--radius-card)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+					class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 				>
-					<h2 class="mb-3 text-sm font-semibold text-[var(--fg)]">Linked devices</h2>
+					<h2 class="mb-3 text-sm font-semibold text-[var(--color-fg)]">
+						Linked devices
+					</h2>
 					<div class="flex flex-wrap gap-2">
 						{#each data.devices.filter( (d) => data.linked_device_ids.includes(d.id), ) as device (device.id)}
 							<a
 								href="/devices/{device.slug}"
-								class="inline-flex items-center gap-1 rounded-full border border-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1 text-xs font-medium text-[var(--accent)] hover:bg-[var(--accent)]/20"
+								class="inline-flex items-center gap-1 rounded-full border border-[var(--color-accent)] bg-[var(--color-accent)]/10 px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20"
 							>
 								{device.name ?? device.slug}
 							</a>
@@ -251,8 +257,8 @@
 					<button
 						type="button"
 						onclick={() => (editing = false)}
-						class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
-						style="border-color: var(--glass-border);"
+						class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-hi)]"
+						style="border-color: var(--color-glass-border);"
 					>
 						Cancel
 					</button>

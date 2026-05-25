@@ -90,7 +90,7 @@
 		<div class="space-y-1.5">
 			<Label for="source_slug">Source</Label>
 			{#if sources.length === 0}
-				<p class="text-sm text-[var(--fg-muted)]">Loading sources…</p>
+				<p class="text-sm text-[var(--color-fg-muted)]">Loading sources…</p>
 			{:else}
 				<SelectRoot
 					type="single"
@@ -137,9 +137,9 @@
 	<!-- Dynamic source params -->
 	{#if param_descriptors.length > 0}
 		<div
-			class="rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+			class="rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] p-4"
 		>
-			<h2 class="mb-4 text-sm font-semibold text-[var(--fg)]">Source parameters</h2>
+			<h2 class="mb-4 text-sm font-semibold text-[var(--color-fg)]">Source parameters</h2>
 			<div class="space-y-4">
 				{#each param_descriptors as desc (desc.key)}
 					<div class="space-y-1.5">
@@ -205,9 +205,9 @@
 		</div>
 	{:else if source_slug && param_descriptors.length === 0}
 		<div
-			class="rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+			class="rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] p-4"
 		>
-			<p class="text-sm text-[var(--fg-muted)]">
+			<p class="text-sm text-[var(--color-fg-muted)]">
 				This source has no configurable parameters.
 			</p>
 		</div>
@@ -236,7 +236,7 @@
 			placeholder="300 (default)"
 			min="1"
 		/>
-		<p class="text-xs text-[var(--fg-muted)]">
+		<p class="text-xs text-[var(--color-fg-muted)]">
 			Number of source items checked per run. Leave blank for the default (300).
 		</p>
 		{#if get_error("max_items_inspected")}
@@ -249,7 +249,7 @@
 		<div class="space-y-1.5">
 			<Label>Linked devices</Label>
 			<DeviceSelector bind:value={linked_device_ids} {devices} />
-			<p class="text-xs text-[var(--fg-muted)]">
+			<p class="text-xs text-[var(--color-fg-muted)]">
 				Images from this subscription will be fanned out to selected devices.
 			</p>
 		</div>
@@ -260,8 +260,8 @@
 		<button
 			type="submit"
 			disabled={submitting}
-			class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
-			style="background: var(--accent);"
+			class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--color-accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
+			style="background: var(--color-accent);"
 		>
 			{submitting ? "Saving…" : submit_label}
 		</button>

@@ -12,12 +12,12 @@
 </script>
 
 <SelectPrimitive.Trigger
-	class="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--fg)] shadow-sm focus:outline-none focus:ring-1 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 {klass}"
+	class="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-fg)] shadow-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-ring)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 {klass}"
 >
 	{#if children}
 		{@render children()}
 	{:else}
-		<span class="text-[var(--fg-muted)]">{placeholder ?? "Select..."}</span>
+		<span class="text-[var(--color-fg-muted)]">{placeholder ?? "Select..."}</span>
 	{/if}
 	<svg
 		xmlns="http://www.w3.org/2000/svg"

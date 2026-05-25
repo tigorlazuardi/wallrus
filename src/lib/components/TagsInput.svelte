@@ -32,18 +32,18 @@
 </script>
 
 <div
-	class="flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--fg)] focus-within:ring-1 focus-within:ring-[var(--ring)] {klass}"
+	class="flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-fg)] focus-within:ring-1 focus-within:ring-[var(--color-ring)] {klass}"
 >
 	{#each value as tag (tag)}
 		<span
-			class="inline-flex items-center gap-1 rounded-full bg-[var(--surface-hi)] px-2 py-0.5 text-xs font-medium text-[var(--fg)]"
+			class="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-hi)] px-2 py-0.5 text-xs font-medium text-[var(--color-fg)]"
 		>
 			{tag}
 			<button
 				type="button"
 				onclick={() => remove_tag(tag)}
 				aria-label="Remove tag {tag}"
-				class="flex h-3.5 w-3.5 items-center justify-center rounded-full hover:bg-[var(--glass-border)] focus:outline-none"
+				class="flex h-3.5 w-3.5 items-center justify-center rounded-full hover:bg-[var(--color-glass-border)] focus:outline-none"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -67,6 +67,6 @@
 		bind:value={input_text}
 		onkeydown={handle_keydown}
 		{placeholder}
-		class="min-w-[6rem] flex-1 bg-transparent outline-none placeholder:text-[var(--fg-muted)]"
+		class="min-w-[6rem] flex-1 bg-transparent outline-none placeholder:text-[var(--color-fg-muted)]"
 	/>
 </div>

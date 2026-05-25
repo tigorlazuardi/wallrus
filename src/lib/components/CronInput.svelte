@@ -48,8 +48,8 @@
 		type="text"
 		bind:value
 		placeholder="0 * * * *"
-		class="flex h-9 w-full rounded-[var(--radius)] border bg-[var(--surface)] px-3 py-1 font-mono text-sm text-[var(--fg)] shadow-sm transition-colors placeholder:text-[var(--fg-muted)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] {validation.valid
-			? 'border-[var(--glass-border)]'
+		class="flex h-9 w-full rounded-[var(--radius)] border bg-[var(--color-surface)] px-3 py-1 font-mono text-sm text-[var(--color-fg)] shadow-sm transition-colors placeholder:text-[var(--color-fg-muted)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] {validation.valid
+			? 'border-[var(--color-glass-border)]'
 			: 'border-red-500'}"
 	/>
 
@@ -57,9 +57,9 @@
 		<p class="text-xs text-red-500">{validation.error}</p>
 	{:else}
 		<div class="space-y-0.5">
-			<p class="text-xs font-medium text-[var(--fg-muted)]">Next 3 runs:</p>
+			<p class="text-xs font-medium text-[var(--color-fg-muted)]">Next 3 runs:</p>
 			{#each validation.next_runs as run, i (i)}
-				<p class="text-xs text-[var(--fg)]">{format_date(run)}</p>
+				<p class="text-xs text-[var(--color-fg)]">{format_date(run)}</p>
 			{/each}
 		</div>
 	{/if}

@@ -28,18 +28,18 @@
 
 <div class="flex flex-wrap gap-2 {klass}">
 	{#if devices.length === 0}
-		<p class="text-sm text-[var(--fg-muted)]">No devices available.</p>
+		<p class="text-sm text-[var(--color-fg-muted)]">No devices available.</p>
 	{:else}
 		{#each devices as device (device.id)}
 			<button
 				type="button"
 				onclick={() => toggle(device.id)}
 				aria-pressed={is_selected(device.id)}
-				class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] {is_selected(
+				class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] {is_selected(
 					device.id,
 				)
-					? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-fg)]'
-					: 'border-[var(--glass-border)] bg-[var(--surface)] text-[var(--fg)] hover:bg-[var(--surface-hi)]'}"
+					? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-fg)]'
+					: 'border-[var(--color-glass-border)] bg-[var(--color-surface)] text-[var(--color-fg)] hover:bg-[var(--color-surface-hi)]'}"
 			>
 				{device.name ?? device.slug}
 			</button>

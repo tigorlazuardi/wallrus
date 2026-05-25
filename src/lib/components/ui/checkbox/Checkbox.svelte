@@ -26,7 +26,7 @@
 	{disabled}
 	{id}
 	{onCheckedChange}
-	class="peer h-4 w-4 shrink-0 rounded-sm border border-[var(--accent)] shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-[var(--accent)] data-[state=checked]:text-[var(--accent-fg)] {klass}"
+	class="peer h-4 w-4 shrink-0 rounded-sm border border-[var(--color-accent)] shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-[var(--color-accent)] data-[state=checked]:text-[var(--color-accent-fg)] {klass}"
 >
 	{#snippet children({ checked: c })}
 		{#if c}

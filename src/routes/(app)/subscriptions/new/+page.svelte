@@ -82,10 +82,13 @@
 
 <div class="container mx-auto max-w-2xl px-4 py-8">
 	<div class="mb-6 flex items-center gap-3">
-		<a href="/subscriptions" class="text-sm text-[var(--fg-muted)] hover:text-[var(--fg)]">
+		<a
+			href="/subscriptions"
+			class="text-sm text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]"
+		>
 			&larr; Subscriptions
 		</a>
-		<h1 class="text-2xl font-bold text-[var(--fg)]">New subscription</h1>
+		<h1 class="text-2xl font-bold text-[var(--color-fg)]">New subscription</h1>
 	</div>
 
 	{#if error}
@@ -116,8 +119,8 @@
 			{#snippet cancel()}
 				<a
 					href="/subscriptions"
-					class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
-					style="border-color: var(--glass-border);"
+					class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-hi)]"
+					style="border-color: var(--color-glass-border);"
 				>
 					Cancel
 				</a>

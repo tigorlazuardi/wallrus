@@ -27,10 +27,13 @@
 
 <div class="container mx-auto max-w-2xl px-4 py-8">
 	<div class="mb-6 flex items-center gap-3">
-		<a href="/devices" class="text-sm text-[var(--fg-muted)] hover:text-[var(--fg)]">
+		<a
+			href="/devices"
+			class="text-sm text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]"
+		>
 			&larr; Devices
 		</a>
-		<h1 class="text-2xl font-bold text-[var(--fg)]">New device</h1>
+		<h1 class="text-2xl font-bold text-[var(--color-fg)]">New device</h1>
 	</div>
 
 	{#if $errors._errors}
@@ -54,7 +57,7 @@
 			{#if $errors.slug}
 				<p class="text-xs text-red-500">{$errors.slug[0]}</p>
 			{:else}
-				<p class="text-xs text-[var(--fg-muted)]">
+				<p class="text-xs text-[var(--color-fg-muted)]">
 					Lowercase, alphanumeric + hyphens. Used in API paths and on-disk directories.
 				</p>
 			{/if}
@@ -75,9 +78,9 @@
 		</div>
 
 		<div
-			class="rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+			class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 		>
-			<h2 class="mb-4 text-sm font-semibold text-[var(--fg)]">Filter criteria</h2>
+			<h2 class="mb-4 text-sm font-semibold text-[var(--color-fg)]">Filter criteria</h2>
 			<FilterEditor bind:value={$form.filter_criteria} />
 		</div>
 
@@ -85,15 +88,15 @@
 			<button
 				type="submit"
 				disabled={$submitting}
-				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
-				style="background: var(--accent);"
+				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--color-accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
+				style="background: var(--color-accent);"
 			>
 				{$submitting ? "Creating…" : "Create device"}
 			</button>
 			<a
 				href="/devices"
-				class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
-				style="border-color: var(--glass-border);"
+				class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-hi)]"
+				style="border-color: var(--color-glass-border);"
 			>
 				Cancel
 			</a>

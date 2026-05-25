@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/stores"
+	import ThemeToggle from "$lib/components/ThemeToggle.svelte"
 
 	let { children } = $props()
 
@@ -49,6 +50,10 @@
 					</a>
 				{/each}
 			</nav>
+
+			<div class="ml-auto">
+				<ThemeToggle />
+			</div>
 		</div>
 	</header>
 

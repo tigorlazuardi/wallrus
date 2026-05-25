@@ -12,11 +12,11 @@
 
 <div class="container mx-auto max-w-5xl px-4 py-8">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-[var(--fg)]">Devices</h1>
+		<h1 class="text-2xl font-bold text-[var(--color-fg)]">Devices</h1>
 		<a
 			href="/devices/new"
-			class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--accent-fg)] transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)]"
-			style="background: var(--accent);"
+			class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--color-accent-fg)] transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)]"
+			style="background: var(--color-accent);"
 		>
 			Create device
 		</a>
@@ -30,11 +30,11 @@
 		</div>
 	{:else if data.items.length === 0}
 		<div class="flex flex-col items-center gap-3 py-16 text-center">
-			<p class="text-[var(--fg-muted)]">No devices configured yet.</p>
+			<p class="text-[var(--color-fg-muted)]">No devices configured yet.</p>
 			<a
 				href="/devices/new"
-				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--accent-fg)] transition-colors hover:opacity-90"
-				style="background: var(--accent);"
+				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--color-accent-fg)] transition-colors hover:opacity-90"
+				style="background: var(--color-accent);"
 			>
 				Create your first device
 			</a>
@@ -50,25 +50,25 @@
 								{device.enabled ? "enabled" : "disabled"}
 							</Badge>
 						</div>
-						<p class="font-mono text-xs text-[var(--fg-muted)]">{device.slug}</p>
+						<p class="font-mono text-xs text-[var(--color-fg-muted)]">{device.slug}</p>
 					</CardHeader>
 					<CardContent class="flex-1 pb-2">
-						<p class="text-xs text-[var(--fg-muted)]">
+						<p class="text-xs text-[var(--color-fg-muted)]">
 							NSFW: {device.filter_criteria.nsfw}
 						</p>
 					</CardContent>
 					<CardFooter class="gap-2 pt-2">
 						<a
 							href="/devices/{device.slug}"
-							class="inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
-							style="border-color: var(--glass-border);"
+							class="inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-medium text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-hi)]"
+							style="border-color: var(--color-glass-border);"
 						>
 							View
 						</a>
 						<a
 							href="/devices/{device.slug}/edit"
-							class="inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
-							style="border-color: var(--glass-border);"
+							class="inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-medium text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-hi)]"
+							style="border-color: var(--color-glass-border);"
 						>
 							Edit
 						</a>

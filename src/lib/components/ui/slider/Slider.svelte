@@ -34,14 +34,14 @@
 >
 	{#snippet children({ thumbs })}
 		<span
-			class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-[var(--surface-hi)]"
+			class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-[var(--color-surface-hi)]"
 		>
-			<SliderPrimitive.Range class="absolute h-full bg-[var(--accent)]" />
+			<SliderPrimitive.Range class="absolute h-full bg-[var(--color-accent)]" />
 		</span>
 		{#each thumbs as index (index)}
 			<SliderPrimitive.Thumb
 				{index}
-				class="block h-4 w-4 rounded-full border border-[var(--accent)] bg-white shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:pointer-events-none disabled:opacity-50"
+				class="block h-4 w-4 rounded-full border border-[var(--color-accent)] bg-white shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] disabled:pointer-events-none disabled:opacity-50"
 			/>
 		{/each}
 	{/snippet}

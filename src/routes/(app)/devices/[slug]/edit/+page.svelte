@@ -27,17 +27,17 @@
 
 <div class="container mx-auto max-w-2xl px-4 py-8">
 	<!-- Breadcrumb -->
-	<div class="mb-6 flex items-center gap-2 text-sm text-[var(--fg-muted)]">
-		<a href="/devices" class="hover:text-[var(--fg)]">Devices</a>
+	<div class="mb-6 flex items-center gap-2 text-sm text-[var(--color-fg-muted)]">
+		<a href="/devices" class="hover:text-[var(--color-fg)]">Devices</a>
 		<span>/</span>
-		<a href="/devices/{data.device.slug}" class="hover:text-[var(--fg)]">
+		<a href="/devices/{data.device.slug}" class="hover:text-[var(--color-fg)]">
 			{data.device.name}
 		</a>
 		<span>/</span>
-		<span class="text-[var(--fg)]">Edit</span>
+		<span class="text-[var(--color-fg)]">Edit</span>
 	</div>
 
-	<h1 class="mb-6 text-2xl font-bold text-[var(--fg)]">Edit {data.device.name}</h1>
+	<h1 class="mb-6 text-2xl font-bold text-[var(--color-fg)]">Edit {data.device.name}</h1>
 
 	{#if $errors._errors}
 		<div
@@ -60,7 +60,9 @@
 				disabled
 				class="cursor-not-allowed opacity-60"
 			/>
-			<p class="text-xs text-[var(--fg-muted)]">Slug cannot be changed after creation.</p>
+			<p class="text-xs text-[var(--color-fg-muted)]">
+				Slug cannot be changed after creation.
+			</p>
 		</div>
 
 		<div class="space-y-1.5">
@@ -78,9 +80,9 @@
 		</div>
 
 		<div
-			class="rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] p-4"
+			class="rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-bg-elev)] p-4"
 		>
-			<h2 class="mb-4 text-sm font-semibold text-[var(--fg)]">Filter criteria</h2>
+			<h2 class="mb-4 text-sm font-semibold text-[var(--color-fg)]">Filter criteria</h2>
 			<FilterEditor bind:value={$form.filter_criteria} />
 		</div>
 
@@ -88,15 +90,15 @@
 			<button
 				type="submit"
 				disabled={$submitting}
-				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
-				style="background: var(--accent);"
+				class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-[var(--color-accent-fg)] transition-colors hover:opacity-90 disabled:opacity-50"
+				style="background: var(--color-accent);"
 			>
 				{$submitting ? "Saving…" : "Save changes"}
 			</button>
 			<a
 				href="/devices/{data.device.slug}"
-				class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--fg)] transition-colors hover:bg-[var(--surface-hi)]"
-				style="border-color: var(--glass-border);"
+				class="inline-flex h-9 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-hi)]"
+				style="border-color: var(--color-glass-border);"
 			>
 				Cancel
 			</a>

@@ -9,7 +9,7 @@
 </script>
 
 <label
-	class="text-sm font-medium leading-none text-[var(--fg)] peer-disabled:cursor-not-allowed peer-disabled:opacity-70 {klass}"
+	class="text-sm font-medium leading-none text-[var(--color-fg)] peer-disabled:cursor-not-allowed peer-disabled:opacity-70 {klass}"
 	{...rest}
 >
 	{@render children?.()}

@@ -11,6 +11,6 @@
 
 <input
 	bind:value
-	class="flex h-9 w-full rounded-[var(--radius)] border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-1 text-sm text-[var(--fg)] shadow-sm transition-colors placeholder:text-[var(--fg-muted)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50 {klass}"
+	class="flex h-9 w-full rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] px-3 py-1 text-sm text-[var(--color-fg)] shadow-sm transition-colors placeholder:text-[var(--color-fg-muted)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] disabled:cursor-not-allowed disabled:opacity-50 {klass}"
 	{...rest}
 />

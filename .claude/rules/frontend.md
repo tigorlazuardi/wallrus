@@ -55,30 +55,53 @@ src/lib/client/
 
 ## Theme
 
-**Archetype: dark-first minimal + glass chrome.** Wallpapers are the hero — gallery stays borderless and minimal so it doesn't compete with image content. Glass effects (`backdrop-filter: blur(20px) saturate(180%)`) are reserved for chrome surfaces.
+**Archetype: warm light-primary + glass chrome.** Wallpapers are the hero — gallery stays borderless and minimal so it doesn't compete with image content. Glass effects (`backdrop-filter: blur(20px) saturate(180%)`) are reserved for chrome surfaces.
 
-### Tokens (dark default)
+### Tokens — locked palette
+
+Light (Mocha Latte) is the **primary** mode. Dark (Catppuccin Mocha) is the `[data-theme="dark"]` override. Accent is Catppuccin **mauve** — `#8839ef` light / `#cba6f7` dark. Brand violet `#7c5cff` is retired.
 
 ```css
-:root[data-theme="dark"] {
-  --bg: #0a0a0c;
-  --bg-elev: #131316;
-  --surface: rgb(255 255 255 / 0.04);
-  --surface-hi: rgb(255 255 255 / 0.08);
-  --glass: rgb(20 20 24 / 0.55);
-  --glass-border: rgb(255 255 255 / 0.08);
-  --fg: #e8e8ec;
-  --fg-muted: #9a9aa3;
-  --accent: #7c5cff; /* violet — DO NOT introduce a second accent */
-  --accent-fg: #f3f0ff;
-  --ring: rgb(124 92 255 / 0.4);
-  --radius: 10px;
-  --radius-card: 12px;
-  --blur: 20px;
+/* DEFAULT — LIGHT (Mocha Latte, primary) */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #ece5d8; /* warm latte */
+  --color-bg-elev: #f5efe3;
+  --color-surface: rgb(76 79 105 / 0.06);
+  --color-surface-hi: rgb(76 79 105 / 0.1);
+  --color-glass: rgb(236 229 216 / 0.75);
+  --color-glass-border: rgb(76 79 105 / 0.1);
+  --color-fg: #463f55; /* warm slate */
+  --color-fg-muted: #756d7d;
+  --color-accent: #8839ef; /* Catppuccin mauve — DO NOT introduce a second accent */
+  --color-accent-fg: #ece5d8;
+  --color-ring: rgb(136 57 239 / 0.4);
 }
+
+/* DARK (Catppuccin Mocha proper) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #1e1e2e; /* base */
+  --color-bg-elev: #181825; /* mantle */
+  --color-surface: #313244; /* surface0 */
+  --color-surface-hi: #45475a; /* surface1 */
+  --color-glass: rgb(30 30 46 / 0.65);
+  --color-glass-border: rgb(205 214 244 / 0.08);
+  --color-fg: #cdd6f4; /* text */
+  --color-fg-muted: #a6adc8; /* subtext0 */
+  --color-accent: #cba6f7; /* mauve */
+  --color-accent-fg: #1e1e2e;
+  --color-ring: rgb(203 166 247 / 0.4);
+}
+
+/* Shared geometry (@theme block) */
+/* --radius: 10px       — inputs, buttons, small chrome */
+/* --radius-card: 14px  — cards, fieldsets, dialogs */
+/* --blur-chrome: 20px */
 ```
 
-Light-mode tokens flip surfaces/glass to white-translucent equivalents. Accent stays `#7c5cff`.
+All CSS variable references must use the `--color-*` prefix (e.g. `var(--color-accent)`, not `var(--accent)`). Geometry tokens use no prefix: `var(--radius)`, `var(--radius-card)`.
 
 ### Glass usage rules
 
@@ -95,8 +118,11 @@ Light-mode tokens flip surfaces/glass to white-translucent equivalents. Accent s
 
 ### Theme toggle
 
-- `:root[data-theme="dark|light"]` set at layout mount from `localStorage` → `prefers-color-scheme` fallback. Default `dark`.
-- Top-bar toggle persists choice in `localStorage`.
+- Three states: `'light' | 'dark' | 'system'`. `'system'` resolves via `matchMedia` at write time.
+- Persisted in `localStorage.wallrus.theme`. Default for fresh visitor: `'system'`.
+- Anti-FOUC inline `<script>` in `src/app.html` applies the theme before first paint.
+- HTML ships `data-theme="light"` as SSR default (light is primary; no flash if system=light).
+- Top-bar `<ThemeToggle>` cycles `light → dark → system` and persists choice.
 
 ## Gallery rendering
 
