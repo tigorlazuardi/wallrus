@@ -71,12 +71,14 @@ export function evaluate(image: ImageMeta, criteria: DeviceFilterCriteria): Filt
 
 	// 4. Aspect ratio
 	if (criteria.aspect_ratio !== undefined) {
-		const actual_ratio = image.width / image.height
-		if (
-			Math.abs(actual_ratio - criteria.aspect_ratio.target) > criteria.aspect_ratio.tolerance
-		) {
-			return { pass: false, reason: "aspect_ratio" }
+		const { target, tolerance } = criteria.aspect_ratio
+		if (target > 0) {
+			const actual_ratio = image.width / image.height
+			if (Math.abs(actual_ratio / target - 1) > tolerance) {
+				return { pass: false, reason: "aspect_ratio" }
+			}
 		}
+		// target <= 0 is invalid — skip AR check (no opinion)
 	}
 
 	// 5. File size

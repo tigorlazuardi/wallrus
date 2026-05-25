@@ -164,7 +164,8 @@ describe("resolution filter", () => {
 
 describe("aspect ratio filter", () => {
 	test("passes when ratio is within tolerance", () => {
-		// 16:9 = ~1.7778, target 1.78 tol 0.01
+		// 16:9 = ~1.7778, target 1.78 tol 0.01 (1%)
+		// actual/target - 1 = 1.7778/1.78 - 1 ≈ -0.00124, abs < 0.01 → pass
 		const result = evaluate(base_image, {
 			nsfw: "all",
 			aspect_ratio: { target: 16 / 9, tolerance: 0.01 },
@@ -173,7 +174,7 @@ describe("aspect ratio filter", () => {
 	})
 
 	test("rejects when ratio exceeds tolerance", () => {
-		// 4:3 = 1.333; target 16/9 ≈ 1.778; diff > 0.1
+		// 4:3 = 1.333; target 16/9 ≈ 1.778; percent deviation ≈ 25% > 10%
 		const result = evaluate(
 			{ ...base_image, width: 1280, height: 960 },
 			{ nsfw: "all", aspect_ratio: { target: 16 / 9, tolerance: 0.1 } },
@@ -186,6 +187,41 @@ describe("aspect ratio filter", () => {
 			{ ...base_image, width: 16, height: 9 },
 			{ nsfw: "all", aspect_ratio: { target: 16 / 9, tolerance: 0 } },
 		)
+		expect(result).toEqual({ pass: true })
+	})
+
+	test("passes: target 1.78, tolerance 0.1, actual 1.85 (within 10%)", () => {
+		// actual/target - 1 = 1.85/1.78 - 1 ≈ 0.0393, abs < 0.1 → pass
+		const result = evaluate(
+			{ ...base_image, width: 185, height: 100 },
+			{ nsfw: "all", aspect_ratio: { target: 1.78, tolerance: 0.1 } },
+		)
+		expect(result).toEqual({ pass: true })
+	})
+
+	test("fails: target 1.78, tolerance 0.1, actual 1.5 (outside 10%)", () => {
+		// actual/target - 1 = 1.5/1.78 - 1 ≈ -0.157, abs > 0.1 → fail
+		const result = evaluate(
+			{ ...base_image, width: 150, height: 100 },
+			{ nsfw: "all", aspect_ratio: { target: 1.78, tolerance: 0.1 } },
+		)
+		expect(result).toEqual({ pass: false, reason: "aspect_ratio" })
+	})
+
+	test("passes: target 0.5, tolerance 0.1, actual ~0.54 (within 10%)", () => {
+		// actual/target - 1 = 0.54/0.5 - 1 ≈ 0.08, abs < 0.1 → pass
+		const result = evaluate(
+			{ ...base_image, width: 54, height: 100 },
+			{ nsfw: "all", aspect_ratio: { target: 0.5, tolerance: 0.1 } },
+		)
+		expect(result).toEqual({ pass: true })
+	})
+
+	test("edge case: target 0, tolerance 0.1 → pass (no opinion when target invalid)", () => {
+		const result = evaluate(base_image, {
+			nsfw: "all",
+			aspect_ratio: { target: 0, tolerance: 0.1 },
+		})
 		expect(result).toEqual({ pass: true })
 	})
 })

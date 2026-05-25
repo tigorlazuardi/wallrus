@@ -48,8 +48,15 @@
 	let aspect_target_str = $state(
 		value.aspect_ratio !== undefined ? String(value.aspect_ratio.target) : "",
 	)
+	// Internal fraction (0..1) — kept as the source of truth for the sync $effect
 	let aspect_tolerance_str = $state(
 		value.aspect_ratio !== undefined ? String(value.aspect_ratio.tolerance) : "",
+	)
+	// Display state for the percent input (0..100 integer)
+	let tolerance_pct_str = $state(
+		value.aspect_ratio !== undefined && value.aspect_ratio.tolerance != null
+			? String(Math.round(value.aspect_ratio.tolerance * 100))
+			: "",
 	)
 
 	// AR auto-derive dirty flag: true if user has manually typed the target
@@ -148,9 +155,21 @@
 		const target = e.target as HTMLInputElement
 		aspect_target_str = target.value
 		ar_target_dirty = true
-		// Default-populate tolerance to 0.1 on first target edit if tolerance is empty/0
+		// Default-populate tolerance to 0.1 (= 10%) on first target edit if tolerance is empty/0
 		if (aspect_tolerance_str === "" || parseFloat(aspect_tolerance_str) === 0) {
 			aspect_tolerance_str = "0.1"
+			tolerance_pct_str = "10"
+		}
+	}
+
+	function handle_tolerance_pct_input(e: Event) {
+		const input = e.target as HTMLInputElement
+		tolerance_pct_str = input.value
+		const pct = parseFloat(input.value)
+		if (!isNaN(pct)) {
+			aspect_tolerance_str = String(pct / 100)
+		} else {
+			aspect_tolerance_str = ""
 		}
 	}
 </script>
@@ -252,21 +271,22 @@
 				/>
 			</div>
 			<div class="space-y-1.5">
-				<Label for="aspect-tolerance">Tolerance (± fraction)</Label>
+				<Label for="aspect-tolerance">Tolerance (%)</Label>
 				<Input
 					id="aspect-tolerance"
 					type="number"
-					step="0.01"
+					step="1"
 					min="0"
-					max="1"
-					placeholder="0.10"
-					bind:value={aspect_tolerance_str}
+					max="100"
+					placeholder="10"
+					value={tolerance_pct_str}
+					oninput={handle_tolerance_pct_input}
 				/>
 			</div>
 		</div>
 		<p class="text-xs text-[var(--color-fg-muted)]">
-			Image AR must be within target × (1 ± tolerance). e.g. target 1.78, tolerance 0.1 →
-			accepts 1.60–1.96.
+			Image AR must match target within ± tolerance%. e.g. target 1.78, tolerance 10 → accepts
+			1.60-1.96.
 		</p>
 	</fieldset>
 
