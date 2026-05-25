@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Sun, Moon, Monitor } from "lucide-svelte"
-	import { themeStore, type Theme } from "$lib/stores/theme"
+	import { themeStore, type Theme } from "$lib/stores/theme.svelte"
 
 	const labels: Record<Theme, string> = {
 		light: "Switch to dark mode (currently light)",
