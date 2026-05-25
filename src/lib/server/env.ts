@@ -12,7 +12,7 @@ const RawEnv = z
 		WALLRUS_MODE: z.enum(["prod", "dev"]).default("prod"),
 		WALLRUS_AUTH_ENABLE: z
 			.union([z.literal("true"), z.literal("false")])
-			.default("true")
+			.default("false")
 			.transform((v) => v === "true"),
 		WALLRUS_USERNAME: z.string().optional(),
 		WALLRUS_PASSWORD: z.string().optional(),

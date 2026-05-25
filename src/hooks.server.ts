@@ -1,6 +1,18 @@
-import type { Handle } from "@sveltejs/kit"
-import { runtime_ref } from "$lib/server/runtime"
+import type { Handle, ServerInit } from "@sveltejs/kit"
+import { boot } from "$lib/server/bootstrap"
+import { runtime_ref, set_runtime } from "$lib/server/runtime"
 import { authenticate } from "$lib/server/auth"
+
+// Lazy-bootstrap the runtime when this hooks module is loaded outside of
+// `cli.ts serve` — most importantly under `bun run dev` (Vite), where no
+// CLI entrypoint runs and `set_runtime()` would otherwise never fire.
+// Production (`cli.ts serve`) already calls `set_runtime()` after `boot()`,
+// so the globalThis guard short-circuits this in that path.
+export const init: ServerInit = async () => {
+	if (globalThis.__wallrus_runtime__ != null) return
+	const runtime = await boot()
+	set_runtime(runtime)
+}
 
 // Exact-match allowlist — these paths never require authentication.
 const EXACT_ALLOWLIST = new Set([

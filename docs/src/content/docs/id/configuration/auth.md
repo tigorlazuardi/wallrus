@@ -6,6 +6,12 @@ description: Auth bawaan single-user vs auth via reverse proxy.
 wallrus punya **satu** model autentikasi: username + password bersama
 tunggal. Multi-user sengaja di luar scope. Ada dua bentuk deployment.
 
+**Posture default: auth dimatikan** (`WALLRUS_AUTH_ENABLE=false`). Instalasi
+fresh melayani semua route secara publik, dengan asumsi ada reverse proxy di
+depan wallrus yang menahan traffic tidak terotentikasi. Bila wallrus dibuka
+langsung tanpa reverse proxy, lompat ke bagian A dan nyalakan auth sebelum
+bind ke interface publik.
+
 ## A. Auth bawaan (kredensial bersama tunggal)
 
 Set:

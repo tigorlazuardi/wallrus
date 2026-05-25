@@ -9,7 +9,10 @@ berubah, halaman ini ikut berubah di kedua bahasa.
 
 ## Wajib saat auth aktif
 
-Wajib hanya bila `WALLRUS_AUTH_ENABLE=true` (default).
+Wajib hanya bila `WALLRUS_AUTH_ENABLE=true`. Default-nya `false` — instalasi
+fresh berjalan tanpa auth, dengan asumsi ada reverse proxy di depan wallrus
+yang menangani auth. Set `WALLRUS_AUTH_ENABLE=true` untuk membuat wallrus
+mengatur auth sendiri, di mana ketiga env di bawah jadi wajib diisi.
 
 | Variabel              | Wajib                | Default | Deskripsi                                                                                                                                |
 | --------------------- | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -23,7 +26,7 @@ Bila `WALLRUS_AUTH_ENABLE=false`, ketiganya diabaikan.
 
 | Variabel                | Default                                            | Deskripsi                                                                                                                                                |
 | ----------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WALLRUS_AUTH_ENABLE`   | `true`                                             | `"true"` atau `"false"`. Bila `false`, semua route publik dan endpoint login mengembalikan `404` / `410`. Cocok untuk deployment di belakang reverse proxy. |
+| `WALLRUS_AUTH_ENABLE`   | `false`                                            | `"true"` atau `"false"`. Bila `false` (default), semua route publik dan endpoint login mengembalikan `404` / `410` — cocok untuk deployment di belakang reverse proxy. Set ke `true` untuk membuat wallrus mengatur auth sendiri (perlu ketiga env kredensial di atas). |
 | `WALLRUS_DATA_DIR`      | `./data` (bare-metal) \| `/data/wallrus` (Docker)  | Direktori penyimpanan database SQLite, thumbnail, file staging, dan subdir per perangkat. Daemon menerapkan `chmod 0700` di dir ini.                       |
 | `WALLRUS_LISTEN_ADDR`   | `0.0.0.0:5173`                                     | Host + port yang dipakai server HTTP.                                                                                                                    |
 | `WALLRUS_MODE`          | `prod`                                             | `"prod"` atau `"dev"`. Bila `dev`, `wallrus serve` melewati `Bun.serve` dan keluar setelah boot. Gunakan `bun run dev` untuk pengembangan lokal (dikelola Vite). Docker image selalu berjalan dalam mode `prod`. |

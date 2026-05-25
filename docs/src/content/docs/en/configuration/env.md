@@ -9,7 +9,11 @@ that file changes, this page changes in lockstep (both locales).
 
 ## Required when auth is enabled
 
-These are required only when `WALLRUS_AUTH_ENABLE=true` (the default).
+These are required only when `WALLRUS_AUTH_ENABLE=true`. The default is
+`false` — fresh installs are unauthenticated, on the assumption that a
+reverse proxy in front of wallrus is doing the auth. Set
+`WALLRUS_AUTH_ENABLE=true` to make wallrus enforce its own auth, in which
+case all three vars below become mandatory.
 
 | Variable                | Required | Default | Description                                                                                                                  |
 | ----------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -23,7 +27,7 @@ If `WALLRUS_AUTH_ENABLE=false`, all three are ignored.
 
 | Variable                | Default                | Description                                                                                                                          |
 | ----------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `WALLRUS_AUTH_ENABLE`   | `true`                 | `"true"` or `"false"`. When `false`, every route is public and the login endpoints return `404` / `410`. Intended for reverse-proxy deployments. |
+| `WALLRUS_AUTH_ENABLE`   | `false`                | `"true"` or `"false"`. When `false` (the default), every route is public and the login endpoints return `404` / `410` — intended for reverse-proxy deployments. Set to `true` to make wallrus enforce its own auth (requires the three credential vars above). |
 | `WALLRUS_DATA_DIR`      | `./data` (bare-metal) `\| /data/wallrus` (Docker image) | Directory holding the SQLite DB, thumbnails, staging files, and per-device subdirs. Daemon enforces `chmod 0700` on this dir. |
 | `WALLRUS_LISTEN_ADDR`   | `0.0.0.0:5173`         | Host + port the HTTP server binds to.                                                                                                |
 | `WALLRUS_MODE`          | `prod`                 | `"prod"` or `"dev"`. When `dev`, `wallrus serve` skips `Bun.serve` and exits after boot. Use `bun run dev` for local development (Vite-managed). The Docker image always runs in `prod` mode. |

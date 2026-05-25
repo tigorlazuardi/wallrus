@@ -6,6 +6,12 @@ description: Built-in single-user auth vs reverse-proxy auth.
 wallrus has **one** authentication model: a single shared username + password.
 Multi-user is intentionally out of scope. There are two deployment shapes.
 
+**Default posture: auth disabled** (`WALLRUS_AUTH_ENABLE=false`). Fresh installs
+serve every route publicly, on the assumption that a reverse proxy in front of
+wallrus is responsible for keeping unauthenticated traffic out. If you are
+running wallrus directly exposed without a reverse proxy, jump to section A
+and turn auth on before binding to a public interface.
+
 ## A. Built-in auth (single shared credential)
 
 Set:
