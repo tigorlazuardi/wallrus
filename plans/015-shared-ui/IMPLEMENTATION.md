@@ -2,7 +2,7 @@
 
 ## Status
 
-**not-started**
+**in-progress** — Phase 1 (client foundation) landed; Phases 2-3 pending.
 
 ## Goal
 
