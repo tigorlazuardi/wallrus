@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { untrack } from "svelte"
-	import { enhance } from "$app/forms"
+	import { goto, invalidateAll } from "$app/navigation"
 	import type { PageData } from "./$types"
 	import SubscriptionForm from "$lib/components/SubscriptionForm.svelte"
 	import type { ParamDescriptor } from "$lib/components/SubscriptionForm.types"
+	import { useSubscriptionMutation } from "$lib/client/subscriptions/use-subscription-mutation.svelte"
 
 	let { data }: { data: PageData } = $props()
+
+	const mutation = useSubscriptionMutation()
 
 	// Edit form state (initialized from subscription data).
 	// Use untrack() to avoid Svelte 5 state_referenced_locally warning.
@@ -39,6 +42,25 @@
 		})
 	}
 
+	async function handle_toggle(): Promise<void> {
+		try {
+			await mutation.toggle({ id: data.subscription.id, enabled: !data.subscription.enabled })
+			await invalidateAll()
+		} catch (e) {
+			save_error = (e as Error).message
+		}
+	}
+
+	async function handle_delete(): Promise<void> {
+		if (!confirm("Delete this subscription? This is a soft delete.")) return
+		try {
+			await mutation.delete(data.subscription.id)
+			await goto("/subscriptions")
+		} catch (e) {
+			save_error = (e as Error).message
+		}
+	}
+
 	async function handle_save(e: SubmitEvent): Promise<void> {
 		e.preventDefault()
 		submitting = true
@@ -46,36 +68,28 @@
 		field_errors = {}
 
 		try {
-			const res = await fetch(`?/update`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					name,
-					input_params,
-					cron,
-					max_items_inspected,
-					linked_device_ids,
-				}),
+			await mutation.update({
+				id: data.subscription.id,
+				name,
+				input_params,
+				cron,
+				...(max_items_inspected !== null ? { max_items_inspected } : {}),
 			})
 
-			if (res.redirected) {
-				window.location.href = res.url
-				return
+			// Reconcile device links client-side
+			const original = new Set(data.linked_device_ids)
+			const current = new Set(linked_device_ids)
+			for (const did of current) {
+				if (!original.has(did)) await mutation.linkDevice(data.subscription.id, did)
+			}
+			for (const did of original) {
+				if (!current.has(did)) await mutation.unlinkDevice(data.subscription.id, did)
 			}
 
-			if (!res.ok) {
-				const body = await res.json()
-				const data_body = (
-					body as { data?: { errors?: Record<string, string | string[]> } }
-				)?.data
-				field_errors = data_body?.errors ?? {}
-				save_error = "Validation failed. Please check the fields below."
-			} else {
-				// Refresh to show updated data
-				window.location.reload()
-			}
-		} catch {
-			save_error = "Network error. Please try again."
+			await invalidateAll()
+			editing = false
+		} catch (e) {
+			save_error = (e as Error).message
 		} finally {
 			submitting = false
 		}
@@ -104,17 +118,16 @@
 			</p>
 		</div>
 		<div class="flex gap-2">
-			<form method="POST" use:enhance action="?/toggle">
-				<button
-					type="submit"
-					class="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors {data
-						.subscription.enabled
-						? 'border-[var(--color-glass-border)] bg-[var(--color-surface)] text-[var(--color-fg)] hover:bg-[var(--color-surface-hi)]'
-						: 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-fg)] hover:opacity-90'}"
-				>
-					{data.subscription.enabled ? "Disable" : "Enable"}
-				</button>
-			</form>
+			<button
+				type="button"
+				onclick={handle_toggle}
+				class="inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors {data
+					.subscription.enabled
+					? 'border-[var(--color-glass-border)] bg-[var(--color-surface)] text-[var(--color-fg)] hover:bg-[var(--color-surface-hi)]'
+					: 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-fg)] hover:opacity-90'}"
+			>
+				{data.subscription.enabled ? "Disable" : "Enable"}
+			</button>
 
 			<button
 				type="button"
@@ -126,18 +139,13 @@
 				{editing ? "Cancel edit" : "Edit"}
 			</button>
 
-			<form method="POST" use:enhance action="?/delete">
-				<button
-					type="submit"
-					onclick={(e) => {
-						if (!confirm("Delete this subscription? This is a soft delete."))
-							e.preventDefault()
-					}}
-					class="inline-flex h-8 items-center gap-1.5 rounded-md border border-red-500/30 bg-red-500/10 px-3 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20"
-				>
-					Delete
-				</button>
-			</form>
+			<button
+				type="button"
+				onclick={handle_delete}
+				class="inline-flex h-8 items-center gap-1.5 rounded-md border border-red-500/30 bg-red-500/10 px-3 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20"
+			>
+				Delete
+			</button>
 		</div>
 	</div>
 
