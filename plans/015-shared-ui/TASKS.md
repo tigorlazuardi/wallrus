@@ -24,7 +24,7 @@
 
 ## Phase 3 — remaining verticals
 
-- [ ] Subscriptions: hooks + universal load + SPA form migration + delete server form actions
+- [~] Subscriptions: hooks + universal load + SPA form migration + delete server form actions (Part A: hooks + tests done; Part B: route migration pending)
 - [ ] Images / gallery: hooks + universal load (gallery uses cursor pagination — hook owns cursor state); favorite / tag / blacklist / restore via mutation hooks
 - [ ] Runs: hooks + universal load (SSE stream unchanged, only list/detail/active data fetch migrates)
 - [ ] `.claude/rules/frontend.md` §Data flow — rewrite rule per IMPLEMENTATION.md §Decisions
