@@ -12,9 +12,11 @@ export default defineConfig({
 	site: SITE,
 	base: BASE,
 	trailingSlash: "always",
-	// Both locales prefixed → no page at the base; redirect to /en/.
+	// Both locales prefixed → no page at the base; redirect to the default
+	// locale. Destination must include `base` — Astro does not prepend it to
+	// redirect targets, so a bare "/en/" lands outside the project subpath.
 	redirects: {
-		"/": "/en/",
+		"/": `${BASE}/en/`,
 	},
 	integrations: [
 		starlight({
