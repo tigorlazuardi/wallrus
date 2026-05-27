@@ -1,5 +1,5 @@
 import type { z } from "zod"
-import type { ParamDescriptor } from "$lib/components/SubscriptionForm.types"
+import type { ParamDescriptor } from "$lib/schemas/sources/ListSources"
 
 // Zod v4 internal shape type (accessed via _zod.def)
 interface ZodV4Def {

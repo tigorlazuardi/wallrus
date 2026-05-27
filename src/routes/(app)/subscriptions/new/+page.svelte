@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { goto } from "$app/navigation"
 	import type { PageData } from "./$types"
 	import SubscriptionForm from "$lib/components/SubscriptionForm.svelte"
 	import type { ParamDescriptor } from "$lib/components/SubscriptionForm.types"
+	import { useSubscriptionMutation } from "$lib/client/subscriptions/use-subscription-mutation.svelte"
 
 	let { data }: { data: PageData } = $props()
 
@@ -38,38 +40,25 @@
 		field_errors = {}
 
 		try {
-			const res = await fetch("?/default", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					source_slug,
-					name,
-					input_params,
-					cron,
-					max_items_inspected,
-					enabled,
-					linked_device_ids,
-				}),
+			const mutation = useSubscriptionMutation()
+
+			// Create the subscription via the API
+			const created = await mutation.create({
+				source_slug,
+				name,
+				input_params,
+				cron,
+				...(max_items_inspected !== null ? { max_items_inspected } : {}),
 			})
 
-			if (res.redirected) {
-				window.location.href = res.url
-				return
+			// Link each selected device to the newly created subscription
+			for (const device_id of linked_device_ids) {
+				await mutation.linkDevice(created.id, device_id)
 			}
 
-			if (!res.ok) {
-				const body = await res.json()
-				// SvelteKit form failure wraps data in { type: "failure", status, data: { ... } }
-				const result_data = (
-					body as {
-						data?: { errors?: Record<string, string | string[]>; error?: string }
-					}
-				)?.data
-				field_errors = result_data?.errors ?? {}
-				error = result_data?.error ?? `Unexpected error (${res.status}).`
-			}
-		} catch {
-			error = "Network error. Please check your connection and try again."
+			await goto(`/subscriptions/${created.id}`)
+		} catch (err) {
+			error = err instanceof Error ? err.message : "Unexpected error. Please try again."
 		} finally {
 			submitting = false
 		}

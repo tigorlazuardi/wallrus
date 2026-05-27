@@ -79,7 +79,7 @@ describe("GET /api/v1/sources", () => {
 		expect(item.display_name).toBe("Test Source")
 	})
 
-	test("does not include extra fields beyond slug and display_name", async () => {
+	test("each item has param_descriptors array", async () => {
 		register({
 			slug: "lean-source",
 			display_name: "Lean Source",
@@ -93,7 +93,8 @@ describe("GET /api/v1/sources", () => {
 
 		const item = body.items.find((i: { slug: string }) => i.slug === "lean-source")
 		expect(item).toBeDefined()
-		// Only slug and display_name — no params_schema, fetch, credential, etc.
-		expect(Object.keys(item).sort()).toEqual(["display_name", "slug"])
+		// Must include slug, display_name, and param_descriptors (no server internals like fetch or credential).
+		expect(Object.keys(item).sort()).toEqual(["display_name", "param_descriptors", "slug"])
+		expect(Array.isArray(item.param_descriptors)).toBe(true)
 	})
 })
