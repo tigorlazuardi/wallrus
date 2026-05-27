@@ -1,16 +1,10 @@
 import type { PageLoad } from "./$types"
-import type { Image } from "$lib/schemas/images/Image"
-
-export interface Device {
-	id: string
-	slug: string
-	name: string
-}
+import { ListImagesResponseSchema, type ListImagesResponse } from "$lib/schemas/images/ListImages"
+import { ListDevicesResponseSchema } from "$lib/schemas/devices/ListDevices"
+import type { Device } from "$lib/schemas/devices/Device"
 
 export interface GalleryData {
-	items: Image[]
-	total: number
-	next_cursor: string | undefined
+	images: ListImagesResponse | null
 	devices: Device[]
 	error?: string
 }
@@ -36,21 +30,16 @@ export const load: PageLoad = async ({ fetch, url }): Promise<GalleryData> => {
 
 	if (!img_res.ok) {
 		return {
-			items: [],
-			total: 0,
-			next_cursor: undefined,
+			images: null,
 			devices: [],
 			error: `Failed to load images (${img_res.status})`,
 		}
 	}
 
-	const data = await img_res.json()
-	const devices: Device[] = dev_res.ok ? (await dev_res.json()).items : []
+	const images = ListImagesResponseSchema.parse(await img_res.json())
+	const devices: Device[] = dev_res.ok
+		? ListDevicesResponseSchema.parse(await dev_res.json()).items
+		: []
 
-	return {
-		items: data.items ?? [],
-		total: data.total ?? 0,
-		next_cursor: data.next_cursor,
-		devices,
-	}
+	return { images, devices }
 }

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { untrack } from "svelte"
 	import { page } from "$app/stores"
 	import { goto, invalidateAll } from "$app/navigation"
 	import type { Image } from "$lib/schemas/images/Image"
+	import { useImages } from "$lib/client/images/use-images.svelte"
 	import Masonry from "$lib/components/Masonry.svelte"
 	import ImageCard from "$lib/components/ImageCard.svelte"
 	import FilterChips from "$lib/components/FilterChips.svelte"
@@ -12,23 +12,20 @@
 
 	let { data }: { data: GalleryData } = $props()
 
-	// Reactive list — server provides initial 50 items; client appends on scroll.
-	// `untrack` captures the initial value without a reactive dependency so Svelte
-	// does not warn about state_referenced_locally. The $effect below re-syncs when
-	// data changes (filter navigation).
-	let items = $state<Image[]>(untrack(() => data.items.slice()))
-	let next_cursor = $state<string | undefined>(untrack(() => data.next_cursor))
-	let loading = $state(false)
-	let selected_image = $state<Image | null>(null)
+	// Gallery hook owns cursor pagination state.
+	// `data.images` may be null when the load returned an error — the hook
+	// accepts undefined as "start empty".
+	const gallery = useImages(data.images ?? undefined, () => $page.url.searchParams.toString())
 
-	// Derive unique source slugs from the loaded items for the filter chips.
-	const sources = $derived([...new Set(items.map((img) => img.source_slug))])
+	// Derive unique source slugs from loaded items for the filter chips.
+	const sources = $derived([...new Set(gallery.state.items.map((img: Image) => img.source_slug))])
 
-	// When the URL changes (filter change), re-derive from data.
-	// data is reactive because SvelteKit reruns load() on navigation.
+	// When the URL changes (filter change), SvelteKit reruns load() and `data`
+	// updates. Reset the hook state with the fresh first page from the server.
 	$effect(() => {
-		items = [...data.items]
-		next_cursor = data.next_cursor
+		if (data.images) {
+			gallery.reset(data.images)
+		}
 	})
 
 	// Filter signature for keying the sentinel. When filters change, the
@@ -38,25 +35,7 @@
 	// Infinite scroll: sentinel ref.
 	let sentinel = $state<HTMLElement | null>(null)
 
-	async function fetch_next_page() {
-		if (loading || !next_cursor) return
-		loading = true
-		try {
-			// Build query string from current URL params + pagination cursor.
-			// We use a plain object to avoid the SVelte URLSearchParams reactivity lint.
-			const existing = $page.url.searchParams.toString()
-			const separator = existing ? "&" : ""
-			const query = `${existing}${separator}next=${encodeURIComponent(next_cursor)}&limit=50`
-			const res = await fetch(`/api/v1/images?${query}`)
-			if (!res.ok) return
-			const json = await res.json()
-			const new_items: Image[] = json.items ?? []
-			items = [...items, ...new_items]
-			next_cursor = json.next_cursor
-		} finally {
-			loading = false
-		}
-	}
+	let selected_image = $state<Image | null>(null)
 
 	$effect(() => {
 		// Re-register observer whenever sentinel element changes (filter change keys it).
@@ -65,7 +44,7 @@
 		const observer = new IntersectionObserver(
 			(entries) => {
 				if (entries[0]?.isIntersecting) {
-					fetch_next_page()
+					gallery.loadMore()
 				}
 			},
 			{ rootMargin: "200px" },
@@ -110,7 +89,7 @@
 				Retry
 			</button>
 		</div>
-	{:else if items.length === 0}
+	{:else if gallery.state.items.length === 0}
 		<!-- Empty state -->
 		<div class="mt-16 flex flex-col items-center gap-4 text-center">
 			<div class="text-5xl" aria-hidden="true">🖼</div>
@@ -143,7 +122,7 @@
 	{:else}
 		<!-- Gallery grid -->
 		<div class="mt-4">
-			<Masonry {items}>
+			<Masonry items={gallery.state.items}>
 				{#snippet item(img)}
 					<ImageCard image={img} onclick={open_image} />
 				{/snippet}
@@ -156,7 +135,7 @@
 		{/key}
 
 		<!-- Loading skeleton for next page -->
-		{#if loading}
+		{#if gallery.state.loading}
 			<div
 				class="mt-4 grid gap-4"
 				style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"
@@ -168,9 +147,9 @@
 		{/if}
 
 		<!-- End-of-list indicator -->
-		{#if !next_cursor && !loading}
+		{#if !gallery.state.next_cursor && !gallery.state.loading}
 			<p class="mt-8 pb-4 text-center text-xs" style="color: var(--color-fg-muted);">
-				{items.length} image{items.length === 1 ? "" : "s"} total
+				{gallery.state.items.length} image{gallery.state.items.length === 1 ? "" : "s"} total
 			</p>
 		{/if}
 	{/if}

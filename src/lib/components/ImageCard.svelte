@@ -2,6 +2,7 @@
 	import { untrack } from "svelte"
 	import type { Image } from "$lib/schemas/images/Image"
 	import { Badge } from "$lib/components/ui/badge"
+	import { useImageMutation } from "$lib/client/images/use-image-mutation.svelte"
 
 	interface Props {
 		image: Image
@@ -38,14 +39,15 @@
 	async function toggle_favorite(e: MouseEvent) {
 		e.stopPropagation()
 		if (favorite_loading) return
+		// Optimistic flip: update UI immediately, revert on failure.
+		const new_favorited = !favorited
+		favorited = new_favorited
 		favorite_loading = true
 		try {
-			const res = await fetch(`/api/v1/images/${image.id}/favorite`, {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ favorited: !favorited }),
-			})
-			if (res.ok) favorited = !favorited
+			await useImageMutation().toggleFavorite(image.id, new_favorited)
+		} catch {
+			// Revert optimistic update on error.
+			favorited = !new_favorited
 		} finally {
 			favorite_loading = false
 		}
@@ -57,7 +59,7 @@
 			"Delete this image? It will be soft-deleted and removed from all device directories.",
 		)
 		if (!confirmed) return
-		await fetch(`/api/v1/images/${image.id}?blacklist=false`, { method: "DELETE" })
+		await useImageMutation().softDelete(image.id)
 		// Parent should invalidate/refetch.
 	}
 </script>
