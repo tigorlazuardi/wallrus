@@ -2,7 +2,9 @@
 
 ## Status
 
-**in-progress** — Phase 1 (client foundation) landed; Phases 2-3 pending.
+**done** — all three phases shipped: client foundation (`$client/config` + `apiFetch`), the devices pilot, and the subscriptions/images/runs verticals. Every `(app)` page now loads via `+page.ts` universal load through `/api/v1/*` and mutates through `$lib/client/<domain>/use-*` hooks (`apiFetch` → `api_base()`). The only surviving `+page.server.ts` are auth-only: `login/+page.server.ts` (sets the session cookie) and `(app)/+layout.server.ts` (auth gate reading `locals.user`). `frontend.md` §Data flow rewritten to match.
+
+**Deferred to the user (not done in the autonomous Ralph loop):** interactive browser smoke (click-through of list/create/edit/delete/toggle, infinite scroll, filter nav) and the gallery SSR latency measurement. These need a running daemon + a browser; the daemon can't boot headless in this environment because of the pre-existing `sharp` `libstdc++` issue (the same one behind the 33 environmental test failures). Code-level verification is green: `bun run check` (0 errors), `bun run build` (succeeds), `bunx eslint .` (0 errors), `bunx prettier --check .` (clean), and the per-vertical hook + API-endpoint unit tests. A human should run the interactive smoke before treating the web UX as fully validated.
 
 ## Goal
 

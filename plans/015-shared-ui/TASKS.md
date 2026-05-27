@@ -20,33 +20,33 @@
 - [x] Toggle / delete flows: client POST via mutation hook
 - [x] Delete superseded server form actions + server loads
 - [x] Hook unit tests (`use-devices.test.ts`, `use-device-mutation.test.ts`)
-- [ ] Manual smoke web: list / create / edit / delete / toggle identical to pre-migration
+- [-] Manual smoke web: list / create / edit / delete / toggle identical to pre-migration — DEFERRED to user (interactive browser + running daemon required; not performable in the autonomous loop, and the daemon can't boot headless here due to the sharp `libstdc++` env issue). Code-level verified via `bun run check` + `bun run build` + hook/endpoint unit tests.
 
 ## Phase 3 — remaining verticals
 
 - [x] Subscriptions: hooks + universal load + SPA form migration + delete server form actions (Part A: hooks + tests done; Part B1: list + runs-history done; Part B2a: sources API + new-page migration done; Part B2b: detail page migration done)
 - [x] Images / gallery: hooks + universal load (gallery uses cursor pagination — hook owns cursor state); favorite / tag / blacklist / restore via mutation hooks
 - [x] Runs: hooks + universal load (SSE stream unchanged, only list/detail/active data fetch migrates)
-- [ ] `.claude/rules/frontend.md` §Data flow — rewrite rule per IMPLEMENTATION.md §Decisions
-- [ ] Audit every remaining `+page.server.ts` — keep `/login` (cookie set) and tag any other explicitly "web-only" page; remove the rest
-- [ ] Final manual smoke across every page
-- [ ] Latency sanity-check: heaviest page (gallery) SSR first paint should stay single-digit ms regression; document if not
+- [x] `.claude/rules/frontend.md` §Data flow — rewrite rule per IMPLEMENTATION.md §Decisions
+- [x] Audit every remaining `+page.server.ts` — survivors are auth-only and legitimate: `login/+page.server.ts` (sets session cookie) + `(app)/+layout.server.ts` (auth gate, reads `locals.user` → redirect, no business-logic service call). No other `+page.server.ts` remains.
+- [-] Final manual smoke across every page — DEFERRED to user (same reason as Phase 2 smoke: needs interactive browser + running daemon).
+- [-] Latency sanity-check: heaviest page (gallery) SSR first paint — DEFERRED to user (needs the running daemon to measure). Note: with the static-adapter mobile build the gallery is client-rendered anyway; on web the universal-load loopback is a single in-process hop.
 
 ## Verification gates
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
-- [ ] Manual smoke per migrated page: behavior unchanged
-- [ ] Per-page sanity: server load deleted, `+page.ts` universal load present, form actions deleted, `SPA: true` superform present, mutation hook called
-- [ ] `lefthook` pre-commit + commit-msg pass
+- [x] `bun run check` clean — 0 errors (9 pre-existing `state_referenced_locally` warnings, none blocking)
+- [x] `bun test` green — all slice tests pass; the only failures are the 33 pre-existing `sharp` `ERR_DLOPEN_FAILED` environmental failures (see `.builder-notes.md`), unrelated to this slice
+- [x] `bunx eslint .` zero errors (1 pre-existing `no-explicit-any` warning in `service/base.ts`)
+- [x] `bunx prettier --check .` clean
+- [-] Manual smoke per migrated page: behavior unchanged — DEFERRED to user (interactive; see Phase 2/3 smoke notes)
+- [x] Per-page sanity: reviewer confirmed each migrated page — server load deleted, `+page.ts` universal load present, form actions removed / hand-rolled submits routed through mutation hooks, `apiFetch`-based hooks wired
+- [-] `lefthook` pre-commit + commit-msg — N/A in this environment (`core.hooksPath` points at a Nix store dir with only a `commit-msg` hook; no `pre-commit`, `lefthook` not on PATH). Gates were run manually each iteration instead. Lefthook still enforces on a normal dev machine + CI.
 
 ## Commit + push
 
-- [ ] Phase 1: `feat(client-config): runtime-configurable API base URL via $client/config`
-- [ ] Phase 2: `feat(shared-ui): extract devices vertical to presenter + hook + universal load`
-- [ ] Phase 3: `feat(shared-ui): migrate subscriptions/images/runs to presenter + hook pattern`
-- [ ] `Status: done` in IMPLEMENTATION.md
-- [ ] README index updated for `015-shared-ui`
-- [ ] Bookkeeping: `chore(plans): mark 015-shared-ui done`
+- [x] Phase 1: `feat(client-config): runtime-configurable API base URL via $client/config`
+- [x] Phase 2: shipped as `feat(shared-ui): add devices data + mutation hooks` + `feat(shared-ui): migrate devices routes to universal load + SPA forms`
+- [x] Phase 3: shipped across the subscriptions (hooks/B1/B2a/B2b), images (hooks + wiring), and runs commits, plus the frontend-rule rewrite
+- [x] `Status: done` in IMPLEMENTATION.md
+- [x] README index updated for `015-shared-ui`
+- [x] Bookkeeping: `chore(plans): mark 015-shared-ui done`
