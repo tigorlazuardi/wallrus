@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
-	import type { PageData } from "./$types"
+	import { useSubscriptions } from "$lib/client/subscriptions/use-subscriptions.svelte"
+	import type { SubscriptionsPageData } from "./+page.ts"
 
-	let { data }: { data: PageData } = $props()
+	let { data }: { data: SubscriptionsPageData } = $props()
+
+	// Wire hook with initial data from universal load — no extra fetch on first paint.
+	const { state } = useSubscriptions(data.subscriptions ?? undefined)
 
 	function toggle_deleted(): void {
 		const url = new URL(window.location.href)
@@ -50,7 +54,21 @@
 		</div>
 	</div>
 
-	{#if data.subscriptions.length === 0}
+	{#if data.error}
+		<div
+			class="rounded-[var(--radius)] border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+		>
+			{data.error}
+		</div>
+	{:else if state.loading}
+		<p class="text-sm text-[var(--color-fg-muted)]">Loading…</p>
+	{:else if state.error}
+		<div
+			class="rounded-[var(--radius)] border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+		>
+			{state.error.message}
+		</div>
+	{:else if !state.data || state.data.items.length === 0}
 		<div
 			class="flex flex-col items-center justify-center rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] py-16 text-center"
 		>
@@ -61,7 +79,7 @@
 		</div>
 	{:else}
 		<div class="space-y-2">
-			{#each data.subscriptions as sub (sub.id)}
+			{#each state.data.items as sub (sub.id)}
 				<a
 					href="/subscriptions/{sub.id}"
 					class="block rounded-[var(--radius-card)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] p-4 transition-colors hover:bg-[var(--color-surface-hi)] {sub.deleted_at
@@ -117,7 +135,7 @@
 		</div>
 
 		<p class="mt-4 text-xs text-[var(--color-fg-muted)]">
-			{data.total} subscription{data.total === 1 ? "" : "s"} total
+			{state.data.total} subscription{state.data.total === 1 ? "" : "s"} total
 		</p>
 	{/if}
 </div>
