@@ -42,14 +42,21 @@ src/lib/components/
   devices/  subscriptions/  runs/  nav/
 src/lib/stores/               # localStorage-backed only
 src/lib/client/
-  sse.ts                      # typed EventSource wrapper
-  fetcher.ts                  # /api/v1/* fetch wrapper
+  config.ts                   # api_base() / set_api_base() — runtime API base URL
+  fetcher.ts                  # apiFetch() — /api/v1/* wrapper that prepends api_base()
+  sse.ts / runs-stream.ts     # typed EventSource wrappers (SSE)
+  <domain>/use-*.svelte.ts    # data + mutation hooks (Svelte 5 runes); e.g. devices/use-devices
 ```
 
 ## Data flow
 
-- **Server `load()` and form actions call services directly** — never `fetch` to your own `/api/v1/*` from server code. Direct service call is faster, type-safe, and bypasses auth re-checks.
-- **Mutations** end with `invalidate('app:images')` (or `invalidateAll()`) so dependent `load()` reruns. No tanstack-query.
+> Post slice 015 the UI is **presenter + hook + thin container**, so the same components run in web SSR hydration and the future mobile webview. All data and mutations flow through `/api/v1/*` via `apiFetch`.
+
+- **Pages load via `+page.ts` universal load** that `fetch`es `/api/v1/*` and parses the response with the operation's Zod schema from `$lib/schemas/<domain>/<Op>`. Feed the result into a data hook (`$lib/client/<domain>/use-*.svelte.ts`) as its `initial` so first paint does no extra fetch.
+- **Forms** use superforms `dataType: 'json'`, `SPA: true` + a client POST through a mutation hook (`$lib/client/<domain>/use-*-mutation.svelte.ts`). On success, `invalidateAll()` (or the hook's `refetch()`) then navigate. The single mutation surface is `/api/v1/*`. (Hand-rolled client forms that aren't on superforms still submit through the mutation hook, never to a `?/action`.)
+- **All client API calls go through `apiFetch` / `api_base()`** (`$lib/client/fetcher` + `$lib/client/config`) so identical code targets same-origin on web and a remote base in the mobile shell. Never hand-roll a relative `fetch('/api/v1/...')` inside a component. Exception: `<img src>` / asset URLs stay relative — mobile asset + auth handling is slice 016.
+- **`+page.server.ts` direct-service survives only for auth**: `/login` (sets the session cookie) and the `(app)` auth gate (`+layout.server.ts`, reads `locals.user` → redirect). Any other page kept on `+page.server.ts` must be explicitly tagged "web-only" with a reason.
+- **Mutations** end with `invalidateAll()` (or a hook `refetch()`) so dependent loads rerun. No tanstack-query.
 - **Client UI state** uses `$state` runes inline. Shared cross-route state goes into `src/lib/stores/` only when justified.
 - **Persisted client prefs** (theme, NSFW reveal, gallery density): tiny `localStorage`-backed stores.
 
@@ -287,6 +294,6 @@ Same import line works from `.svelte`, `+page.ts`, `+page.server.ts`, `+server.t
 - Don't put glass on gallery cards.
 - Don't add infinite scroll — pagination is page-based.
 - Don't reach for `tanstack-query` / external server-state libs — `load()` + `invalidate*()` is enough.
-- Don't call `fetch('/api/v1/...')` from `+page.server.ts` or `+server.ts` — call the service directly.
+- Don't hand-roll a relative `fetch('/api/v1/...')` in a component — go through `apiFetch` (`$lib/client/fetcher`) so the base URL resolves on mobile too. `+page.ts` universal loads use the SvelteKit `load` `fetch`; `+server.ts` route handlers call services directly and never `fetch` their own API.
 - Don't add a JS masonry library unless the `dense` fallback path explicitly triggers (gap density unacceptable on real content).
 - Don't introduce a third font family.
