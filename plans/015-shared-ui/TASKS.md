@@ -26,7 +26,7 @@
 
 - [x] Subscriptions: hooks + universal load + SPA form migration + delete server form actions (Part A: hooks + tests done; Part B1: list + runs-history done; Part B2a: sources API + new-page migration done; Part B2b: detail page migration done)
 - [x] Images / gallery: hooks + universal load (gallery uses cursor pagination — hook owns cursor state); favorite / tag / blacklist / restore via mutation hooks
-- [ ] Runs: hooks + universal load (SSE stream unchanged, only list/detail/active data fetch migrates)
+- [x] Runs: hooks + universal load (SSE stream unchanged, only list/detail/active data fetch migrates)
 - [ ] `.claude/rules/frontend.md` §Data flow — rewrite rule per IMPLEMENTATION.md §Decisions
 - [ ] Audit every remaining `+page.server.ts` — keep `/login` (cookie set) and tag any other explicitly "web-only" page; remove the rest
 - [ ] Final manual smoke across every page
