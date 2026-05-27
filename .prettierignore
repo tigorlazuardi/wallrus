@@ -13,5 +13,9 @@ pnpm-lock.yaml
 *.min.css
 drizzle/migrations
 
+# Env files — no parser available
+.env
+.env.*
+
 # Starlight user docs site has its own format lifecycle
 docs/

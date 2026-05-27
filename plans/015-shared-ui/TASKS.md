@@ -2,11 +2,11 @@
 
 ## Phase 1 — client foundation
 
-- [ ] `$lib/client/config.ts` — `api_base()` + `set_api_base(url)`, normalises trailing slash, defaults to `import.meta.env.PUBLIC_API_BASE ?? ""`
-- [ ] `$lib/client/config.test.ts` — unit tests (empty default, set/get, trailing slash normalised)
-- [ ] `$lib/client/fetcher.ts` — wire `api_base()` into every `/api/v1/*` call
-- [ ] `$lib/client/fetcher.test.ts` — empty base = relative URL = web no-op; non-empty base = absolute URL
-- [ ] `.env.example` — add `PUBLIC_API_BASE=` documented as "empty for web, set at runtime on mobile"
+- [x] `$lib/client/config.ts` — `api_base()` + `set_api_base(url)`, normalises trailing slash, defaults to `import.meta.env.PUBLIC_API_BASE ?? ""`
+- [x] `$lib/client/config.test.ts` — unit tests (empty default, set/get, trailing slash normalised)
+- [x] `$lib/client/fetcher.ts` — wire `api_base()` into every `/api/v1/*` call
+- [x] `$lib/client/fetcher.test.ts` — empty base = relative URL = web no-op; non-empty base = absolute URL
+- [x] `.env.example` — add `PUBLIC_API_BASE=` documented as "empty for web, set at runtime on mobile"
 
 ## Phase 2 — pilot vertical: devices
 
