@@ -3,9 +3,14 @@
 	import { Badge } from "$lib/components/ui/badge"
 	import FilterEditor from "$lib/components/FilterEditor.svelte"
 	import type { DeviceFilters } from "$lib/schemas/devices/DeviceFilters"
+	import { useDevice } from "$lib/client/devices/use-device.svelte"
+	import { useDeviceMutation } from "$lib/client/devices/use-device-mutation.svelte"
 	import type { DeviceDetailData } from "./+page.ts"
 
 	let { data }: { data: DeviceDetailData } = $props()
+
+	// Wire hook with initial data from universal load — no extra fetch on first paint.
+	const { state: device_state } = useDevice(data.device?.slug ?? "", data.device ?? undefined)
 
 	// Local copy of filter_criteria for live editing.
 	// untrack() avoids a state_referenced_locally warning — we only want the
@@ -21,7 +26,7 @@
 	$effect(() => {
 		// Capture current value — creates reactive dependency
 		const current = filter_criteria
-		const device = data.device
+		const device = device_state.data
 		if (!device) return
 
 		clearTimeout(save_timer)
@@ -29,23 +34,17 @@
 			save_status = "saving"
 			save_error = null
 			try {
-				const res = await fetch(`/api/v1/devices/${device.slug}`, {
-					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ filter_criteria: current }),
+				await useDeviceMutation().update({
+					id: device.id,
+					filter_criteria: current,
 				})
-				if (res.ok) {
-					save_status = "saved"
-					setTimeout(() => {
-						save_status = "idle"
-					}, 2000)
-				} else {
-					save_status = "error"
-					save_error = `Save failed (${res.status})`
-				}
-			} catch {
+				save_status = "saved"
+				setTimeout(() => {
+					save_status = "idle"
+				}, 2000)
+			} catch (e) {
 				save_status = "error"
-				save_error = "Network error."
+				save_error = (e as Error).message
 			}
 		}, 800)
 	})
@@ -77,8 +76,8 @@
 		>
 			{data.error}
 		</div>
-	{:else if data.device}
-		{@const device = data.device}
+	{:else if device_state.data}
+		{@const device = device_state.data}
 		<!-- Header -->
 		<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
 			<div>

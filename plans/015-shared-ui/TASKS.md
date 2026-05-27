@@ -13,12 +13,12 @@
 - [x] `$lib/client/devices/use-devices.svelte.ts` — list hook, accepts optional `initial`, exposes `{ state, refetch }`
 - [x] `$lib/client/devices/use-device.svelte.ts` — single-device hook
 - [x] `$lib/client/devices/use-device-mutation.svelte.ts` — `{ create, update, delete, toggle }` action funcs returning parsed response
-- [ ] Audit `src/lib/components/devices/*` for presenter purity (no `+page.server.ts` import, no `$app/stores` page read, no `fetch`). Refactor offenders.
-- [ ] `src/routes/(app)/devices/+page.server.ts` → `+page.ts` universal load via `fetch("/api/v1/devices")`
-- [ ] `src/routes/(app)/devices/new/+page.server.ts` form action → superforms `SPA: true` + `useDeviceMutation().create`
-- [ ] `src/routes/(app)/devices/[slug]/edit/+page.server.ts` form action → SPA superforms + `update`
-- [ ] Toggle / delete flows: client POST via mutation hook
-- [ ] Delete superseded server form actions + server loads
+- [x] Audit `src/lib/components/devices/*` for presenter purity (no `+page.server.ts` import, no `$app/stores` page read, no `fetch`). Refactor offenders.
+- [x] `src/routes/(app)/devices/+page.server.ts` → `+page.ts` universal load via `fetch("/api/v1/devices")`
+- [x] `src/routes/(app)/devices/new/+page.server.ts` form action → superforms `SPA: true` + `useDeviceMutation().create`
+- [x] `src/routes/(app)/devices/[slug]/edit/+page.server.ts` form action → SPA superforms + `update`
+- [x] Toggle / delete flows: client POST via mutation hook
+- [x] Delete superseded server form actions + server loads
 - [x] Hook unit tests (`use-devices.test.ts`, `use-device-mutation.test.ts`)
 - [ ] Manual smoke web: list / create / edit / delete / toggle identical to pre-migration
 

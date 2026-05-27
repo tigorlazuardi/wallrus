@@ -6,17 +6,24 @@
 	import { Label } from "$lib/components/ui/label"
 	import FilterEditor from "$lib/components/FilterEditor.svelte"
 	import { CreateDeviceRequestSchema } from "$lib/schemas/devices/CreateDevice"
+	import { useDeviceMutation } from "$lib/client/devices/use-device-mutation.svelte"
 	import { slugify } from "$lib/util/slugify"
 	import type { PageData } from "./$types"
 
 	let { data }: { data: PageData } = $props()
 
-	const { form, errors, enhance, submitting } = superForm(data.form, {
+	const { form, errors, enhance, submitting, message } = superForm(data.form, {
 		dataType: "json",
+		SPA: true,
 		validators: zodClient(CreateDeviceRequestSchema),
-		onResult: ({ result }) => {
-			if (result.type === "redirect") {
-				goto(result.location)
+		onUpdate: async ({ form, cancel }) => {
+			if (!form.valid) return
+			try {
+				const created = await useDeviceMutation().create(form.data)
+				await goto(`/devices/${created.slug}`)
+			} catch (e) {
+				form.message = (e as Error).message
+				cancel()
 			}
 		},
 	})
@@ -53,6 +60,14 @@
 		</a>
 		<h1 class="text-2xl font-bold text-[var(--color-fg)]">New device</h1>
 	</div>
+
+	{#if $message}
+		<div
+			class="mb-4 rounded-[var(--radius)] border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+		>
+			{$message}
+		</div>
+	{/if}
 
 	{#if $errors._errors}
 		<div

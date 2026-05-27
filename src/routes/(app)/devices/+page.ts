@@ -1,9 +1,10 @@
 import type { PageLoad } from "./$types"
 import type { Device } from "$lib/schemas/devices/Device"
+import type { ListDevicesResponse } from "$lib/schemas/devices/ListDevices"
+import { ListDevicesResponseSchema } from "$lib/schemas/devices/ListDevices"
 
 export interface DevicesPageData {
-	items: Device[]
-	total: number
+	devices: ListDevicesResponse | null
 	error?: string
 }
 
@@ -11,14 +12,10 @@ export const load: PageLoad = async ({ fetch }): Promise<DevicesPageData> => {
 	const res = await fetch("/api/v1/devices?limit=200")
 	if (!res.ok) {
 		return {
-			items: [],
-			total: 0,
+			devices: { items: [] as Device[], total: 0 },
 			error: `Failed to load devices (${res.status})`,
 		}
 	}
-	const data = await res.json()
-	return {
-		items: data.items ?? [],
-		total: data.total ?? 0,
-	}
+	const devices = ListDevicesResponseSchema.parse(await res.json())
+	return { devices }
 }

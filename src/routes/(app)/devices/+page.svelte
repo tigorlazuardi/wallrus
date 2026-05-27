@@ -1,9 +1,13 @@
 <script lang="ts">
 	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "$lib/components/ui/card"
 	import { Badge } from "$lib/components/ui/badge"
+	import { useDevices } from "$lib/client/devices/use-devices.svelte"
 	import type { DevicesPageData } from "./+page.ts"
 
 	let { data }: { data: DevicesPageData } = $props()
+
+	// Wire hook with initial data from universal load — no extra fetch on first paint.
+	const { state } = useDevices(data.devices ?? undefined)
 </script>
 
 <svelte:head>
@@ -28,7 +32,15 @@
 		>
 			{data.error}
 		</div>
-	{:else if data.items.length === 0}
+	{:else if state.loading}
+		<p class="text-sm text-[var(--color-fg-muted)]">Loading…</p>
+	{:else if state.error}
+		<div
+			class="rounded-[var(--radius)] border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+		>
+			{state.error.message}
+		</div>
+	{:else if !state.data || state.data.items.length === 0}
 		<div class="flex flex-col items-center gap-3 py-16 text-center">
 			<p class="text-[var(--color-fg-muted)]">No devices configured yet.</p>
 			<a
@@ -41,7 +53,7 @@
 		</div>
 	{:else}
 		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each data.items as device (device.id)}
+			{#each state.data.items as device (device.id)}
 				<Card class="flex flex-col">
 					<CardHeader class="pb-2">
 						<div class="flex items-start justify-between gap-2">
