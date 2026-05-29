@@ -1,75 +1,72 @@
-# 016 — Mobile shell — tasks
+# 016 — Mobile web shell — tasks
 
-> **Status: deferred / not-started.** Depends on slice 015 being
-> **done** first. Do NOT pick up these tasks until the user
-> greenlights mobile work explicitly.
+> **Status: not-started, Ralph-loop-able.** All gates are
+> machine-checkable. Native shell (Capacitor scaffold, Kotlin/Swift,
+> signing, TestFlight, device verification) is split out to
+> [`019-native-shell`](../019-native-shell/) — do NOT do native work here.
 
-## Phase 4 — dual adapter build
+## Phase 1 — dual adapter build
 
 - [ ] `bun add -d @sveltejs/adapter-static`
-- [ ] `svelte.config.js` — adapter switch on `WALLRUS_ADAPTER === "static"`, static output to `build-mobile/` with SPA fallback
+- [ ] `svelte.config.js` — adapter switch on `WALLRUS_ADAPTER === "static"`, static output to `build-mobile/` with SPA `index.html` fallback
 - [ ] `package.json` — `"build:mobile": "WALLRUS_ADAPTER=static bun --bun vite build"`
 - [ ] `bun run build` (web) + `bun run build:mobile` (static) both succeed locally
 - [ ] CI workflow runs both builds; static build failure breaks the build
 
-## Phase 5 — Capacitor scaffold
+## Phase 2 — backend auth for mobile
 
-- [ ] `bun add @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios @capacitor/preferences`
-- [ ] `bun x cap init wallrus io.wallrus.app --web-dir=build-mobile`
-- [ ] `bun x cap add android`
-- [ ] `bun x cap add ios`
-- [ ] `mobile/src/app.ts` — boot: detect `Capacitor.isNativePlatform()`, read `api_base` from preferences → `set_api_base()` → continue; else navigate to `/setup`
-- [ ] `mobile/src/app.ts` — same for `auth_token`: read → attach to fetcher; if absent, login flow navigates and saves
-- [ ] `src/routes/setup/+page.svelte` — text input + "Test connection" button (`/healthz` check), gated by `Capacitor.isNativePlatform()` else 404
-- [ ] `mobile/src/screens/` — thin containers for screens that diverge from web routes (most don't; webview renders SvelteKit routes as-is)
-- [ ] `mobile/capacitor.config.ts` — server CSP permits `capacitor://localhost`
-- [ ] `bun x cap sync` succeeds
-- [ ] Android emulator launches; loads `/setup`; setup flow saves URL; gallery loads
-- [ ] iOS simulator same flow
+- [ ] `LoginResponseSchema` (`{ access_token, expires_at }`) at `$lib/schemas/auth/Login`
+- [ ] `src/routes/api/v1/auth/login/+server.ts` — return `{ access_token, expires_at }` body AND keep `Set-Cookie`; auth-disabled path stays `204`
+- [ ] `login.test.ts` — assert body matches schema + cookie still set (auth on); assert `204` no token (auth off)
+- [ ] `GET /api/v1/auth/status` → `{ auth_enabled }` (public, un-gated) + test for both env states
 
-## Phase 6 — native wallpaper plugin
+## Phase 3 — mobile boot + fetcher + auth hook
 
-- [ ] `mobile/plugins/wallpaper/src/index.ts` — `WallpaperPlugin` interface + `registerPlugin("Wallpaper")`
-- [ ] `mobile/plugins/wallpaper/android/WallpaperPlugin.kt` — `WallpaperManager.setBitmap` with `FLAG_SYSTEM | FLAG_LOCK` per `target`
-- [ ] `mobile/android/app/src/main/AndroidManifest.xml` — declare `SET_WALLPAPER` permission
-- [ ] Android plugin registration in `MainActivity.java`
-- [ ] `mobile/plugins/wallpaper/ios/WallpaperPlugin.swift` — save asset to Photos via `PHPhotoLibrary` + present `UIActivityViewController`
-- [ ] iOS plugin registration in `AppDelegate.swift` / `Plugin.m`
-- [ ] Wire "Set as wallpaper" button into image detail screen with target picker (Android) / explainer dialog (iOS)
-- [ ] Native-side image download (OkHttp Android / URLSession iOS) — avoid base64 bridge crossing
-- [ ] Android emulator verification: wallpaper actually changes
-- [ ] iOS simulator verification: save + share-sheet appears, user can tap "Use as Wallpaper"
+- [ ] `bun add @capacitor/core @capacitor/preferences`
+- [ ] `src/lib/client/mobile/platform.ts` — `isNativePlatform()` wrapper (single mock seam)
+- [ ] `src/lib/client/mobile/boot.ts` — read `api_base`/`auth_token` from Preferences → `set_api_base()`; return next route (`/setup` vs `/`)
+- [ ] `src/lib/client/mobile/boot.test.ts` — both branches (configured vs first-launch)
+- [ ] `src/lib/client/fetcher.ts` — Bearer header on native (read `auth_token`), web cookie path unchanged
+- [ ] `src/lib/client/fetcher.test.ts` — extend to cover native (Bearer) + web (no Bearer) via mocked `platform.ts`
+- [ ] `src/lib/client/auth/use-auth-mutation.svelte.ts` — `login()` posts creds, stores `auth_token` on native
+- [ ] `src/lib/client/auth/use-auth-mutation.test.ts`
 
-## Phase 7 — release wiring
+## Phase 4 — setup/login screen
 
-- [ ] Android adaptive app icon + splash screen + signing keystore (gitignored, path via env var)
-- [ ] iOS app icon set + splash + bundle ID + provisioning profile
-- [ ] Decision: distribution path (self-hosted APK + TestFlight is the recommendation)
-- [ ] If self-hosted APK: new endpoint `/api/v1/mobile/release/latest` returning `{ version, sha256, url, mandatory }`
-- [ ] If self-hosted APK: boot-time version check in `mobile/src/app.ts` with in-app "update available" prompt
-- [ ] `mobile/README.md` — build + sign + distribute instructions for both platforms
-- [ ] First internal-distribution APK published + verified on real device
-- [ ] First TestFlight build accepted by App Store Connect
+- [ ] `src/routes/setup/+page.ts` — gate: 404 unless `isNativePlatform()`
+- [ ] `src/routes/setup/+page.svelte` — URL input + "Test connection" (`/healthz`) → `/api/v1/auth/status` → conditional username/password → save prefs + `set_api_base` + `goto("/")`
+- [ ] Setup-screen component test (health OK + auth-off skip; auth-on reveals creds + login)
 
-## Verification gates
+## Phase 5 — wallpaper plugin contract + detail UI
 
-- [ ] `bun run check` clean (no regression)
+- [ ] `src/lib/client/mobile/wallpaper.ts` — `WallpaperPlugin` interface + `registerPlugin("Wallpaper")`
+- [ ] Wire "Set as wallpaper" into `src/routes/(app)/images/[id]/+page.svelte` — target picker (Android) / explainer dialog (iOS) / hidden on web
+- [ ] Detail-UI test — platform mocked native, asserts plugin called with correct `target`
+
+## Phase 6 — release manifest endpoint
+
+- [ ] `$lib/schemas/mobile/ReleaseLatest` — `{ version, sha256, url, mandatory }`
+- [ ] `GET /api/v1/mobile/release/latest` route + service stub + test
+- [ ] Boot-time version check + in-app "update available" prompt (testable TS; `mandatory` → blocking)
+
+## Verification gates (all machine-checkable)
+
+- [ ] `bun run check` clean
 - [ ] `bun test` green
 - [ ] `bunx eslint .` zero errors
 - [ ] `bunx prettier --check .` clean
-- [ ] Phase 4: both adapter builds succeed; CI catches regressions on each
-- [ ] Phase 5: emulator setup flow saves URL + loads gallery
-- [ ] Phase 6: wallpaper actually changes on Android device/emulator
-- [ ] Phase 6: iOS share-sheet flow verified by user
-- [ ] Phase 7: APK installs and runs on stock Android; TestFlight accepts iOS build
+- [ ] `bun run build` + `bun run build:mobile` both succeed
+- [ ] CI catches static-build regression
 - [ ] `lefthook` pre-commit + commit-msg pass at every commit
 
 ## Commit + push (one per phase)
 
-- [ ] Phase 4: `feat(mobile-shell): dual adapter build (Bun web + static mobile)`
-- [ ] Phase 5: `feat(mobile-shell): Capacitor scaffold + dynamic base URL setup screen`
-- [ ] Phase 6: `feat(mobile-wallpaper): native WallpaperManager plugin (Android) + save-to-Photos (iOS)`
-- [ ] Phase 7: `feat(mobile-release): Android signing + iOS provisioning + distribution wiring`
+- [ ] Phase 1: `feat(mobile-shell): dual adapter build (Bun web + static mobile)`
+- [ ] Phase 2: `feat(mobile-shell): login returns Bearer token + public auth/status endpoint`
+- [ ] Phase 3: `feat(mobile-shell): mobile boot + fetcher Bearer injection + auth mutation hook`
+- [ ] Phase 4: `feat(mobile-shell): unified setup/login screen (base URL + conditional creds)`
+- [ ] Phase 5: `feat(mobile-shell): wallpaper plugin TS contract + detail-screen wiring`
+- [ ] Phase 6: `feat(mobile-shell): self-hosted release manifest endpoint + update check`
 - [ ] `Status: done` in IMPLEMENTATION.md
 - [ ] README index updated for `016-mobile-shell`
 - [ ] Bookkeeping: `chore(plans): mark 016-mobile-shell done`

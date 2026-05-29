@@ -87,8 +87,16 @@ authoritative checklist for the slice.
 | `013-webui-runs`            | done                   | Run dashboard with SSE live updates and per-subscription history                                             |
 | `014-ui-theme`              | done                   | Warm Catppuccin Mocha Latte primary + Mocha dark + cycling theme toggle                                      |
 | `015-shared-ui`             | done                   | Presenter + hook + thin container split, dynamic API base, universal load, SPA superforms (web-only outcome) |
-| `016-mobile-shell`          | not-started (deferred) | Dual adapter build, Capacitor scaffold, native wallpaper plugin, internal distribution                       |
+| `016-mobile-shell`          | not-started            | Mobile web shell (loop-able): dual adapter, Bearer login, setup/login screen, plugin TS contract, release endpoint |
 | `017-device-form-polish`    | done                   | Native res columns + AR auto-derive + tolerance UI + slug auto-gen + muted placeholder                       |
 | `018-ar-tolerance-percent`  | done                   | AR tolerance is fractional percent (not absolute delta); UI displays as %                                    |
+| `019-native-shell`          | deferred (human-gated) | Capacitor scaffold + native Kotlin/Swift wallpaper plugin + signing + APK/TestFlight distribution            |
 
-Completion promise (last slice emits): `<promise>WALLRUS-MVP-COMPLETE</promise>`.
+Completion promise (last loop-able slice emits): `<promise>WALLRUS-MVP-COMPLETE</promise>`.
+
+**Loop-scope note:** slices marked `deferred (human-gated)` (e.g.
+`019-native-shell`) require a native toolchain / physical device / human
+sign-off and are **excluded** from the `WALLRUS-MVP-COMPLETE` index check.
+The Ralph loop emits the promise when every *non-human-gated* slice is
+`done`; it must never attempt to drive a human-gated slice (it would jam
+at `blocked`). See `019-native-shell/IMPLEMENTATION.md`.
