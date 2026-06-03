@@ -87,7 +87,7 @@ authoritative checklist for the slice.
 | `013-webui-runs`            | done                   | Run dashboard with SSE live updates and per-subscription history                                             |
 | `014-ui-theme`              | done                   | Warm Catppuccin Mocha Latte primary + Mocha dark + cycling theme toggle                                      |
 | `015-shared-ui`             | done                   | Presenter + hook + thin container split, dynamic API base, universal load, SPA superforms (web-only outcome) |
-| `016-mobile-shell`          | not-started            | Mobile web shell (loop-able): dual adapter, Bearer login, setup/login screen, plugin TS contract, release endpoint |
+| `016-mobile-shell`          | done                   | Mobile web shell (loop-able): dual adapter, Bearer login, setup/login screen, plugin TS contract, release endpoint |
 | `017-device-form-polish`    | done                   | Native res columns + AR auto-derive + tolerance UI + slug auto-gen + muted placeholder                       |
 | `018-ar-tolerance-percent`  | done                   | AR tolerance is fractional percent (not absolute delta); UI displays as %                                    |
 | `019-native-shell`          | deferred (human-gated) | Capacitor scaffold + native Kotlin/Swift wallpaper plugin + signing + APK/TestFlight distribution            |

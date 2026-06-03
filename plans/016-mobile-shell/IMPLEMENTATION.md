@@ -2,7 +2,7 @@
 
 ## Status
 
-**not-started** — Ralph-loop-able. Every gate in this slice is
+**done** — All 6 phases landed and pushed. Every gate in this slice is
 machine-checkable (`bun run check` / `bun test` / `eslint` / `prettier` /
 both adapter builds), so the loop can build AND close it without a
 device, emulator, native toolchain, or human in the loop.
