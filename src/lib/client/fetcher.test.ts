@@ -5,10 +5,37 @@
  *   - Empty base (default) → relative URL passed to fetch (web same-origin no-op)
  *   - Non-empty base → absolute URL prefixed
  *   - RequestInit is forwarded to the underlying fetch
+ *   - Native branch: Authorization: Bearer header injected from stored auth_token
+ *   - Web branch: no Authorization header (cookie path unchanged)
  */
 
-import { afterEach, describe, expect, test } from "bun:test"
+import { afterEach, describe, expect, mock, test } from "bun:test"
 import { set_api_base } from "./config"
+
+// ---------------------------------------------------------------------------
+// Mock @capacitor/preferences (shared across all tests)
+// ---------------------------------------------------------------------------
+
+let _mock_token: string | null = null
+
+mock.module("@capacitor/preferences", () => ({
+	Preferences: {
+		get: ({ key }: { key: string }) =>
+			Promise.resolve({ value: key === "auth_token" ? _mock_token : null }),
+		set: () => Promise.resolve(),
+		remove: () => Promise.resolve(),
+	},
+}))
+
+// ---------------------------------------------------------------------------
+// Mock platform seam (shared across all tests)
+// ---------------------------------------------------------------------------
+
+let _is_native = false
+
+mock.module("$lib/client/mobile/platform", () => ({
+	isNativePlatform: () => _is_native,
+}))
 
 // ---------------------------------------------------------------------------
 // Fake fetch
@@ -43,11 +70,13 @@ globalThis.fetch = proxy_fetch as typeof fetch
 
 afterEach(() => {
 	_fetch_stub = null
+	_is_native = false
+	_mock_token = null
 	set_api_base("")
 })
 
 // ---------------------------------------------------------------------------
-// Tests
+// Web path tests (existing + extended)
 // ---------------------------------------------------------------------------
 
 describe("apiFetch() — empty base (web same-origin)", () => {
@@ -129,5 +158,80 @@ describe("apiFetch() — RequestInit forwarding", () => {
 		await apiFetch("/api/v1/devices")
 
 		expect(calls[0]!.init).toBeUndefined()
+	})
+})
+
+// ---------------------------------------------------------------------------
+// Native branch — Bearer injection
+// ---------------------------------------------------------------------------
+
+describe("apiFetch() — native platform with auth_token", () => {
+	test("injects Authorization: Bearer header when token is stored", async () => {
+		_is_native = true
+		_mock_token = "test-jwt-token"
+		set_api_base("http://192.168.1.100:5173")
+
+		const capturedInits: RequestInit[] = []
+		const fake_fetch = (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+			capturedInits.push(init ?? {})
+			return Promise.resolve(new Response("ok", { status: 200 }))
+		}
+		_fetch_stub = fake_fetch as unknown as typeof fetch
+
+		const { apiFetch } = await import("./fetcher")
+		await apiFetch("/api/v1/devices")
+
+		expect(capturedInits).toHaveLength(1)
+		const headers = new Headers(capturedInits[0]!.headers)
+		expect(headers.get("Authorization")).toBe("Bearer test-jwt-token")
+	})
+
+	test("preserves caller headers while injecting Bearer", async () => {
+		_is_native = true
+		_mock_token = "my-token"
+		set_api_base("http://192.168.1.100:5173")
+
+		const capturedInits: RequestInit[] = []
+		const fake_fetch = (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+			capturedInits.push(init ?? {})
+			return Promise.resolve(new Response("ok", { status: 200 }))
+		}
+		_fetch_stub = fake_fetch as unknown as typeof fetch
+
+		const { apiFetch } = await import("./fetcher")
+		await apiFetch("/api/v1/devices", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+		})
+
+		const headers = new Headers(capturedInits[0]!.headers)
+		expect(headers.get("Authorization")).toBe("Bearer my-token")
+		expect(headers.get("Content-Type")).toBe("application/json")
+	})
+})
+
+// ---------------------------------------------------------------------------
+// Web branch — no Bearer injection
+// ---------------------------------------------------------------------------
+
+describe("apiFetch() — web platform (no Bearer)", () => {
+	test("does not inject Authorization header on web", async () => {
+		_is_native = false
+		_mock_token = "should-not-be-used"
+
+		const capturedInits: (RequestInit | undefined)[] = []
+		const fake_fetch = (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+			capturedInits.push(init)
+			return Promise.resolve(new Response("ok", { status: 200 }))
+		}
+		_fetch_stub = fake_fetch as unknown as typeof fetch
+
+		const { apiFetch } = await import("./fetcher")
+		await apiFetch("/api/v1/devices")
+
+		expect(capturedInits).toHaveLength(1)
+		// init is undefined (no headers object was created)
+		const headers = new Headers(capturedInits[0]?.headers)
+		expect(headers.get("Authorization")).toBeNull()
 	})
 })
