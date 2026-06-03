@@ -21,6 +21,7 @@ const EXACT_ALLOWLIST = new Set([
 	"/login",
 	"/api/v1/auth/login",
 	"/api/v1/auth/logout",
+	"/api/v1/auth/status",
 	"/favicon.ico",
 	"/favicon.svg",
 ])

@@ -7,6 +7,9 @@ export const LoginRequestSchema = z.object({
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>
 
-export const LoginResponseSchema = z.object({})
+export const LoginResponseSchema = z.object({
+	access_token: z.string().min(1),
+	expires_at: z.number().int().positive(),
+})
 
 export type LoginResponse = z.infer<typeof LoginResponseSchema>

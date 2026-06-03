@@ -6,6 +6,9 @@ import { sign_session } from "$lib/server/auth/jwt"
 import { set_session_cookie } from "$lib/server/auth/cookie"
 import { LoginRequestSchema } from "$lib/schemas/auth/Login"
 
+/** JWT TTL in seconds — mirrors the value in jwt.ts. */
+const JWT_TTL_SECONDS = 30 * 24 * 60 * 60
+
 export const POST: RequestHandler = async (event) => {
 	// Rate limit check — performed before any credential access.
 	let ip: string
@@ -86,8 +89,18 @@ export const POST: RequestHandler = async (event) => {
 
 	// Success — sign JWT, set cookie, clear rate-limit counter.
 	reset(ip)
+	const now_ms = Date.now()
 	const token = await sign_session({ username, secret: e.WALLRUS_AUTH_SECRET! })
 	set_session_cookie(event, token)
 
-	return new Response(null, { status: 204 })
+	// Also return the token + expiry in the response body so the native mobile
+	// client (Capacitor webview) can store and inject it as a Bearer header.
+	// The web path keeps using the cookie; having both on the same response is
+	// harmless and avoids a separate mobile-only endpoint.
+	const expires_at = now_ms + JWT_TTL_SECONDS * 1000
+
+	return new Response(JSON.stringify({ access_token: token, expires_at }), {
+		status: 200,
+		headers: { "content-type": "application/json" },
+	})
 }

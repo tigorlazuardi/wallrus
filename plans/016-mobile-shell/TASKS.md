@@ -7,18 +7,18 @@
 
 ## Phase 1 — dual adapter build
 
-- [ ] `bun add -d @sveltejs/adapter-static`
-- [ ] `svelte.config.js` — adapter switch on `WALLRUS_ADAPTER === "static"`, static output to `build-mobile/` with SPA `index.html` fallback
-- [ ] `package.json` — `"build:mobile": "WALLRUS_ADAPTER=static bun --bun vite build"`
-- [ ] `bun run build` (web) + `bun run build:mobile` (static) both succeed locally
-- [ ] CI workflow runs both builds; static build failure breaks the build
+- [x] `bun add -d @sveltejs/adapter-static`
+- [x] `svelte.config.js` — adapter switch on `WALLRUS_ADAPTER === "static"`, static output to `build-mobile/` with SPA `index.html` fallback
+- [x] `package.json` — `"build:mobile": "WALLRUS_ADAPTER=static bun --bun vite build"`
+- [x] `bun run build` (web) + `bun run build:mobile` (static) both succeed locally
+- [x] CI workflow runs both builds; static build failure breaks the build
 
 ## Phase 2 — backend auth for mobile
 
-- [ ] `LoginResponseSchema` (`{ access_token, expires_at }`) at `$lib/schemas/auth/Login`
-- [ ] `src/routes/api/v1/auth/login/+server.ts` — return `{ access_token, expires_at }` body AND keep `Set-Cookie`; auth-disabled path stays `204`
-- [ ] `login.test.ts` — assert body matches schema + cookie still set (auth on); assert `204` no token (auth off)
-- [ ] `GET /api/v1/auth/status` → `{ auth_enabled }` (public, un-gated) + test for both env states
+- [x] `LoginResponseSchema` (`{ access_token, expires_at }`) at `$lib/schemas/auth/Login`
+- [x] `src/routes/api/v1/auth/login/+server.ts` — return `{ access_token, expires_at }` body AND keep `Set-Cookie`; auth-disabled path stays `204`
+- [x] `login.test.ts` — assert body matches schema + cookie still set (auth on); assert `204` no token (auth off)
+- [x] `GET /api/v1/auth/status` → `{ auth_enabled }` (public, un-gated) + test for both env states
 
 ## Phase 3 — mobile boot + fetcher + auth hook
 

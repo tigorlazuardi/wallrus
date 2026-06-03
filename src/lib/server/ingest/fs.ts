@@ -12,7 +12,6 @@
 import { copyFileSync, unlinkSync } from "node:fs"
 import { link, copyFile } from "node:fs/promises"
 import { renameSync } from "node:fs"
-import sharp from "sharp"
 
 // ---------------------------------------------------------------------------
 // atomic_write
@@ -82,6 +81,11 @@ export async function link_or_copy(src: string, dst: string): Promise<void> {
  * The caller is responsible for ensuring `thumb_path`'s parent directory exists.
  */
 export async function compute_thumbnail(blob_path: string, thumb_path: string): Promise<void> {
+	// Dynamic import so the native addon is only loaded at call time, not at
+	// module evaluation time. This prevents the static adapter build from
+	// crashing when it runs the SSR bundle to generate the SPA fallback HTML —
+	// sharp's native binary is unavailable in that build environment.
+	const { default: sharp } = await import("sharp")
 	await sharp(blob_path)
 		.rotate()
 		.resize(512, 512, { fit: "inside", withoutEnlargement: true })
