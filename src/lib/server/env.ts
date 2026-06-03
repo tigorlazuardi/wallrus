@@ -24,6 +24,15 @@ const RawEnv = z
 			.default("false")
 			.transform((v) => v === "true"),
 
+		// Mobile release manifest — all optional; omit to disable update checks.
+		WALLRUS_MOBILE_RELEASE_VERSION: z.string().optional(),
+		WALLRUS_MOBILE_RELEASE_SHA256: z.string().optional(),
+		WALLRUS_MOBILE_RELEASE_URL: z.string().optional(),
+		WALLRUS_MOBILE_RELEASE_MANDATORY: z
+			.union([z.literal("true"), z.literal("false")])
+			.default("false")
+			.transform((v) => v === "true"),
+
 		// Browser → /otlp proxy gate. See `.claude/rules/telemetry.md` §Browser
 		// telemetry proxy. `enable` mirrors the main auth posture, `auth`
 		// forces authenticated submission, `disable` turns the proxy off.

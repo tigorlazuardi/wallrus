@@ -28,6 +28,7 @@ function make_env(overrides: Partial<Env>): Env {
 		WALLRUS_AUTH_SECRET: "x".repeat(32),
 		WALLRUS_JWT_TTL_DAYS: 30,
 		WALLRUS_TRUST_PROXY: false,
+		WALLRUS_MOBILE_RELEASE_MANDATORY: false,
 		WALLRUS_OTEL_FRONTEND: "enable",
 		OTEL_SERVICE_NAME: "wallrus",
 		password_hash: undefined,

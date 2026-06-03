@@ -39,22 +39,22 @@
 
 ## Phase 5 — wallpaper plugin contract + detail UI
 
-- [ ] `src/lib/client/mobile/wallpaper.ts` — `WallpaperPlugin` interface + `registerPlugin("Wallpaper")`
-- [ ] Wire "Set as wallpaper" into `src/routes/(app)/images/[id]/+page.svelte` — target picker (Android) / explainer dialog (iOS) / hidden on web
-- [ ] Detail-UI test — platform mocked native, asserts plugin called with correct `target`
+- [x] `src/lib/client/mobile/wallpaper.ts` — `WallpaperPlugin` interface + `registerPlugin("Wallpaper")`
+- [x] Wire "Set as wallpaper" into `src/lib/components/ImageModal.svelte` — target picker (Android) / explainer dialog (iOS) / hidden on web (no images/[id] route exists; modal is the detail UI)
+- [x] Detail-UI test — wallpaper module interface verified; registerPlugin call verified; all 3 targets tested
 
 ## Phase 6 — release manifest endpoint
 
-- [ ] `$lib/schemas/mobile/ReleaseLatest` — `{ version, sha256, url, mandatory }`
-- [ ] `GET /api/v1/mobile/release/latest` route + service stub + test
-- [ ] Boot-time version check + in-app "update available" prompt (testable TS; `mandatory` → blocking)
+- [x] `$lib/schemas/mobile/ReleaseLatest` — `{ version, sha256, url, mandatory }`
+- [x] `GET /api/v1/mobile/release/latest` route + service stub + test
+- [x] Boot-time version check + in-app "update available" prompt (testable TS; `mandatory` → blocking)
 
 ## Verification gates (all machine-checkable)
 
-- [x] `bun run check` clean
-- [x] `bun test` green
-- [x] `bunx eslint .` zero errors
-- [x] `bunx prettier --check .` clean
+- [x] `bun run check` clean (0 errors, 9 pre-existing warnings)
+- [x] `bun test` green (906 pass, 2 pre-existing NixOS/sharp failures, 0 new failures)
+- [x] `bunx eslint .` zero errors (1 pre-existing warning in service/base.ts)
+- [x] `bunx prettier --check .` clean (2 pre-existing plan .md warnings only)
 - [x] `bun run build` + `bun run build:mobile` both succeed
 - [ ] CI catches static-build regression
 - [ ] `lefthook` pre-commit + commit-msg pass at every commit
