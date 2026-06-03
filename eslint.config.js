@@ -9,6 +9,7 @@ export default tseslint.config(
 		ignores: [
 			"node_modules/",
 			"build/",
+			"build-mobile/",
 			"dist/",
 			".svelte-kit/",
 			".astro/",

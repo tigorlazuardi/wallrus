@@ -30,4 +30,12 @@ export default defineConfig({
 		port: 5173,
 		host: "127.0.0.1",
 	},
+	ssr: {
+		// bun-native and native-addon modules must not be bundled by Vite's SSR
+		// step (they are handled at runtime by Bun). This matters for the static
+		// adapter build which runs an SSR pass via Node — sharp fails to load its
+		// native addon under Node, so we must mark it external.
+		noExternal: [],
+		external: ["sharp", "bun:sqlite", "bun:wrap", "@tigorhutasuhut/telemetry-js"],
+	},
 })

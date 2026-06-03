@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "static/**"
+      - "drizzle/**"
+      - "package.json"
+      - "bun.lock"
+      - "svelte.config.*"
+      - "vite.config.*"
+      - "tailwind.config.*"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Type-check
+        run: bun run check
+
+      - name: Tests
+        run: bun test
+
+      - name: Lint
+        run: bunx eslint .
+
+      - name: Format check
+        run: bunx prettier --check .
+
+      - name: Build (web — Bun adapter)
+        run: bun run build
+
+      - name: Build (mobile — static SPA adapter)
+        run: bun run build:mobile

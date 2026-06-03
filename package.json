@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bun --bun vite dev",
     "build": "bun --bun vite build",
+    "build:mobile": "WALLRUS_ADAPTER=static bun --bun vite build",
     "preview": "bun --bun vite preview",
     "serve": "bun run src/cli.ts serve",
     "test": "bun test",
@@ -38,6 +39,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@sveltejs/adapter-static": "3.0.10",
     "@commitlint/cli": "21.0.1",
     "@commitlint/config-conventional": "21.0.1",
     "@eslint/js": "10.0.1",
