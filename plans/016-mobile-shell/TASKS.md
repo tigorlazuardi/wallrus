@@ -22,20 +22,20 @@
 
 ## Phase 3 — mobile boot + fetcher + auth hook
 
-- [ ] `bun add @capacitor/core @capacitor/preferences`
-- [ ] `src/lib/client/mobile/platform.ts` — `isNativePlatform()` wrapper (single mock seam)
-- [ ] `src/lib/client/mobile/boot.ts` — read `api_base`/`auth_token` from Preferences → `set_api_base()`; return next route (`/setup` vs `/`)
-- [ ] `src/lib/client/mobile/boot.test.ts` — both branches (configured vs first-launch)
-- [ ] `src/lib/client/fetcher.ts` — Bearer header on native (read `auth_token`), web cookie path unchanged
-- [ ] `src/lib/client/fetcher.test.ts` — extend to cover native (Bearer) + web (no Bearer) via mocked `platform.ts`
-- [ ] `src/lib/client/auth/use-auth-mutation.svelte.ts` — `login()` posts creds, stores `auth_token` on native
-- [ ] `src/lib/client/auth/use-auth-mutation.test.ts`
+- [x] `bun add @capacitor/core @capacitor/preferences`
+- [x] `src/lib/client/mobile/platform.ts` — `isNativePlatform()` wrapper (single mock seam)
+- [x] `src/lib/client/mobile/boot.ts` — read `api_base`/`auth_token` from Preferences → `set_api_base()`; return next route (`/setup` vs `/`)
+- [x] `src/lib/client/mobile/boot.test.ts` — both branches (configured vs first-launch)
+- [x] `src/lib/client/fetcher.ts` — Bearer header on native (read `auth_token`), web cookie path unchanged
+- [x] `src/lib/client/fetcher.test.ts` — extend to cover native (Bearer) + web (no Bearer) via mocked `platform.ts`
+- [x] `src/lib/client/auth/use-auth-mutation.svelte.ts` — `login()` posts creds, stores `auth_token` on native
+- [x] `src/lib/client/auth/use-auth-mutation.test.ts`
 
 ## Phase 4 — setup/login screen
 
-- [ ] `src/routes/setup/+page.ts` — gate: 404 unless `isNativePlatform()`
-- [ ] `src/routes/setup/+page.svelte` — URL input + "Test connection" (`/healthz`) → `/api/v1/auth/status` → conditional username/password → save prefs + `set_api_base` + `goto("/")`
-- [ ] Setup-screen component test (health OK + auth-off skip; auth-on reveals creds + login)
+- [x] `src/routes/setup/+page.ts` — gate: 404 unless `isNativePlatform()`
+- [x] `src/routes/setup/+page.svelte` — URL input + "Test connection" (`/healthz`) → `/api/v1/auth/status` → conditional username/password → save prefs + `set_api_base` + `goto("/")`
+- [-] Setup-screen component test (health OK + auth-off skip; auth-on reveals creds + login) — SKIPPED: no vitest harness; project uses bun:test only. Svelte rune compilation not available in bun:test. Critical paths covered by use-auth-mutation.test.ts + boot.test.ts. See .builder-notes.md.
 
 ## Phase 5 — wallpaper plugin contract + detail UI
 
@@ -51,11 +51,11 @@
 
 ## Verification gates (all machine-checkable)
 
-- [ ] `bun run check` clean
-- [ ] `bun test` green
-- [ ] `bunx eslint .` zero errors
-- [ ] `bunx prettier --check .` clean
-- [ ] `bun run build` + `bun run build:mobile` both succeed
+- [x] `bun run check` clean
+- [x] `bun test` green
+- [x] `bunx eslint .` zero errors
+- [x] `bunx prettier --check .` clean
+- [x] `bun run build` + `bun run build:mobile` both succeed
 - [ ] CI catches static-build regression
 - [ ] `lefthook` pre-commit + commit-msg pass at every commit
 
