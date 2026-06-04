@@ -18,14 +18,20 @@
 	let filter_criteria = $state<DeviceFilters>(
 		untrack(() => data.device?.filter_criteria ?? { nsfw: "all" }),
 	)
+	// Native resolution — top-level device fields (not part of filter_criteria).
+	// Seed once from load; FilterEditor owns subsequent edits.
+	let native_width = $state<number | null>(untrack(() => data.device?.native_width ?? null))
+	let native_height = $state<number | null>(untrack(() => data.device?.native_height ?? null))
 	let save_status = $state<"idle" | "saving" | "saved" | "error">("idle")
 	let save_error = $state<string | null>(null)
 	let save_timer: ReturnType<typeof setTimeout> | undefined
 
 	// Debounced PATCH on filter change
 	$effect(() => {
-		// Capture current value — creates reactive dependency
+		// Capture current values — creates reactive dependencies
 		const current = filter_criteria
+		const nw = native_width
+		const nh = native_height
 		const device = device_state.data
 		if (!device) return
 
@@ -37,6 +43,8 @@
 				await useDeviceMutation().update({
 					id: device.id,
 					filter_criteria: current,
+					native_width: nw,
+					native_height: nh,
 				})
 				save_status = "saved"
 				setTimeout(() => {
@@ -116,7 +124,12 @@
 			<div
 				class="rounded-[var(--radius)] border border-[var(--color-glass-border)] bg-[var(--color-surface)] p-4"
 			>
-				<FilterEditor bind:value={filter_criteria} />
+				<FilterEditor
+					bind:value={filter_criteria}
+					bind:native_width
+					bind:native_height
+					ar_target_dirty_init={true}
+				/>
 			</div>
 		</section>
 
