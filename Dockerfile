@@ -44,6 +44,11 @@ COPY --from=deps   --chown=wallrus:wallrus /app/node_modules  ./node_modules
 COPY              --chown=wallrus:wallrus package.json bun.lock ./
 COPY              --chown=wallrus:wallrus drizzle             ./drizzle
 COPY              --chown=wallrus:wallrus src                 ./src
+# Bun resolves the `$lib/*` alias at runtime via tsconfig `paths`. The mapping
+# lives in the SvelteKit-generated `.svelte-kit/tsconfig.json`, which the root
+# `tsconfig.json` extends. Ship both so `bun run src/cli.ts` can resolve `$lib`.
+COPY --from=build  --chown=wallrus:wallrus /app/tsconfig.json             ./tsconfig.json
+COPY --from=build  --chown=wallrus:wallrus /app/.svelte-kit/tsconfig.json ./.svelte-kit/tsconfig.json
 
 # Docker-friendly defaults. Override via -e or compose env.
 ENV WALLRUS_DATA_DIR=/data/wallrus \
