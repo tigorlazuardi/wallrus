@@ -50,6 +50,18 @@ wallrus membaca nama env **standar** OpenTelemetry. Gunakan variabel yang sama y
 | ----------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `WALLRUS_OTEL_FRONTEND` | `enable` | Salah satu dari `enable`, `auth`, `disable`. Mengontrol proxy `/otlp` yang meneruskan sinyal OTel browser ke upstream. Lihat [Telemetry browser](./browser-telemetry/) untuk matriks posture lengkap. |
 
+## User container (Docker)
+
+Variabel-variabel ini dibaca oleh skrip entrypoint container — **bukan** oleh aplikasi wallrus itu sendiri. Tidak berpengaruh di luar Docker.
+
+| Variabel | Default | Deskripsi                                                                                                                                                              |
+| -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PUID`   | `1000`  | Numeric user ID yang dipakai daemon. Entrypoint men-`chown` `/data/wallrus` ke UID ini saat startup, lalu melepas hak root sebelum daemon berjalan.                    |
+| `PGID`   | `1000`  | Numeric group ID. File dan direktori dimiliki oleh GID ini, sehingga siapa pun dalam grup tersebut (mis. Samba, Syncthing) bisa membaca koleksi gambar.                |
+| `UMASK`  | `027`   | Masker pembuatan file di dalam container. `027` menghasilkan `0750` untuk direktori dan `0640` untuk file. DB kredensial (`wallrus.db`) selalu `0600` bagaimanapun. |
+
+Default (`1000:1000`) cocok dengan user non-root pertama di kebanyakan distro desktop dan NAS — tidak perlu diubah kecuali host kamu menggunakan UID/GID berbeda.
+
 ## Perilaku fail-fast
 
 Bila `WALLRUS_AUTH_ENABLE=true` dan salah satu dari tiga env kredensial

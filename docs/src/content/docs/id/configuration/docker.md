@@ -39,6 +39,29 @@ volumes:
     driver: local
 ```
 
+## User & permission
+
+Entrypoint container menjalankan `chown -R PUID:PGID /data/wallrus` saat startup (hanya bila ownership belum sesuai), lalu berpindah ke user tersebut sebelum daemon dimulai. Daemon tidak pernah berjalan sebagai root.
+
+Set `PUID` dan `PGID` sesuai ID user host kamu agar koleksi bisa langsung dibaca dari host:
+
+```yaml
+    environment:
+      PUID: "1000"   # host: id -u
+      PGID: "1000"   # host: id -g
+      UMASK: "027"   # opsional, ini adalah default
+```
+
+Model permission di dalam `/data/wallrus`:
+
+| Path                                       | Mode   | Keterangan                                                                                              |
+| ------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------- |
+| `/data/wallrus/` dan direktori device/thumb | `0750` | Akses owner + group; tidak bisa dibaca oleh publik.                                                     |
+| File gambar (`<device-slug>/…`)            | `0640` | Owner baca/tulis, group baca — mudah dibagikan via Samba atau Syncthing.                                |
+| `wallrus.db`, `wallrus.db-wal`, `.db-shm`  | `0600` | Owner saja. DB menyimpan kredensial source dalam plaintext; anggota group tidak bisa membacanya meski bisa melihat isi data dir. |
+
+Ubah `UMASK` hanya bila kamu perlu permission lebih ketat (`077`, hanya owner untuk segalanya) atau lebih longgar (`022`, gambar bisa dibaca publik).
+
 ## Volume
 
 Container mengharapkan data dir di-mount di `/data/wallrus`. Isinya:

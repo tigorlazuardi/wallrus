@@ -51,6 +51,18 @@ wallrus reads the **standard** OpenTelemetry env names. Set the same variables y
 | ------------------------- | -------- | ----------- |
 | `WALLRUS_OTEL_FRONTEND`   | `enable` | One of `enable`, `auth`, `disable`. Controls the `/otlp` proxy that forwards browser OTel signals upstream. See [Browser telemetry](./browser-telemetry/) for the full posture matrix. |
 
+## Container user (Docker)
+
+These variables are read by the container entrypoint script — **not** by the wallrus app itself. They have no effect outside Docker.
+
+| Variable | Default | Description                                                                                                                                              |
+| -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PUID`   | `1000`  | Numeric user ID the daemon runs as. The entrypoint `chown`s `/data/wallrus` to this UID on startup and drops privileges before starting the daemon.     |
+| `PGID`   | `1000`  | Numeric group ID. Files and directories are group-owned by this GID, so any user in that group (e.g. Samba, Syncthing) can read the image collection.   |
+| `UMASK`  | `027`   | File-creation mask applied inside the container. `027` yields `0750` on directories and `0640` on files. The credential DB (`wallrus.db`) is always `0600` regardless. |
+
+The defaults (`1000:1000`) match the first non-root user on most desktop and NAS distros — no change needed unless your host uses a different UID/GID.
+
 ## Fail-fast behavior
 
 When `WALLRUS_AUTH_ENABLE=true` and any of the three credential vars is missing

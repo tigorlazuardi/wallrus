@@ -39,6 +39,29 @@ volumes:
     driver: local
 ```
 
+## User & permissions
+
+The container entrypoint runs `chown -R PUID:PGID /data/wallrus` on startup (only when the ownership doesn't already match), then drops to that user before launching the daemon. The daemon never runs as root.
+
+Set `PUID` and `PGID` to your host user's IDs so the collection is directly readable from the host:
+
+```yaml
+    environment:
+      PUID: "1000"   # host: id -u
+      PGID: "1000"   # host: id -g
+      UMASK: "027"   # optional, this is the default
+```
+
+Permission model inside `/data/wallrus`:
+
+| Path                                       | Mode   | Rationale                                                                          |
+| ------------------------------------------ | ------ | ---------------------------------------------------------------------------------- |
+| `/data/wallrus/` and device/thumb dirs     | `0750` | Owner + group access; no world read.                                               |
+| Image files (`<device-slug>/…`)            | `0640` | Owner read/write, group read — easy sharing via Samba or Syncthing.                |
+| `wallrus.db`, `wallrus.db-wal`, `.db-shm`  | `0600` | Owner-only. The DB holds source credentials in plaintext; group members cannot read it even though they can list the data dir. |
+
+Adjust `UMASK` only if you need stricter (`077`, owner-only for everything) or looser (`022`, world-readable images) permissions.
+
 ## Volume
 
 The container expects the data dir mounted at `/data/wallrus`. Inside:
