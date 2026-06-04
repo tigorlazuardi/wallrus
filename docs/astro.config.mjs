@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config"
 import starlight from "@astrojs/starlight"
+import starlightLlmsTxt from "starlight-llms-txt"
 
 // Project pages deploy: https://<owner>.github.io/wallrus/
 // `site` + `base` produce correct asset URLs under the /wallrus/ subpath.
@@ -37,6 +38,7 @@ export default defineConfig({
 					href: "https://github.com/tigorlazuardi/wallrus",
 				},
 			],
+			plugins: [starlightLlmsTxt()],
 			sidebar: [
 				{
 					label: "Getting started",
