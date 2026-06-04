@@ -84,7 +84,7 @@ function ext_from_url(url: string): KnownExt | undefined {
 }
 
 function ensure_dir(dir_path: string): void {
-	mkdirSync(dir_path, { recursive: true, mode: 0o755 })
+	mkdirSync(dir_path, { recursive: true, mode: 0o750 })
 }
 
 // ---------------------------------------------------------------------------
@@ -478,7 +478,7 @@ export async function run_subscription(runtime: Runtime, subscription_id: string
 							)
 							if (canonical_path === undefined) {
 								await atomic_write(temp_path, device_path)
-								chmodSync(device_path, 0o644)
+								chmodSync(device_path, 0o640)
 								canonical_path = device_path
 							} else {
 								await link_or_copy(canonical_path, device_path)
@@ -553,7 +553,7 @@ export async function run_subscription(runtime: Runtime, subscription_id: string
 						)
 						if (canonical_path === undefined) {
 							await atomic_write(temp_path, device_path)
-							chmodSync(device_path, 0o644)
+							chmodSync(device_path, 0o640)
 							canonical_path = device_path
 						} else {
 							await link_or_copy(canonical_path, device_path)

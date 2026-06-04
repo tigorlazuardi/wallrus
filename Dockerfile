@@ -33,9 +33,7 @@ WORKDIR /app
 
 # Non-root user, owned data dir.
 RUN groupadd -r wallrus && useradd -r -g wallrus -m -d /home/wallrus wallrus \
-	&& mkdir -p /data/wallrus \
-	&& chown -R wallrus:wallrus /data/wallrus \
-	&& chmod 0700 /data/wallrus
+	&& mkdir -p /data/wallrus
 
 # Copy the SvelteKit build output + the production dependency tree + CLI entry
 # + migrations (needed at startup by drizzle-orm/bun-sqlite/migrator).
@@ -53,13 +51,18 @@ COPY --from=build  --chown=wallrus:wallrus /app/.svelte-kit/tsconfig.json ./.sve
 # Docker-friendly defaults. Override via -e or compose env.
 ENV WALLRUS_DATA_DIR=/data/wallrus \
 	WALLRUS_LISTEN_ADDR=0.0.0.0:5173 \
-	NODE_ENV=production
+	NODE_ENV=production \
+	PUID=1000 \
+	PGID=1000 \
+	UMASK=027
 
-USER wallrus
+COPY --chmod=0755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 5173
 VOLUME ["/data/wallrus"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
 	CMD bun -e 'fetch("http://127.0.0.1:5173/healthz").then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))'
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["bun", "run", "src/cli.ts", "serve"]

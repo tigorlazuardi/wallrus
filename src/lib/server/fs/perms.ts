@@ -1,11 +1,13 @@
 import { chmodSync, existsSync, mkdirSync, statSync } from "node:fs"
 import { join } from "node:path"
 
-// Enforce 0700 on the data dir and 0600 on the DB file. Wallrus refuses to
-// start if either is world/group readable — credentials live in plaintext
-// per the source-credentials decision. See `.claude/rules/api.md` §Credentials.
+// Enforce 0750 on the data dir (owner + group, never world) and 0600 on the DB
+// file plus its WAL/SHM sidecars. The data dir is group-readable so an operator
+// group (PGID) can serve images over Samba/syncthing; the DB stays owner-only
+// because source credentials live there in plaintext. See `.claude/rules/api.md`
+// §Credentials.
 
-const MODE_DIR = 0o700
+const MODE_DIR = 0o750
 const MODE_FILE = 0o600
 
 export function ensure_data_dir(base_dir: string) {
@@ -17,9 +19,13 @@ export function ensure_data_dir(base_dir: string) {
 }
 
 export function ensure_db_perms(db_file: string) {
-	if (!existsSync(db_file)) return // first boot — drizzle-kit will create it
-	chmodSync(db_file, MODE_FILE)
-	assert_mode(db_file, MODE_FILE)
+	// db_file plus SQLite's WAL/SHM sidecars. Skip any that don't exist yet
+	// (first boot — drizzle creates the db; WAL/SHM appear on first write).
+	for (const file of [db_file, `${db_file}-wal`, `${db_file}-shm`]) {
+		if (!existsSync(file)) continue
+		chmodSync(file, MODE_FILE)
+		assert_mode(file, MODE_FILE)
+	}
 }
 
 function assert_mode(path: string, expected: number) {

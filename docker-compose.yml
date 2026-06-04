@@ -18,6 +18,11 @@ services:
     ports:
       - "5173:5173"
     environment:
+      # Host user/group that owns the data dir + serves it (Samba/syncthing).
+      # Default 1000:1000. UMASK 027 => dirs 0750, files 0640 (group read, no world).
+      PUID: 1000
+      PGID: 1000
+      UMASK: "027"
       WALLRUS_AUTH_ENABLE: "false"
       # WALLRUS_USERNAME: "admin"
       # WALLRUS_PASSWORD: "change-me"
