@@ -24,6 +24,8 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/preferences": "^8.0.1",
     "@sveltejs/kit": "2.61.1",
     "@tigorhutasuhut/telemetry-js": "^1.10.0",
     "bits-ui": "2.18.1",
