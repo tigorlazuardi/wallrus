@@ -7,7 +7,16 @@
 import { EventEmitter } from "node:events"
 import type { RunHistoryRow } from "$lib/server/db/schema"
 
-const emitter = new EventEmitter()
+// Stored on `globalThis` so the same emitter is shared between the cli.ts module
+// graph (scheduler/ingest call `emit_update`) and the bundled SvelteKit build
+// graph (the SSE route `/api/v1/runs/stream` calls `subscribe`). Without this
+// the two graphs hold separate emitters and run updates never reach SSE
+// clients. Mirrors the globalThis pattern in `runtime.ts` / `_registry.ts`.
+declare global {
+	var __wallrus_runs_emitter__: EventEmitter | undefined
+}
+
+const emitter: EventEmitter = (globalThis.__wallrus_runs_emitter__ ??= new EventEmitter())
 
 // Increase the default listener limit — a busy server may have many SSE
 // clients concurrently subscribed.
