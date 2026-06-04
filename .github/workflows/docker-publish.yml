@@ -66,3 +66,15 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger deploy webhook
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          WEBHOOK_USER: ${{ secrets.DEPLOY_WEBHOOK_USER }}
+          WEBHOOK_PASSWORD: ${{ secrets.DEPLOY_WEBHOOK_PASSWORD }}
+        run: |
+          curl -fsS --retry 3 --retry-delay 5 --max-time 30 \
+            -X POST \
+            -u "${WEBHOOK_USER}:${WEBHOOK_PASSWORD}" \
+            https://webhook.tigor.web.id/hooks/deploy-wallrus
