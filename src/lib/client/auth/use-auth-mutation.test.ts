@@ -126,7 +126,8 @@ describe("useAuthMutation().login() — web platform", () => {
 
 describe("useAuthMutation().login() — error handling", () => {
 	test("throws on 401 response", async () => {
-		_api_fetch_override = () => Promise.resolve(new Response("invalid_credentials", { status: 401 }))
+		_api_fetch_override = () =>
+			Promise.resolve(new Response("invalid_credentials", { status: 401 }))
 
 		const { useAuthMutation } = await import("./use-auth-mutation.svelte")
 		const { login } = useAuthMutation()

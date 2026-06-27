@@ -20,3 +20,6 @@ drizzle/migrations
 
 # Starlight user docs site has its own format lifecycle
 docs/
+
+# Internal planning docs — historical record, not shipped code
+plans/
