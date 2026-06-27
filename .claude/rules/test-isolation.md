@@ -67,4 +67,3 @@ later hook test). Rules below are non-negotiable.
   or made benign in `afterEach`/`afterAll`?
 - Would my file still pass if it ran **first** in the suite? Verify:
   `bun test path/to/my.test.ts path/to/some-other-hook.test.ts` (mine first) → 0 fail.
-</content>
